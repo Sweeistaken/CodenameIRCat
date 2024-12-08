@@ -1,0 +1,3 @@
+# IRCat
+
+IRCd in Python
