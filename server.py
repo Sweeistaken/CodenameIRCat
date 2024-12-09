@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-__version__ = "0.0.1-preview"
+__version__ = "0.0.1-pre-alpha"
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, threading, traceback, sys, os, yaml
@@ -60,6 +60,7 @@ def session(connection, client):
                     elif text.split(" ")[0] == "USER":
                         if not ready:
                             username = text.split(" ")[1]
+                            ready = True
                     elif (ready and already_set) and not finished:
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
