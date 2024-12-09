@@ -69,7 +69,7 @@ def session(connection, client):
                     if command == "NICK":
                         pending = text.split(" ")[1]
                         if pending[0] == ":": pending[1:]
-                        if pending in nickname_list or pending in reserved:
+                        if pending.lower() in lower_nicks or pending in reserved:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
                         else:
@@ -86,6 +86,7 @@ def session(connection, client):
                     elif (ready and already_set) and not finished:
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw"}
+                        lower_nicks[pending.lower()] = pending
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
@@ -155,11 +156,11 @@ def session(connection, client):
 
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
-                            target = args[0]
-                            who_user = property_list[target]["username"]
-                            who_realname = property_list[target]["realname"]
-                            who_host = property_list[target]["host"]
-                            if args[0] in property_list:
+                            target = text.split(" ")[1]
+                            if target in property_list:
+                                who_user = property_list[target]["username"]
+                                who_realname = property_list[target]["realname"]
+                                who_host = property_list[target]["host"]
                                 connection.sendall(bytes(f":{server} 311 {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 312 {target} {server} :{identifier}\r\n","UTF-8"))
                                 #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
@@ -247,6 +248,7 @@ def session(connection, client):
     if pending != "*":
         del nickname_list[pending]
         del property_list[pending]
+        del lower_nicks[pending.lower()]
     if not safe_quit:
         done = []
         for i, users in channels_list.items():
