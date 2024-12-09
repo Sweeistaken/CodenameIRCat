@@ -20,7 +20,7 @@ with open(sys.argv[1], 'r') as file:
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server_address = ('0.0.0.0', 6667)
+server_address = ('', 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
 nickname_list = {} # Stores nicknames and the respective sockets
