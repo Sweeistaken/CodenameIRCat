@@ -226,6 +226,7 @@ def session(connection, client):
         del nickname_list[pending]
         del property_list[pending]
     if not safe_quit:
+        done = []
         for i, users in channels_list.items():
             if pending in users:
                 for j in users:
