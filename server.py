@@ -33,10 +33,11 @@ def session(connection, client):
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
-    username = "oreo"
-    hostname = ""
-    realname = "realname"
-    safe_quit = False
+    username = "oreo" # Username/ident specified by client
+    hostname = "" # Hostname, can be IP or domain
+    realname = "realname" # Realname specified by client
+    safe_quit = False # If the client safely exited, or if the server should manually drop the connection
+    cause = "Unknown" # The cause of the unexpected exit
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -215,8 +216,9 @@ def session(connection, client):
                     
                     
                         
-            except:
+            except Exception as ex:
                 print(traceback.format_exc())
+                cause = str(ex)
                 break
             
             if not data:
@@ -232,7 +234,7 @@ def session(connection, client):
             if pending in users:
                 for j in users:
                     if j != pending and not j in done:
-                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :Error, possibly disconnected.\r\n","UTF-8"))
+                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :Read error: {cause}\r\n","UTF-8"))
                         done.append(j)
                 # Remove the quitting user from the channel.
                 try:
