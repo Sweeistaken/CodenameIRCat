@@ -163,12 +163,18 @@ def session(connection, client):
                             connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
+
+
+
+                        # Ignore empty text
+                        elif text.split(" ")[0] == "":
+                            pass
+                        else:
+                            # Unknown command
+                            cmd = text.split(" ")[0]
+                            connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
                     
-                    elif text.split(" ")[0] == "":
-                        pass
-                    else:
-                        cmd = text.split(" ")[0]
-                        connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
+                    
                         
             except:
                 print(traceback.format_exc())
