@@ -50,6 +50,8 @@ def session(connection, client):
                 command = text.split(" ")[0].upper()
                 try:
                     args = text.split(" ")[1:]
+                except:
+                    pass
                 for text in textt.split("\r\n"):
                     if command == "NICK":
                         pending = text.split(" ")[1]
