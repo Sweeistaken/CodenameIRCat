@@ -57,7 +57,7 @@ def session(connection, client):
                             if not already_set:
                                 nickname_list[pending] = connection
                                 already_set = True
-                    elif text.split(" ")[0] == "USER":
+                    elif text.split(" ")[0].upper() == "USER":
                         if not ready:
                             username = text.split(" ")[1]
                             ready = True
@@ -65,12 +65,12 @@ def session(connection, client):
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
-                        connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq NETWORK={displayname} CHANTYPES=# :are supported by this server\r\n", "UTF-8"))
                         
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
                     elif (ready and already_set) and finished:
-                        if text.split(" ")[0] == "JOIN":
+                        if text.split(" ")[0].upper() == "JOIN":
                             channel = text.split(" ")[1]
                             success = True
                             if success:
@@ -87,7 +87,7 @@ def session(connection, client):
                                     nickname_list[i].sendall(bytes(f":{pending}!~{username}@{client[0]} JOIN {channel}\r\n","UTF-8"))
                                 except:
                                     pass
-                        if text.split(" ")[0] == "PART":
+                        elif text.split(" ")[0].upper() == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
                                 try:
@@ -98,14 +98,14 @@ def session(connection, client):
                                 channels_list[channel].remove(pending)
                             except:
                                 print(traceback.format_exc())
-                        if text.split(" ")[0] == "WHO":
+                        elif text.split(" ")[0].upper() == "WHO":
                             channel = text.split(" ")[1]
                             if channel in channels_list:
                                 if pending in channels_list[channel]:
                                     users = " ".join(channels_list[channel])
                                     connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        if text.split(" ")[0] == "PRIVMSG":
+                        elif text.split(" ")[0].upper() == "PRIVMSG":
                             target = text.split(" ")[1]
                             if target in channels_list:
                                 if pending in channels_list[target]:
@@ -120,7 +120,7 @@ def session(connection, client):
                             else:
                                 nickname_list[target].sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             nickname_list[i].sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        if text.split(" ")[0] == "QUIT":
+                        elif text.split(" ")[0].upper() == "QUIT":
                             # Parse the quit message.
                             done = []
                             msg = text.split(" ")[1:]
@@ -130,7 +130,10 @@ def session(connection, client):
                             else:
                                 msg = "Client Quit"
                             text = f"QUIT :{msg}"
-                            # Broadcast all users in the joined channels that the person left.
+                            # Confirm QUIT and close the socket.
+                            connection.sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\nERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
+                            connection.close()
+                            # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():
                                 if pending in users:
                                     for j in users:
@@ -142,8 +145,6 @@ def session(connection, client):
                                         channels_list[i].remove(pending)
                                     except:
                                         print(traceback.format_exc())
-                            # Finally, confirm that the client quitted by mirroring the QUIT message.
-                            connection.sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\nERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             break
             except:
                 print(traceback.format_exc())
