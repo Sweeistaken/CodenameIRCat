@@ -13,6 +13,8 @@ TODO:
    -  [ ] WallOps
    -  [ ] Channel invite system
    -  [ ] Wildcard logic (for +b)
+   -  [ ] Send PING and wait for PONG
+   -  [ ] Reply PONG if received PING
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
@@ -32,6 +34,14 @@ TODO:
 - [ ] Destructive features for CHANOPS
    -  [ ] `KICK`
    -  [ ] `MODE <channel>`
+- [ ] Destructive features for IRCOPS
+   -  [ ] `KILL <user> <comment>`
+   -  [ ] `MODE <external user>`
+   -  [ ] `RESTART`
+- [ ] Extra commands
+   -  [ ] `USERS`
+   -  [ ] `WHOIS`
+   -  [ ] `WHOWAS`
 - [ ] Implement services.
    -  [ ] Nickserv
    -  [ ] ChanServ
