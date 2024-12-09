@@ -46,7 +46,7 @@ TODO:
    -  [ ] Nickserv
    -  [ ] ChanServ
    -  [ ] GitServ (Custom user for pull/restart)
-   -  [ ] Link `PRIVMSG *serv` and `*s` to `*serv`
+   -  [ ] Link `PRIVMSG *serv` to `*serv`
 - [ ] Add IRCv3 features.
    -  Will research later.
 
