@@ -34,12 +34,16 @@ def session(connection, client):
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
     username = "oreo"
-    hostname = client[0]
+    hostname = ""
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
-        connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
-        
+        try:
+            hostname = socket.gethostbyaddr(client[0])[0]
+            connection.sendall(bytes(f":{server} NOTICE * :*** Got it! {hostname}\r\n","UTF-8"))
+        except:
+            hostname = client[0]
+            connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
         while True:
             try:
                 data = connection.recv(2048)
@@ -111,7 +115,7 @@ def session(connection, client):
                                             users = " ".join(channels_list[channel])
                                             connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                                print("Successfully pre-loaded /WHO list")
+                                print("Successfully pre-loaded /NAMES list")
                         elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
@@ -126,13 +130,13 @@ def session(connection, client):
                         elif command == "WHO":
                             channel = text.split(" ")[1]
                             if channel in channels_list:
-                                if pending in channels_list[channel]:
-                                    users = " ".join(channels_list[channel])
-                                    connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                for i in channels_list[channel]:
+                                    who_host = nickname_list[i]["host"]
+                                    connection.sendall(bytes(f":{server} 352 {pending} {i} {who_host}\r\n","UTF-8"))
                             elif channel in nickname_list:
+                                connection.sendall(bytes(f":{server} 353 {pending} {channel} {users} {server}\r\n","UTF-8"))
 
-
-                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "PRIVMSG":
                             target = text.split(" ")[1]
                             if target in channels_list:
@@ -156,7 +160,7 @@ def session(connection, client):
                                 mse = " ".join(msg)
                                 msg = f"Quit: {mse}"
                             else:
-                                msg = "Client Quit"
+                                msg = pending
                             text = f"QUIT :{msg}"
                             # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():
