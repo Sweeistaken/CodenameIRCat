@@ -130,10 +130,6 @@ def session(connection, client):
                             else:
                                 msg = "Client Quit"
                             text = f"QUIT :{msg}"
-                            # Confirm QUIT and close the socket.
-                            connection.sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\n","UTF-8"))
-                            connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
-                            connection.close()
                             # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():
                                 if pending in users:
@@ -146,6 +142,10 @@ def session(connection, client):
                                         channels_list[i].remove(pending)
                                     except:
                                         print(traceback.format_exc())
+                            # Confirm QUIT and close the socket.
+                            connection.sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\n","UTF-8"))
+                            connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
+                            connection.close()
                             break
             except:
                 print(traceback.format_exc())
