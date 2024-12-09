@@ -9,12 +9,15 @@ if not len(sys.argv) == 2:
     sys.exit(1)
 server = "127.0.0.1"
 displayname = "foo"
+identifier = "somewhere in the universe"
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
     except: print("using fallback server address")
     try: displayname = data["name"]
     except: print("using fallback display name")
+    try: displayname = data["identifier"]
+    except: print("using fallback identifier")
     file.close()
     print("Successfully loaded config!")
 ip = get('https://api.ipify.org').content.decode('utf8')
@@ -65,7 +68,7 @@ def session(connection, client):
                         pass
                     if command == "NICK":
                         pending = text.split(" ")[1]
-                        if pending[0] == ":": pednding[1:]
+                        if pending[0] == ":": pending[1:]
                         if pending in nickname_list or pending in reserved:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
@@ -158,7 +161,12 @@ def session(connection, client):
                             who_host = property_list[target]["host"]
                             if args[0] in property_list:
                                 connection.sendall(bytes(f":{server} 311 {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
-
+                                connection.sendall(bytes(f":{server} 312 {target} {server} :{identifier}\r\n","UTF-8"))
+                                #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
+                                #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
+                                connection.sendall(bytes(f":{server} 318 {target} :End of /WHOIS list\r\n","UTF-8"))
+                                
+                                
                             else:
                                 connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
@@ -190,7 +198,7 @@ def session(connection, client):
                                 mse = " ".join(msg)
                                 msg = f"Quit: {mse}"
                             else:
-                                msg = "Quit: " pending
+                                msg = "Quit: " + pending
                             text = f"QUIT :{msg}"
                             # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():

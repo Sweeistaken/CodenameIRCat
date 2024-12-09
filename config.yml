@@ -5,3 +5,6 @@ name: foo
 
 # The hostname the server should go by, such as ircserver1.example.com
 host: 127.0.0.1
+
+# The identifier for this server, such as the location (Used in whois)
+identifier: somewhere in the universe
