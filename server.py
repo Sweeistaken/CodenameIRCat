@@ -165,8 +165,6 @@ def session(connection, client):
                                 #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
                                 #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
                                 connection.sendall(bytes(f":{server} 318 {target} :End of /WHOIS list\r\n","UTF-8"))
-                                
-                                
                             else:
                                 connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
