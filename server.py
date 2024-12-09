@@ -36,6 +36,7 @@ def session(connection, client):
     username = "oreo"
     hostname = ""
     realname = "realname"
+    safe_quit = False
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -167,7 +168,6 @@ def session(connection, client):
                                 nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                             else:
                                 connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
-                            nickname_list[i].sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "QUIT":
                             # Parse the quit message.
                             done = []
@@ -194,6 +194,7 @@ def session(connection, client):
                             connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                             connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                             connection.close()
+                            safe_quit = True
                             break
                         elif command == "GITSERV":
                             connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Hello!\r\n","UTF-8"))
