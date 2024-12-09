@@ -74,7 +74,7 @@ def session(connection, client):
                             ready = True
                     elif command == "CAP":
                         if args[0] == "LS":
-                            connection.sendall(bytes(f":{server}  CAP * LS :away-notify", "UTF-8"))
+                            connection.sendall(bytes(f":{server}  CAP * LS :away-notify\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
