@@ -163,6 +163,8 @@ def session(connection, client):
                             connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
+                        elif text.split(" ")[0] == "GITSERV":
+                            connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Hello!\r\n","UTF-8"))
 
 
 
