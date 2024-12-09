@@ -12,7 +12,7 @@ TODO:
    -  [ ] Identity management
    -  [ ] WallOps
    -  [ ] Channel invite system
-   -  [ ] Wildcard logic (for +b)
+   -  [ ] Wildcard logic (for +b and +q)
    -  [ ] Send PING and wait for PONG
    -  [ ] Reply PONG if received PING
    -  [ ] Change of nicknames
