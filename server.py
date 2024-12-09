@@ -28,7 +28,7 @@ channels_list = {}
 flags_list =    {}
 print("Now listening on port 6667")
 def session(connection, client):
-    pending = None # The nickname of the client
+    pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
@@ -52,7 +52,7 @@ def session(connection, client):
                         pending = text.split(" ")[1]
                         if pending in nickname_list:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
-                            pending = None
+                            pending = "*"
                         else:
                             if not already_set:
                                 nickname_list[pending] = connection
@@ -61,6 +61,8 @@ def session(connection, client):
                         if not ready:
                             username = text.split(" ")[1]
                             ready = True
+                    elif "CAP LS 302" in text:
+                        connection.sendall(bytes(f":{server}  CAP * LS :, "UTF-8"))
                     elif (ready and already_set) and not finished:
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
@@ -161,6 +163,11 @@ def session(connection, client):
                             connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
+                    
+                    
+                    else:
+                        cmd = text.split(" ")[0]
+                        connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
                         
             except:
                 print(traceback.format_exc())
@@ -169,7 +176,7 @@ def session(connection, client):
                 break
     finally:
         connection.close()
-    if pending != None:
+    if pending != "*":
         del nickname_list[pending]
 try:
     while True:
