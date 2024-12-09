@@ -218,10 +218,11 @@ def session(connection, client):
                         
             except Exception as ex:
                 print(traceback.format_exc())
-                cause = str(ex)
+                cause = "Read error: " + str(ex)
                 break
             
             if not data:
+                cause = "Remote host closed the connection"
                 break
     finally:
         connection.close()
@@ -234,7 +235,7 @@ def session(connection, client):
             if pending in users:
                 for j in users:
                     if j != pending and not j in done:
-                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :Read error: {cause}\r\n","UTF-8"))
+                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
                         done.append(j)
                 # Remove the quitting user from the channel.
                 try:
