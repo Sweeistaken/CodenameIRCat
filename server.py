@@ -23,7 +23,9 @@ tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_address = ('', 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
+reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
+lower_nicks =   [] # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
 flags_list =    {} # Stores flags for channels and users
 property_list = {} # Stores properties (hostname) for users
@@ -64,12 +66,11 @@ def session(connection, client):
                     if command == "NICK":
                         pending = text.split(" ")[1]
                         if pending[0] == ":": pednding[1:]
-                        if pending in nickname_list:
+                        if pending in nickname_list or pending in reserved:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
                         else:
                             if not already_set:
-                                nickname_list[pending] = connection
                                 already_set = True
                     elif command == "USER":
                         if not ready:
@@ -80,7 +81,8 @@ def session(connection, client):
                         if args[0] == "LS":
                             connection.sendall(bytes(f":{server}  CAP * LS :\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
-                        property_list[pending] = {"host": hostname, "username": username, "realname": realname}
+                        nickname_list[pending] = connection
+                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw"}
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
@@ -149,6 +151,16 @@ def session(connection, client):
                                 connection.sendall(bytes(f":{server} 352 {pending} * {who_user} ~{who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
 
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
+                        elif command == "WHOIS":
+                            target = args[0]
+                            who_user = property_list[target]["username"]
+                            who_realname = property_list[target]["realname"]
+                            who_host = property_list[target]["host"]
+                            if args[0] in property_list:
+                                connection.sendall(bytes(f":{server} 311 {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+
+                            else:
+                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
                             channel = text.split(" ")[1]
                             if channel in channels_list:
@@ -178,7 +190,7 @@ def session(connection, client):
                                 mse = " ".join(msg)
                                 msg = f"Quit: {mse}"
                             else:
-                                msg = pending
+                                msg = "Quit: " pending
                             text = f"QUIT :{msg}"
                             # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():
