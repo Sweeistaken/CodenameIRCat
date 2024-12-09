@@ -66,6 +66,7 @@ def session(connection, client):
                         else:
                             if not already_set:
                                 nickname_list[pending] = connection
+                                property_list[pending] = {"host": hostname}
                                 already_set = True
                     elif command == "USER":
                         if not ready:
@@ -106,10 +107,10 @@ def session(connection, client):
                                     print(channels_list)
                                     for i in channels_list[channel]:
                                         try:
-                                            nickname_list[i].sendall(bytes(f":{pending}!~{username}@{client[0]} JOIN {channel}\r\n","UTF-8"))
+                                            nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} JOIN {channel}\r\n","UTF-8"))
                                         except:
                                             pass
-                                # Code re-used in the WHO command
+                                # Code re-used in the NAMES command
                                 if channel in channels_list:
                                         if pending in channels_list[channel]:
                                             users = " ".join(channels_list[channel])
@@ -120,7 +121,7 @@ def session(connection, client):
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
                                 try:
-                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\n","UTF-8"))
+                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                 except:
                                     pass
                             try:
@@ -131,12 +132,24 @@ def session(connection, client):
                             channel = text.split(" ")[1]
                             if channel in channels_list:
                                 for i in channels_list[channel]:
-                                    who_host = nickname_list[i]["host"]
-                                    connection.sendall(bytes(f":{server} 352 {pending} {i} {who_host}\r\n","UTF-8"))
+                                    who_host = property_list[i]["host"]
+                                    who_user = property_list[i]["username"]
+                                    who_realname = property_list[i]["realname"]
+                                    connection.sendall(bytes(f":{server} 352 {pending} {who_user} ~{who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
                             elif channel in nickname_list:
-                                connection.sendall(bytes(f":{server} 353 {pending} {channel} {users} {server}\r\n","UTF-8"))
+                                who_host = property_list[channel]["host"]
+                                who_user = property_list[channel]["username"]
+                                who_realname = property_list[channel]["realname"]
+                                connection.sendall(bytes(f":{server} 352 {pending} * {who_user} ~{who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
 
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
+                        elif command == "NAMES":
+                            channel = text.split(" ")[1]
+                            if channel in channels_list:
+                                    if pending in channels_list[channel]:
+                                        users = " ".join(channels_list[channel])
+                                        connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "PRIVMSG":
                             target = text.split(" ")[1]
                             if target in channels_list:
@@ -167,7 +180,7 @@ def session(connection, client):
                                 if pending in users:
                                     for j in users:
                                         if j != pending and not j in done:
-                                            nickname_list[j].sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\n","UTF-8"))
+                                            nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                             done.append(j)
                                     # Remove the quitting user from the channel.
                                     try:
@@ -175,8 +188,8 @@ def session(connection, client):
                                     except:
                                         print(traceback.format_exc())
                             # Confirm QUIT and close the socket.
-                            connection.sendall(bytes(f":{pending}!~{username}@{client[0]} {text}\r\n","UTF-8"))
-                            connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
+                            connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                            connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
                         elif command == "GITSERV":
@@ -203,6 +216,19 @@ def session(connection, client):
         connection.close()
     if pending != "*":
         del nickname_list[pending]
+        del property_list[pending]
+    if not safe_quit:
+        for i, users in channels_list.items():
+            if pending in users:
+                for j in users:
+                    if j != pending and not j in done:
+                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :Error, possibly disconnected.\r\n","UTF-8"))
+                        done.append(j)
+                # Remove the quitting user from the channel.
+                try:
+                    channels_list[i].remove(pending)
+                except:
+                    print(traceback.format_exc())
 try:
     while True:
         connection, client = tcp_socket.accept()
