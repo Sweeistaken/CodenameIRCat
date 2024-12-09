@@ -1,6 +1,8 @@
-# IRCat
+# Codename IRCat
 
 Lightweight IRCd in Python
+
+* [Mastodon tag (for updates)](https://mastodon.swee.codes/tags/CodenameIRCat)
 
 TODO:
 - [ ] Implement the base of an IRCd, using Libera.Chat as a reference
