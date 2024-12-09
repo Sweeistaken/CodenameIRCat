@@ -50,6 +50,7 @@ TODO:
    -  [ ] Link `PRIVMSG *serv` to `*serv`
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
+   -  [ ] `away-notify`
    -  Will research later.
 
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
