@@ -48,6 +48,8 @@ def session(connection, client):
             try:
                 textt = data.decode()
                 command = text.split(" ")[0].upper()
+                try:
+                    args = text.split(" ")[1:]
                 for text in textt.split("\r\n"):
                     if command == "NICK":
                         pending = text.split(" ")[1]
@@ -135,7 +137,7 @@ def session(connection, client):
                             elif target in nickname_list:
                                 nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                             else:
-                                nickname_list[target].sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             nickname_list[i].sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "QUIT":
                             # Parse the quit message.
