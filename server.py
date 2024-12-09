@@ -47,8 +47,9 @@ def session(connection, client):
             print("Received data: {}".format(data))
             try:
                 textt = data.decode()
+                command = text.split(" ")[0].upper()
                 for text in textt.split("\r\n"):
-                    if text.split(" ")[0] == "NICK":
+                    if command == "NICK":
                         pending = text.split(" ")[1]
                         if pending in nickname_list:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
@@ -57,7 +58,7 @@ def session(connection, client):
                             if not already_set:
                                 nickname_list[pending] = connection
                                 already_set = True
-                    elif text.split(" ")[0].upper() == "USER":
+                    elif command == "USER":
                         if not ready:
                             username = text.split(" ")[1]
                             ready = True
@@ -71,12 +72,12 @@ def session(connection, client):
                         
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
-                    elif text.split(" ")[0].upper() == "PING":
+                    elif command == "PING":
                         e = text.split(" ")[1]
                         print("Replied to PING.")
                         connection.sendall(bytes(f"PONG {e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
-                        if text.split(" ")[0].upper() == "JOIN":
+                        if command == "JOIN":
                             channel = text.split(" ")[1]
                             success = True
                             if channel in channels_list:
@@ -103,7 +104,7 @@ def session(connection, client):
                                         users = " ".join(channels_list[channel])
                                         connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        elif text.split(" ")[0].upper() == "PART":
+                        elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
                                 try:
@@ -114,14 +115,14 @@ def session(connection, client):
                                 channels_list[channel].remove(pending)
                             except:
                                 print(traceback.format_exc())
-                        elif text.split(" ")[0].upper() == "WHO":
+                        elif command == "WHO":
                             channel = text.split(" ")[1]
                             if channel in channels_list:
                                 if pending in channels_list[channel]:
                                     users = " ".join(channels_list[channel])
                                     connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        elif text.split(" ")[0].upper() == "PRIVMSG":
+                        elif command == "PRIVMSG":
                             target = text.split(" ")[1]
                             if target in channels_list:
                                 if pending in channels_list[target]:
@@ -136,7 +137,7 @@ def session(connection, client):
                             else:
                                 nickname_list[target].sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             nickname_list[i].sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        elif text.split(" ")[0].upper() == "QUIT":
+                        elif command == "QUIT":
                             # Parse the quit message.
                             done = []
                             msg = text.split(" ")[1:]
@@ -163,7 +164,7 @@ def session(connection, client):
                             connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
-                        elif text.split(" ")[0] == "GITSERV":
+                        elif command == "GITSERV":
                             connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Hello!\r\n","UTF-8"))
 
 
