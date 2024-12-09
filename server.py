@@ -35,6 +35,7 @@ def session(connection, client):
     finished = False # If the server gave the client its information, indicating it's ready.
     username = "oreo"
     hostname = ""
+    realname = "realname"
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -66,16 +67,17 @@ def session(connection, client):
                         else:
                             if not already_set:
                                 nickname_list[pending] = connection
-                                property_list[pending] = {"host": hostname}
                                 already_set = True
                     elif command == "USER":
                         if not ready:
                             username = text.split(" ")[1]
+                            realname = " ".join(text.split(" ")[4:])[1:]
                             ready = True
                     elif command == "CAP":
                         if args[0] == "LS":
                             connection.sendall(bytes(f":{server}  CAP * LS :\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
+                        property_list[pending] = {"host": hostname, "username": username, "realname": realname}
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
