@@ -23,9 +23,10 @@ tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_address = ('0.0.0.0', 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
-nickname_list = {}
-channels_list = {}
-flags_list =    {}
+nickname_list = {} # Stores nicknames and the respective sockets
+channels_list = {} # Store channels and their user lists
+flags_list =    {} # Stores flags for channels and users
+property_list = {} # Stores properties (hostname) for users
 print("Now listening on port 6667")
 def session(connection, client):
     pending = "*" # The nickname of the client
@@ -110,6 +111,7 @@ def session(connection, client):
                                             users = " ".join(channels_list[channel])
                                             connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                print("Successfully pre-loaded /WHO list")
                         elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
@@ -127,6 +129,9 @@ def session(connection, client):
                                 if pending in channels_list[channel]:
                                     users = " ".join(channels_list[channel])
                                     connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                            elif channel in nickname_list:
+
+
                             connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "PRIVMSG":
                             target = text.split(" ")[1]
