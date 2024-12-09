@@ -16,7 +16,7 @@ with open(sys.argv[1], 'r') as file:
     except: print("using fallback server address")
     try: displayname = data["name"]
     except: print("using fallback display name")
-    try: displayname = data["identifier"]
+    try: identifier = data["identifier"]
     except: print("using fallback identifier")
     file.close()
     print("Successfully loaded config!")
