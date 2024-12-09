@@ -62,6 +62,7 @@ def session(connection, client):
                         pass
                     if command == "NICK":
                         pending = text.split(" ")[1]
+                        if pending[0] == ":": pednding[1:]
                         if pending in nickname_list:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
