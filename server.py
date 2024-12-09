@@ -82,32 +82,34 @@ def session(connection, client):
                         connection.sendall(bytes(f"PONG {e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
                         if command == "JOIN":
-                            channel = text.split(" ")[1]
-                            success = True
-                            if channel in channels_list:
-                                if pending in channels_list[channel]:
-                                    success=False
-                                    print(f"{pending} is already in {channel} , ignoring JOIN request.")
-                            if success:
-                                try:
-                                    if channel in channels_list:
-                                        channels_list[channel].append(pending)
-                                    else:
-                                        channels_list[channel] = [pending]
-                                except:
-                                    connection.sendall(bytes(f":{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
-                                print(channels_list)
-                                for i in channels_list[channel]:
-                                    try:
-                                        nickname_list[i].sendall(bytes(f":{pending}!~{username}@{client[0]} JOIN {channel}\r\n","UTF-8"))
-                                    except:
-                                        pass
-                            # Code re-used in the WHO command
-                            if channel in channels_list:
+                            channels = text.split(" ")[1]
+                            for channelt in channels.split(","):
+                                channel = channelt.strip()
+                                success = True
+                                if channel in channels_list:
                                     if pending in channels_list[channel]:
-                                        users = " ".join(channels_list[channel])
-                                        connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                        success=False
+                                        print(f"{pending} is already in {channel} , ignoring JOIN request.")
+                                if success:
+                                    try:
+                                        if channel in channels_list:
+                                            channels_list[channel].append(pending)
+                                        else:
+                                            channels_list[channel] = [pending]
+                                    except:
+                                        connection.sendall(bytes(f":{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
+                                    print(channels_list)
+                                    for i in channels_list[channel]:
+                                        try:
+                                            nickname_list[i].sendall(bytes(f":{pending}!~{username}@{client[0]} JOIN {channel}\r\n","UTF-8"))
+                                        except:
+                                            pass
+                                # Code re-used in the WHO command
+                                if channel in channels_list:
+                                        if pending in channels_list[channel]:
+                                            users = " ".join(channels_list[channel])
+                                            connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
