@@ -2,8 +2,10 @@
 __version__ = 0
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback
+import socket, time, threading, traceback, sys, os
 from requests import get
+if not len(sys.argv) == 2:
+    print("IRCat requires the following arguments: config.yml")
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -110,14 +112,17 @@ def session(connection, client):
                             msg = "Client Quit"
                         text = f"QUIT :{msg}"
                         # Broadcast all users in the joined channels that the person left.
-                        for i in channels_list:
-                            if pending in i:
-                                for j in channels_list[i]:
+                        for i, users in channels_list.items():
+                            if pending in users:
+                                for j in users:
                                     if j != pending and not j in done:
                                         nickname_list[j].sendall(bytes(f":{pending}!~oreo@{client[0]} {text}\r\n","UTF-8"))
                                         done.append(j)
                                 # Remove the quitting user from the channel.
-                                channels_list[i].remove(pending)
+                                try:
+                                    channels_list[i].remove(pending)
+                                except:
+                                    print(traceback.format_exc())
                         # Finally, confirm that the client quitted by mirroring the QUIT message.
                         connection.sendall(bytes(f":{pending}!~oreo@{client[0]} {text}\r\nERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                         break
