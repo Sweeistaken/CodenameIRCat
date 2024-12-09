@@ -69,6 +69,10 @@ def session(connection, client):
                         
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
+                    elif text.split(" ")[0].upper() == "PING":
+                        e = text.split(" ")[1]
+                        print("Replied to PING.")
+                        connection.sendall(bytes(f"PONG {e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
                         if text.split(" ")[0].upper() == "JOIN":
                             channel = text.split(" ")[1]
@@ -147,6 +151,7 @@ def session(connection, client):
                             connection.sendall(bytes(f"ERROR :Closing Link: {client[0]} ({msg})\r\n","UTF-8"))
                             connection.close()
                             break
+                        
             except:
                 print(traceback.format_exc())
             
