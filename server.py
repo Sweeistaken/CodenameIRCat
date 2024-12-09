@@ -73,7 +73,7 @@ def session(connection, client):
                             username = text.split(" ")[1]
                             ready = True
                     elif command == "CAP":
-                        if args[0] == "LS"
+                        if args[0] == "LS":
                             connection.sendall(bytes(f":{server}  CAP * LS :away-notify", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
