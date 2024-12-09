@@ -62,7 +62,7 @@ def session(connection, client):
                             username = text.split(" ")[1]
                             ready = True
                     elif "CAP LS 302" in text:
-                        connection.sendall(bytes(f":{server}  CAP * LS :, "UTF-8"))
+                        connection.sendall(bytes(f":{server}  CAP * LS :", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
