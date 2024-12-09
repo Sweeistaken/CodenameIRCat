@@ -1,0 +1,7 @@
+# IRCat Configuration
+
+# Used as the server/network's display name.
+name: foo
+
+# The hostname the server should go by, such as ircserver1.example.com
+host: 127.0.0.1

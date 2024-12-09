@@ -2,15 +2,23 @@
 __version__ = 0
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, os
+import socket, time, threading, traceback, sys, os, yaml
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
+    sys.exit(1)
+server = "127.0.0.1"
+displayname = "foo"
+with open(sys.argv[1], 'r') as file:
+    data = yaml.safe_load(file)
+    try: server = data["host"]
+    except: print("using fallback server address")
+    try: displayname = data["name"]
+    except: print("using fallback display name")
+    file.close()
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server = "127.0.0.1"
-displayname = "SWEE.codes"
 server_address = ('0.0.0.0', 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
