@@ -5,7 +5,7 @@ print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, threading, traceback
 from requests import get
 ip = get('https://api.ipify.org').content.decode('utf8')
-tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.SO_REUSEADDR)
 server = "127.0.0.1"
 displayname = "SWEE.codes"
 server_address = ('0.0.0.0', 6667)
