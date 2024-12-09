@@ -1,6 +1,6 @@
 # IRCat Configuration
 
-# Used as the server/network's display name.
+# Used as the server/network's display name. MUST NOT CONTAIN SPACES!
 name: foo
 
 # The hostname the server should go by, such as ircserver1.example.com
