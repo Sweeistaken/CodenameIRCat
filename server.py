@@ -5,7 +5,8 @@ print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, threading, traceback
 from requests import get
 ip = get('https://api.ipify.org').content.decode('utf8')
-tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.SO_REUSEADDR)
+tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server = "127.0.0.1"
 displayname = "SWEE.codes"
 server_address = ('0.0.0.0', 6667)
@@ -135,7 +136,6 @@ try:
         threading.Thread(target=session, daemon=True, args=[connection, client]).start()
 except:
     print("Shutting down...")
-    for i, j in nickname_list.items():
-        j.close()
     time.sleep(2)
+    tcp_socket.shutdown(1)
     tcp_socket.close()
