@@ -15,6 +15,7 @@ TODO:
    -  [ ] Wildcard logic (for +b)
    -  [ ] Send PING and wait for PONG
    -  [ ] Reply PONG if received PING
+   -  [ ] Change of nicknames
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
