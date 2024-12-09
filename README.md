@@ -49,7 +49,7 @@ TODO:
    -  [ ] GitServ (Custom user for pull/restart)
    -  [ ] Link `PRIVMSG *serv` to `*serv`
 - [ ] Add IRCv3 features.
-   -  [ ] List capabilities (`CAP LS 302`)
+   -  [x] List capabilities (`CAP LS 302`)
    -  Will research later.
 
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
