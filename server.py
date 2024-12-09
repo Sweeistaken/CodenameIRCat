@@ -28,7 +28,7 @@ tcp_socket.bind(server_address)
 tcp_socket.listen(1)
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   [] # Nicknames in lowercase
+lower_nicks =   {} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
 flags_list =    {} # Stores flags for channels and users
 property_list = {} # Stores properties (hostname) for users
