@@ -191,8 +191,10 @@ def session(connection, client):
                                     except:
                                         print(traceback.format_exc())
                             # Confirm QUIT and close the socket.
-                            connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                            connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
+                            if connection.recv(2048):
+                                connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                            if connection.recv(2048):
+                                connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                             connection.close()
                             safe_quit = True
                             break
