@@ -16,6 +16,7 @@ with open(sys.argv[1], 'r') as file:
     try: displayname = data["name"]
     except: print("using fallback display name")
     file.close()
+    print("Successfully loaded config!")
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
