@@ -38,8 +38,8 @@ def pinger(nick, connection):
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
             print("Sent ping message to " + nick)
             connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-            ping_pending = True
-        elif ping_pending and ((time.time() - property_list[nick]["last_ping"]) > 120):
+            property_list[nick]["ping_pending"] = True
+        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 120):
             property_list[nick]["cause"] = "Ping timeout: 120 seconds"
             connection.close()
             break
