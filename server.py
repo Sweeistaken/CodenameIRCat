@@ -234,7 +234,7 @@ def session(connection, client):
                                 connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                 connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                             except:
-                                pass
+                                break
                             connection.close()
                             safe_quit = True
                             break
