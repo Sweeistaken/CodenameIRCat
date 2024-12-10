@@ -41,6 +41,7 @@ def pinger(nick, connection):
             property_list[nick]["ping_pending"] = True
         elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 120):
             property_list[nick]["cause"] = "Ping timeout: 120 seconds"
+            connection.shutdown(socket.SHUT_WR)
             connection.close()
             break
 def session(connection, client):
