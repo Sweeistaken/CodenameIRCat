@@ -161,11 +161,11 @@ def session(connection, client):
                                 who_user = property_list[target]["username"]
                                 who_realname = property_list[target]["realname"]
                                 who_host = property_list[target]["host"]
-                                connection.sendall(bytes(f":{server} 311 {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
-                                connection.sendall(bytes(f":{server} 312 {target} {server} :{identifier}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
                                 #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
                                 #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
-                                connection.sendall(bytes(f":{server} 318 {target} :End of /WHOIS list\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
                             else:
                                 connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
