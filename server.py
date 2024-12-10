@@ -189,10 +189,16 @@ def session(connection, client):
                                     who_user = property_list[target]["username"]
                                     who_realname = property_list[target]["realname"]
                                     who_host = property_list[target]["host"]
+                                    try:
+                                        who_flags = property_list[target]["modes"]
+                                    except:
+                                        who_flags = None
                                     connection.sendall(bytes(f":{server} 311 {pending} {target} ~{who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
                                     #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
                                     #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
+                                    if who_flags != None and who_flags != "iw":
+                                        connection.sendall(bytes(f":{server} 379 {pending} {target} :Is using modes +{who_flags}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
                                 else:
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
@@ -275,6 +281,14 @@ def session(connection, client):
                             connection.close()
                             safe_quit = True
                             break
+                        elif command == "MODE":
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                            elif len(args) == 1:
+                                if args[0] == pending:
+                                    yourmodes = property_list[pending]["modes"]
+                                    connection.sendall(bytes(f":{server} {pending} 221 +{yourmodes}\r\n","UTF-8"))
+
                         elif command == "GITSERV":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
