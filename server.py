@@ -79,7 +79,10 @@ def session(connection, client):
                     if command == "NICK":
                         pending = text.split(" ")[1]
                         if pending[0] == ":": pending[1:]
-                        if pending.lower() in lower_nicks or pending in reserved:
+                        if "!" in pending or ":" in pending or "#" in pending or "*" in pending:
+                            connection.sendall(bytes(f":{server} 432 * {pending} :Erroneus nickname\r\n","UTF-8"))
+                            pending = "*"
+                        elif pending.lower() in lower_nicks or pending in reserved:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
                         else:
@@ -276,11 +279,10 @@ def session(connection, client):
                             try:
                                 connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                 connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
-                            except:
+                            finally:
+                                connection.close()
+                                safe_quit = True
                                 break
-                            connection.close()
-                            safe_quit = True
-                            break
                         elif command == "MODE":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
@@ -288,6 +290,25 @@ def session(connection, client):
                                 if args[0] == pending:
                                     yourmodes = property_list[pending]["modes"]
                                     connection.sendall(bytes(f":{server} {pending} 221 +{yourmodes}\r\n","UTF-8"))
+                                elif args[0] in channels_list:
+                                    target = args[0]
+                                    if args[0] in property_list:
+                                        if "modes" in property_list[args[0]]:
+                                            # Get the modes + parameters, then print them out.
+                                            modes = property_list[args[0]]["modes"]
+                                            params = property_list[args[0]]["params"]
+                                            connection.sendall(bytes(f":{server} {pending} {target} +{modes} {params}\r\n","UTF-8"))
+                                        else:
+                                            # Default channel mode
+                                            connection.sendall(bytes(f":{server} {pending} {target} +n\r\n","UTF-8"))
+                                    else:
+                                        # Default channel mode
+                                        connection.sendall(bytes(f":{server} {pending} {target} +n\r\n","UTF-8"))
+                                else:
+                                    if args[0][0] == "#":
+                                        connection.sendall(bytes(f":{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
+                                    else:
+                                        connection.sendall(bytes(f":{server} {pending} 505 :Cant change mode for other users\r\n","UTF-8"))
 
                         elif command == "GITSERV":
                             if len(args) == 0:
