@@ -33,6 +33,15 @@ channels_list = {} # Store channels and their user lists
 flags_list =    {} # Stores flags for channels and users
 property_list = {} # Stores properties (hostname) for users
 print("Now listening on port 6667")
+def pinger(nick, connection):
+    while nick in property_list:
+        if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
+            connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+            ping_pending = True
+        elif ping_pending and ((time.time() - property_list[nick]["last_ping"]) > 120):
+            property_list[nick]["cause"] = "Ping timeout: 120 seconds"
+            connection.close()
+            break
 def session(connection, client):
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
@@ -43,8 +52,6 @@ def session(connection, client):
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
     cause = "Unknown" # The cause of the unexpected exit
-    last_ping = time.time() # Time since the client was pinged
-    ping_pending = False # If the ping is pending
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -87,9 +94,9 @@ def session(connection, client):
                             connection.sendall(bytes(f":{server}  CAP * LS :\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         nickname_list[pending] = connection
-                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw"}
-                        last_ping = time.time()
+                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False}
                         lower_nicks[pending.lower()] = pending
+                        threading.Thread(target=pinger, args=[pending, connection])
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
@@ -136,8 +143,8 @@ def session(connection, client):
                             e = text.split(" ")[1]
                             if e == server:
                                 print("Client replied to PING.")
-                                last_ping = time.time()
-                                ping_pending = False
+                                property_list[pending]["last_ping"] = time.time()
+                                property_list[pending]["ping_pending"] = False
                         elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
@@ -241,14 +248,6 @@ def session(connection, client):
                             # Unknown command
                             cmd = text.split(" ")[0]
                             connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
-                        if (time.time() - last_ping) > 60 and not ping_pending:
-                            connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-                            ping_pending = True
-                        elif ping_pending and ((time.time() - last_ping) > 195):
-                            cause = "Ping timeout: 255 seconds"
-                            safe_quit = False
-                            break
-                    
                         
             except Exception as ex:
                 print(traceback.format_exc())
@@ -260,6 +259,8 @@ def session(connection, client):
                 break
     finally:
         connection.close()
+    if "cause" in property_list[pending]:
+        cause = property_list[pending]
     if pending != "*":
         del nickname_list[pending]
         del property_list[pending]
