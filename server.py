@@ -274,7 +274,7 @@ def session(connection, client):
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "PULL":
-                                updater = subprocess.run(["git", "pull"])
+                                updater = subprocess.run(["git", "pull"], stdout=subprocess.PIPE)
                                 if updater.stdout.decode().strip() == "Already up to date.":
                                     connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :IRCat is already up-to-date.\r\n","UTF-8"))
                                 else:
