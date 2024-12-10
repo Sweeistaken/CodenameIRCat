@@ -43,6 +43,8 @@ def session(connection, client):
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
     cause = "Unknown" # The cause of the unexpected exit
+    last_ping = time.time() # Time since the client was pinged
+    ping_pending = False # If the ping is pending
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -86,6 +88,7 @@ def session(connection, client):
                     elif (ready and already_set) and not finished:
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw"}
+                        last_ping = time.time()
                         lower_nicks[pending.lower()] = pending
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
@@ -129,6 +132,12 @@ def session(connection, client):
                                             connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                 print("Successfully pre-loaded /NAMES list")
+                        elif command == "PONG":
+                            e = text.split(" ")[1]
+                            if e == server:
+                                print("Client replied to PING.")
+                                last_ping = time.time()
+                                ping_pending = False
                         elif command == "PART":
                             channel = text.split(" ")[1]
                             for i in channels_list[channel]:
@@ -232,7 +241,13 @@ def session(connection, client):
                             # Unknown command
                             cmd = text.split(" ")[0]
                             connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
-                    
+                        if (time.time() - last_ping) > 60 and not ping_pending:
+                            connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+                            ping_pending = True
+                        elif ping_pending and ((time.time() - last_ping) > 195):
+                            cause = "Ping timeout: 255 seconds"
+                            safe_quit = False
+                            break
                     
                         
             except Exception as ex:
