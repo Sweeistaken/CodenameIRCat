@@ -28,10 +28,9 @@ tcp_socket.bind(server_address)
 tcp_socket.listen(1)
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   {} # Nicknames in lowercase
+lower_nicks =   {"gitserv": "GitServ"} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
-flags_list =    {} # Stores flags for channels and users
-property_list = {} # Stores properties (hostname) for users
+property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"}} # Stores properties for active users and channels
 print("Now listening on port 6667")
 def pinger(nick, connection):
     while nick in property_list:
@@ -184,11 +183,13 @@ def session(connection, client):
                                 connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
                             else:
                                 target = text.split(" ")[1]
+                                if target.lower() in lower_nicks:
+                                    target = lower_nicks[target.lower()]
                                 if target in property_list:
                                     who_user = property_list[target]["username"]
                                     who_realname = property_list[target]["realname"]
                                     who_host = property_list[target]["host"]
-                                    connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 311 {pending} {target} ~{who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
                                     #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
                                     #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
@@ -208,6 +209,8 @@ def session(connection, client):
                         elif command == "PRIVMSG":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
+                                if target.lower() in lower_nicks:
+                                    target = lower_nicks[target.lower()]
                                 if target in channels_list:
                                     if pending in channels_list[target]:
                                         for i in channels_list[channel]:
@@ -225,6 +228,8 @@ def session(connection, client):
                         elif command == "NOTICE":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
+                                if target.lower() in lower_nicks:
+                                    target = lower_nicks[target.lower()]
                                 if target in channels_list:
                                     if pending in channels_list[target]:
                                         for i in channels_list[channel]:
