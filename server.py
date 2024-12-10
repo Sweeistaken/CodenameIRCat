@@ -207,6 +207,20 @@ def session(connection, client):
                                 nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                             else:
                                 connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                        elif command == "NOTICE":
+                            target = text.split(" ")[1]
+                            if target in channels_list:
+                                if pending in channels_list[target]:
+                                    for i in channels_list[channel]:
+                                        try:
+                                            if i != pending:
+                                                nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                        except:
+                                            pass
+                            elif target in nickname_list:
+                                nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                            else:
+                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "QUIT":
                             # Parse the quit message.
                             done = []
