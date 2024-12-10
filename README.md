@@ -7,7 +7,7 @@ Lightweight IRCd in Python
 
 TODO:
 - [ ] Implement the base of an IRCd, using Libera.Chat as a reference
-   -  [ ] Add the (full) connection process
+   -  [x] Add the (full) connection process
    -  [x] Add join/part, and it's requirements (WHO, etc)
    -  [x] Implement proper PRIVMSG
    -  [x] Broadcast QUIT
@@ -16,7 +16,7 @@ TODO:
    -  [ ] WallOps
    -  [ ] Channel invite system
    -  [ ] Wildcard logic (for +b and +q)
-   -  [ ] Send PING and wait for PONG
+   -  [x] Send PING and wait for PONG
    -  [x] Reply PONG if received PING
    -  [ ] Change of nicknames
    -  [ ] Change of hostnames
