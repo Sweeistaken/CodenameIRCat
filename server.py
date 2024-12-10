@@ -261,7 +261,7 @@ def session(connection, client):
     finally:
         connection.close()
     if "cause" in property_list[pending]:
-        cause = property_list[pending]
+        cause = property_list[pending]["cause"]
     if pending != "*":
         del nickname_list[pending]
         del property_list[pending]
