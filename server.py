@@ -281,9 +281,9 @@ def session(connection, client):
                             elif args[0].upper() == "PULL":
                                 updater = subprocess.run(["git", "pull"], stdout=subprocess.PIPE)
                                 if updater.stdout.decode().strip() == "Already up to date.":
-                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :IRCat is already up-to-date.\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
                                 else:
-                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Done, it is recommended to use /UPDATE if you're an IRC op\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
                             elif args[0].upper() == "VERSION":
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
