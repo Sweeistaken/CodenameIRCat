@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, os, yaml
+import socket, time, threading, traceback, sys, subprocess, yaml
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -148,79 +148,97 @@ def session(connection, client):
                                 property_list[pending]["last_ping"] = time.time()
                                 property_list[pending]["ping_pending"] = False
                         elif command == "PART":
-                            channel = text.split(" ")[1]
-                            for i in channels_list[channel]:
-                                try:
-                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                except:
-                                    pass
-                            try:
-                                channels_list[channel].remove(pending)
-                            except:
-                                print(traceback.format_exc())
-                        elif command == "WHO":
-                            channel = text.split(" ")[1]
-                            if channel in channels_list:
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                            else:
+                                channel = text.split(" ")[1]
                                 for i in channels_list[channel]:
-                                    who_host = property_list[i]["host"]
-                                    who_user = property_list[i]["username"]
-                                    who_realname = property_list[i]["realname"]
-                                    connection.sendall(bytes(f":{server} 352 {pending} {who_user} ~{who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
-                            elif channel in nickname_list:
-                                who_host = property_list[channel]["host"]
-                                who_user = property_list[channel]["username"]
-                                who_realname = property_list[channel]["realname"]
-                                connection.sendall(bytes(f":{server} 352 {pending} * {who_user} ~{who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
+                                    try:
+                                        nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                    except:
+                                        pass
+                                try:
+                                    channels_list[channel].remove(pending)
+                                except:
+                                    print(traceback.format_exc())
+                        elif command == "WHO":
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                            else:
+                                channel = text.split(" ")[1]
+                                if channel in channels_list:
+                                    for i in channels_list[channel]:
+                                        who_host = property_list[i]["host"]
+                                        who_user = property_list[i]["username"]
+                                        who_realname = property_list[i]["realname"]
+                                        connection.sendall(bytes(f":{server} 352 {pending} {who_user} ~{who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
+                                elif channel in nickname_list:
+                                    who_host = property_list[channel]["host"]
+                                    who_user = property_list[channel]["username"]
+                                    who_realname = property_list[channel]["realname"]
+                                    connection.sendall(bytes(f":{server} 352 {pending} * {who_user} ~{who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
 
-                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
-                            target = text.split(" ")[1]
-                            if target in property_list:
-                                who_user = property_list[target]["username"]
-                                who_realname = property_list[target]["realname"]
-                                who_host = property_list[target]["host"]
-                                connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
-                                connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
-                                #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
-                                #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
-                                connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                target = text.split(" ")[1]
+                                if target in property_list:
+                                    who_user = property_list[target]["username"]
+                                    who_realname = property_list[target]["realname"]
+                                    who_host = property_list[target]["host"]
+                                    connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
+                                    #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
+                                    #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
+                                    connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
-                            channel = text.split(" ")[1]
-                            if channel in channels_list:
-                                    if pending in channels_list[channel]:
-                                        users = " ".join(channels_list[channel])
-                                        connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                            else:
+                                channel = text.split(" ")[1]
+                                if channel in channels_list:
+                                        if pending in channels_list[channel]:
+                                            users = " ".join(channels_list[channel])
+                                            connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                         elif command == "PRIVMSG":
-                            target = text.split(" ")[1]
-                            if target in channels_list:
-                                if pending in channels_list[target]:
-                                    for i in channels_list[channel]:
-                                        try:
-                                            if i != pending:
-                                                nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                        except:
-                                            pass
-                            elif target in nickname_list:
-                                nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                            if len(args) >= 2:
+                                target = text.split(" ")[1]
+                                if target in channels_list:
+                                    if pending in channels_list[target]:
+                                        for i in channels_list[channel]:
+                                            try:
+                                                if i != pending:
+                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                            except:
+                                                pass
+                                elif target in nickname_list:
+                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
                         elif command == "NOTICE":
-                            target = text.split(" ")[1]
-                            if target in channels_list:
-                                if pending in channels_list[target]:
-                                    for i in channels_list[channel]:
-                                        try:
-                                            if i != pending:
-                                                nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                        except:
-                                            pass
-                            elif target in nickname_list:
-                                nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                            if len(args) >= 2:
+                                target = text.split(" ")[1]
+                                if target in channels_list:
+                                    if pending in channels_list[target]:
+                                        for i in channels_list[channel]:
+                                            try:
+                                                if i != pending:
+                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                            except:
+                                                pass
+                                elif target in nickname_list:
+                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
                         elif command == "QUIT":
                             # Parse the quit message.
                             done = []
@@ -253,7 +271,22 @@ def session(connection, client):
                             safe_quit = True
                             break
                         elif command == "GITSERV":
-                            connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Hello!\r\n","UTF-8"))
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                            elif args[0].upper() == "PULL":
+                                updater = subprocess.run(["git", "pull"])
+                                if updater.stdout.decode().strip() == "Already up to date.":
+                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :IRCat is already up-to-date.\r\n","UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Done, it is recommended to use /UPDATE if you're an IRC op\r\n","UTF-8"))
+                            elif args[0].upper() == "VERSION":
+                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
+                            else:
+                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :GitServ Usage:\r\n","UTF-8"))
+                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
+                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
+                                
 
 
 
