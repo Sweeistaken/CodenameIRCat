@@ -19,6 +19,7 @@ TODO:
    -  [ ] Send PING and wait for PONG
    -  [x] Reply PONG if received PING
    -  [ ] Change of nicknames
+   -  [ ] Change of hostnames
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
@@ -44,7 +45,7 @@ TODO:
    -  [ ] `RESTART`
 - [ ] Extra commands
    -  [ ] `USERS`
-   -  [ ] `WHOIS`
+   -  [x] `WHOIS`
    -  [ ] `WHOWAS`
 - [ ] Implement services.
    -  [ ] Nickserv
