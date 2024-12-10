@@ -107,9 +107,9 @@ def session(connection, client):
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
                     elif command == "PING":
-                        e = text.split(" ")[1]
+                        e = " ".join(text.split(" ")[1:])
                         print("Replied to PING.")
-                        connection.sendall(bytes(f"PONG {e}\r\n","UTF-8"))
+                        connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
                         if command == "JOIN":
                             channels = text.split(" ")[1]
