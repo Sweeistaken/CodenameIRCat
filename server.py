@@ -111,8 +111,8 @@ def session(connection, client):
                         finished = True
                     elif command == "PING":
                         e = text.split(" ")[1]
-                        print("Replying with \"" + str([f":{server} PONG :{e}\r\n"]) + "\"")
-                        connection.sendall(bytes(f":{server} PONG {e}\r\n","UTF-8"))
+                        print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
+                        connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
                         if command == "JOIN":
                             channels = text.split(" ")[1]
