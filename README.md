@@ -11,8 +11,8 @@ TODO:
    -  [x] Add join/part, and it's requirements (WHO, etc)
    -  [x] Implement proper PRIVMSG
    -  [x] Broadcast QUIT
-   -  [ ] DNS lookup
-   -  [ ] Identity management
+   -  [x] DNS lookup
+   -  [x] Identity management
    -  [ ] WallOps
    -  [ ] Channel invite system
    -  [ ] Wildcard logic (for +b and +q)
@@ -52,6 +52,8 @@ TODO:
    -  [ ] ChanServ
    -  [ ] GitServ (Custom user for pull/restart)
    -  [ ] Link `PRIVMSG *serv` to `*serv`
+- [ ] Extra (not planned) features
+   -  [ ] ident support
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
    -  [ ] `away-notify`
