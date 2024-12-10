@@ -109,8 +109,8 @@ def session(connection, client):
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
                     elif command == "PING":
-                        e = " ".join(text.split(" ")[1:])
-                        print("Replied to PING.")
+                        e = text.split(" ")[1]
+                        print("Replying with " + f":{server} PONG {server} :{e}\r\n")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                     elif (ready and already_set) and finished:
                         if command == "JOIN":
@@ -151,7 +151,7 @@ def session(connection, client):
                                 property_list[pending]["ping_pending"] = False
                         elif command == "PART":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
                                 channel = text.split(" ")[1]
                                 for i in channels_list[channel]:
@@ -165,7 +165,7 @@ def session(connection, client):
                                     print(traceback.format_exc())
                         elif command == "WHO":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
                                 channel = text.split(" ")[1]
                                 if channel in channels_list:
@@ -183,7 +183,7 @@ def session(connection, client):
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
                                 target = text.split(" ")[1]
                                 if target.lower() in lower_nicks:
@@ -207,7 +207,7 @@ def session(connection, client):
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                         elif command == "NAMES":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
                                 channel = text.split(" ")[1]
                                 if channel in channels_list:
@@ -233,7 +233,7 @@ def session(connection, client):
                                 else:
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                         elif command == "NOTICE":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
@@ -252,7 +252,7 @@ def session(connection, client):
                                 else:
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                         elif command == "QUIT":
                             # Parse the quit message.
                             done = []
@@ -285,7 +285,7 @@ def session(connection, client):
                                 break
                         elif command == "MODE":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif len(args) == 1:
                                 if args[0] == pending:
                                     yourmodes = property_list[pending]["modes"]
@@ -297,22 +297,22 @@ def session(connection, client):
                                             # Get the modes + parameters, then print them out.
                                             modes = property_list[args[0]]["modes"]
                                             params = property_list[args[0]]["params"]
-                                            connection.sendall(bytes(f":{server} {pending} 221 {target} +{modes} {params}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f":{server} 221 {pending} {target} +{modes} {params}\r\n","UTF-8"))
                                         else:
                                             # Default channel mode
-                                            connection.sendall(bytes(f":{server} {pending} 324 {target} +n\r\n","UTF-8"))
+                                            connection.sendall(bytes(f":{server} 324 {pending} {target} +n\r\n","UTF-8"))
                                     else:
                                         # Default channel mode
-                                        connection.sendall(bytes(f":{server} {pending} 324 {target} +n\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} 324 {pending} {target} +n\r\n","UTF-8"))
                                 else:
                                     if args[0][0] == "#":
-                                        connection.sendall(bytes(f":{server} {pending} 403 {target} :No such channel\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
                                     else:
-                                        connection.sendall(bytes(f":{server} {pending} 505 :Cant change mode for other users\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} 505 {pending} :Cant change mode for other users\r\n","UTF-8"))
 
                         elif command == "GITSERV":
                             if len(args) == 0:
-                                connection.sendall(bytes(f":{server} {pending} 461 {command} :Not enough parameters\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "PULL":
                                 updater = subprocess.run(["git", "pull"], stdout=subprocess.PIPE)
                                 if updater.stdout.decode().strip() == "Already up to date.":
