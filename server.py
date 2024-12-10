@@ -297,16 +297,16 @@ def session(connection, client):
                                             # Get the modes + parameters, then print them out.
                                             modes = property_list[args[0]]["modes"]
                                             params = property_list[args[0]]["params"]
-                                            connection.sendall(bytes(f":{server} {pending} {target} +{modes} {params}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f":{server} {pending} 221 {target} +{modes} {params}\r\n","UTF-8"))
                                         else:
                                             # Default channel mode
-                                            connection.sendall(bytes(f":{server} {pending} {target} +n\r\n","UTF-8"))
+                                            connection.sendall(bytes(f":{server} {pending} 324 {target} +n\r\n","UTF-8"))
                                     else:
                                         # Default channel mode
-                                        connection.sendall(bytes(f":{server} {pending} {target} +n\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} {pending} 324 {target} +n\r\n","UTF-8"))
                                 else:
                                     if args[0][0] == "#":
-                                        connection.sendall(bytes(f":{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} {pending} 403 {target} :No such channel\r\n","UTF-8"))
                                     else:
                                         connection.sendall(bytes(f":{server} {pending} 505 :Cant change mode for other users\r\n","UTF-8"))
 
