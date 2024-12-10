@@ -65,8 +65,9 @@ def session(connection, client):
         while True:
             try:
                 data = connection.recv(2048)
-            except:
-                print("Disconnected.")
+            except Exception as ex:
+                cause = "Read error: " + str(ex)
+                break
             print("Received data: {}".format(data))
             try:
                 textt = data.decode()
