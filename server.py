@@ -36,6 +36,7 @@ print("Now listening on port 6667")
 def pinger(nick, connection):
     while nick in property_list:
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
+            print("Sent ping message to " + nick)
             connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
             ping_pending = True
         elif ping_pending and ((time.time() - property_list[nick]["last_ping"]) > 120):
@@ -142,7 +143,7 @@ def session(connection, client):
                         elif command == "PONG":
                             e = text.split(" ")[1]
                             if e == server:
-                                print("Client replied to PING.")
+                                print(pending + " replied to PING.")
                                 property_list[pending]["last_ping"] = time.time()
                                 property_list[pending]["ping_pending"] = False
                         elif command == "PART":
