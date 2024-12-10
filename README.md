@@ -50,7 +50,7 @@ TODO:
 - [ ] Implement services.
    -  [ ] Nickserv
    -  [ ] ChanServ
-   -  [ ] GitServ (Custom user for pull/restart)
+   -  [x] GitServ (Custom user for pull)
    -  [ ] Link `PRIVMSG *serv` to `*serv`
 - [ ] Extra (not planned) features
    -  [ ] ident support
