@@ -11,3 +11,8 @@ identifier: somewhere in the universe
 
 # The nickserv account to automatically be IRC opped
 admin-nick: admin
+
+# The path of the data file to be used by NickServ, ChanServ, etc
+# This MUST be a file path.
+# Recommended to use a .db extension because it is an SQLite database
+data-file: /path/to/data/for/ircat.db
