@@ -330,7 +330,9 @@ def session(connection, client):
                                     else:
                                         connection.sendall(bytes(f":{server} 505 {pending} :Cant change mode for other users\r\n","UTF-8"))
 
-                        elif command == "GITSERV":
+                        elif command == "GITSERV" or (command == "PRIVMSG" and args[0].lower() == "gitserv"):
+                            if command == "PRIVMSG":
+                                args = args[1:]
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "PULL":
