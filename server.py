@@ -35,10 +35,10 @@ print("Now listening on port 6667")
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
-        print(property_list[nick]["ping_pending"] == True)
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
             print("Sent ping message to " + nick)
             property_list[nick]["ping_pending"] = True
+            time.sleep(0.5)
             connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
         elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 120):
             property_list[nick]["cause"] = "Ping timeout: 120 seconds"
