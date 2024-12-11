@@ -35,7 +35,7 @@ TODO:
    -  [ ] l \<num\> (user limit)
    -  [ ] b \<usermask\> (ban a user)
    -  [ ] k \<key\> (password lock)
-   -  [ ] EXTRAS q (Quiet)
+   -  [ ] EXTRAS q \<usermask\> (Quiet)
 - [ ] Destructive features for CHANOPS
    -  [ ] `KICK`
    -  [ ] `MODE <channel>`
