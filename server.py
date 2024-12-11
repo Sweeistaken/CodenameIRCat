@@ -309,7 +309,7 @@ def session(connection, client):
                             elif len(args) == 1:
                                 if args[0] == pending:
                                     yourmodes = property_list[pending]["modes"]
-                                    connection.sendall(bytes(f":{server} {pending} 221 +{yourmodes}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 221 {pending} +{yourmodes}\r\n","UTF-8"))
                                 elif args[0] in channels_list:
                                     target = args[0]
                                     if args[0] in property_list:
