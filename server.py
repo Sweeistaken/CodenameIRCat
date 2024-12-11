@@ -61,6 +61,7 @@ tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_address = ('', 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
+opened=True
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"gitserv": "GitServ"} # Nicknames in lowercase
@@ -350,6 +351,7 @@ def session(connection, client):
                             if "o" in property_list[pending]["modes"]:
                                 tcp_socket.shutdown(socket.SHUT_RDWR)
                                 tcp_socket.close()
+                                opened = False
                             else:
                                 connection.sendall(bytes(f":{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
 
@@ -413,7 +415,7 @@ def session(connection, client):
                 except:
                     print(traceback.format_exc())
 try:
-    while True:
+    while opened:
         connection, client = tcp_socket.accept()
         threading.Thread(target=session, daemon=True, args=[connection, client]).start()
 except:
