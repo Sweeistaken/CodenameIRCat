@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, subprocess, yaml
+import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -10,6 +10,8 @@ if not len(sys.argv) == 2:
 server = "127.0.0.1"
 displayname = "foo"
 identifier = "somewhere in the universe"
+admin_nick = "admin"
+data_path  = ""
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
@@ -18,6 +20,12 @@ with open(sys.argv[1], 'r') as file:
     except: print("using fallback display name")
     try: identifier = data["identifier"]
     except: print("using fallback identifier")
+    try: admin_nick = data["admin-nick"]
+    except: print("using fallback admin nick")
+    try: data_path = data["data-path"]
+    except:
+        print("IRCat requires \"data-path\" in config.yml")
+        sys.exit(1)
     file.close()
     print("Successfully loaded config!")
 ip = get('https://api.ipify.org').content.decode('utf8')
