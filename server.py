@@ -304,6 +304,7 @@ def session(connection, client):
                                 safe_quit = True
                                 break
                         elif command == "MODE":
+                            target = args[0]
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif len(args) == 1:
@@ -311,7 +312,6 @@ def session(connection, client):
                                     yourmodes = property_list[pending]["modes"]
                                     connection.sendall(bytes(f":{server} 221 {pending} +{yourmodes}\r\n","UTF-8"))
                                 elif args[0] in channels_list:
-                                    target = args[0]
                                     if args[0] in property_list:
                                         if "modes" in property_list[args[0]]:
                                             # Get the modes + parameters, then print them out.
