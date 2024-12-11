@@ -55,9 +55,19 @@ TODO:
    -  [ ] Link `PRIVMSG *serv` to `*serv`
 - [ ] Extra (not planned) features
    -  [ ] ident support
+- [ ] Authentication
+   -  [ ] Make the server able to change the client's host
+   -  [ ] Store credentials in an SQLite3 file.
+   -  [ ] Map NickServ IDENTIFY
+   -  [ ] Map PASS
+   -  [ ] Mock SASL PLAIN
+- [ ] SSL/TLS
+   -  [ ] Use a thread to accept connections on SSL port 6697
+   -  [ ] Automatically reload the certificate if defined in config.
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
    -  [ ] `away-notify`
+   -  [ ] `tls` (STARTTLS)
    -  Will research later.
 
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
