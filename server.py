@@ -346,6 +346,13 @@ def session(connection, client):
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                         
+                        elif command == "RESTART":
+                            if "o" in property_list[pending]["modes"]:
+                                tcp_socket.shutdown(socket.SHUT_RDWR)
+                                tcp_socket.close()
+                            else:
+                                connection.sendall(bytes(f":{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
+
                         elif command == "PRIVMSG":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
