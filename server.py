@@ -34,6 +34,8 @@ property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname
 print("Now listening on port 6667")
 def pinger(nick, connection):
     while nick in property_list:
+        global property_list
+        print(property_list[nick]["ping_pending"] = True)
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
             print("Sent ping message to " + nick)
             connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
