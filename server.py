@@ -33,8 +33,8 @@ channels_list = {} # Store channels and their user lists
 property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"}} # Stores properties for active users and channels
 print("Now listening on port 6667")
 def pinger(nick, connection):
+    global property_list
     while nick in property_list:
-        global property_list
         print(property_list[nick]["ping_pending"] == True)
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
             print("Sent ping message to " + nick)
