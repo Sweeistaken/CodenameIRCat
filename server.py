@@ -351,6 +351,7 @@ def session(connection, client):
                             if "o" in property_list[pending]["modes"]:
                                 tcp_socket.shutdown(socket.SHUT_RDWR)
                                 tcp_socket.close()
+                                global opened
                                 opened = False
                             else:
                                 connection.sendall(bytes(f":{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
