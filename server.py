@@ -54,7 +54,7 @@ owner varchar(255),
 usermodes varchar(255),
 optimodes varchar(255),
 );""")
-        
+config = IRCat_DATA_BROKER()
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
