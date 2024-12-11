@@ -20,6 +20,7 @@ TODO:
    -  [x] Reply PONG if received PING
    -  [ ] Change of nicknames
    -  [ ] Change of hostnames
+   -  [ ] Away
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
