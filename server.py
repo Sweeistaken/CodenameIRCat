@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3
+import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -28,6 +28,33 @@ with open(sys.argv[1], 'r') as file:
         sys.exit(1)
     file.close()
     print("Successfully loaded config!")
+class IRCat_DATA_BROKER:
+    def __init__(self):
+        if not os.path.isfile(data_path):
+            print("Creating database file...")
+            open(data_path, "w").write("")
+        self.conn = sqlite3.connect(data_path)
+        self.db = self.conn.cursor()
+        self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='nickserv' ''')
+        if self.db.fetchall()[0]!=1:
+            print("Creating NickServ table...")
+            self.db.execute("""CREATE table nickserv (
+user varchar(255),
+modes varchar(255),
+hash varchar(255),
+group varchar(255));""")
+        self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='chanserv' ''')
+        if self.db.fetchall()[0]!=1:
+            print("Creating ChanServ table...")
+            self.db.execute("""CREATE table chanserv (
+name varchar(255),
+modes varchar(255),
+params varchar(255),
+owner varchar(255),
+usermodes varchar(255),
+optimodes varchar(255),
+);""")
+        
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -226,25 +253,6 @@ def session(connection, client):
                                             users = " ".join(channels_list[channel])
                                             connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                        elif command == "PRIVMSG":
-                            if len(args) >= 2:
-                                target = text.split(" ")[1]
-                                if target.lower() in lower_nicks:
-                                    target = lower_nicks[target.lower()]
-                                if target in channels_list:
-                                    if pending in channels_list[target]:
-                                        for i in channels_list[channel]:
-                                            try:
-                                                if i != pending:
-                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                            except:
-                                                pass
-                                elif target in nickname_list:
-                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                else:
-                                    connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
-                            else:
-                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                         elif command == "NOTICE":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
@@ -337,7 +345,26 @@ def session(connection, client):
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :GitServ Usage:\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
-                                
+                        
+                        elif command == "PRIVMSG":
+                            if len(args) >= 2:
+                                target = text.split(" ")[1]
+                                if target.lower() in lower_nicks:
+                                    target = lower_nicks[target.lower()]
+                                if target in channels_list:
+                                    if pending in channels_list[target]:
+                                        for i in channels_list[channel]:
+                                            try:
+                                                if i != pending:
+                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                            except:
+                                                pass
+                                elif target in nickname_list:
+                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                            else:
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
 
 
 
