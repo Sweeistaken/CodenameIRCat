@@ -42,7 +42,7 @@ class IRCat_DATA_BROKER:
 user varchar(255),
 modes varchar(255),
 hash varchar(255),
-group varchar(255),
+nicks varchar(255),
 );""")
         self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='chanserv' ''')
         if self.db.fetchall()[0]!=1:
