@@ -74,6 +74,7 @@ def pinger(nick, connection):
         elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 255):
             if nick in property_list:
                 property_list[nick]["cause"] = "Ping timeout: 255 seconds"
+                print("SHUTTING DOWN FOR " + nick)
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
                 break
@@ -196,26 +197,33 @@ def session(connection, client):
                                 elif pending2.lower() in lower_nicks or pending2 in reserved:
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
+                                    print("Broadcasting nickname change...")
                                     # Broadcast the nickname change
                                     done = []
                                     for i, users in channels_list.items():
                                         if pending in users:
                                             for j in users:
                                                 if j != pending and j != pending2 and not j in done:
+                                                    print("Broadcasting on " + i)
                                                     nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                                     done.append(j)
                                             # Replace the nickname
                                             try:
+                                                print("Changing on " + i)
                                                 channels_list[i].remove(pending)
                                                 channels_list[i].append(pending2)
                                             except:
                                                 print(traceback.format_exc())
+                                    print("Sending nickname change...")
                                     conection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                    print("Moving config...")
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
                                     del lower_nicks[pending.lower()]
                                     lower_nicks[pending2.lower()] = pending2
+                                    print("starting pinger...")
                                     pending = pending2
+                                    property_list[pending2]["ping_pending"] = False
                                     threading.Thread(target=pinger, args=[pending, connection]).start()
                                     print(f"User {pending} set nick")
                         elif command == "PART":
