@@ -183,7 +183,7 @@ def session(connection, client):
                                 print(pending + " replied to PING.")
                                 property_list[pending]["last_ping"] = time.time()
                                 property_list[pending]["ping_pending"] = False
-                        if command == "NICK":
+                        elif command == "NICK":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
