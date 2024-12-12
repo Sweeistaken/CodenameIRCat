@@ -110,7 +110,7 @@ def session(connection, client):
             print("Received data: {}".format(data))
             try:
                 textt = data.decode()
-                for text in textt.split("\r\n"):
+                for text in textt.replace("\r", "").split("\n"):
                     command = text.split(" ")[0].upper()
                     try:
                         args = text.split(" ")[1:]
