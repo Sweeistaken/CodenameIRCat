@@ -440,7 +440,7 @@ def session(connection, client):
                     if j != pending and not j in done:
                         nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
                         done.append(j)
-                # Remove the quitting user from the channel
+                # Remove the quitting user from the channel.
                 try:
                     channels_list[i].remove(pending)
                 except:
