@@ -199,7 +199,7 @@ def session(connection, client):
                                     for i, users in channels_list.items():
                                         if pending in users:
                                             for j in users:
-                                                if j != pending and not j in done:
+                                                if j != pending and j != pending2 and not j in done:
                                                     nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                                     done.append(j)
                                             # Replace the nickname
