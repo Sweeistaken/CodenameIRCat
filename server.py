@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"INTERNET RELAY CAT v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os
+import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -43,6 +43,8 @@ class IRCat_DATA_BROKER:
         if self.db.fetchall()[0]!=1:
             print("Creating ChanServ table...")
             self.db.execute("""CREATE table chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
+    def nickserv_identify(self, nick, password):
+        
 config = IRCat_DATA_BROKER()
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
