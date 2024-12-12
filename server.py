@@ -116,7 +116,7 @@ def session(connection, client):
                         args = text.split(" ")[1:]
                     except:
                         pass
-                    if command == "NICK":
+                    if command == "NICK" and not already_set:
                         pending = text.split(" ")[1]
                         if pending[0] == ":": pending[1:]
                         if "!" in pending or ":" in pending or "#" in pending or "*" in pending:
@@ -126,9 +126,8 @@ def session(connection, client):
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
                         else:
-                            if not already_set:
-                                already_set = True
-                                print(f"User {pending} set nick")
+                            already_set = True
+                            print(f"User {pending} set nick")
                     elif command == "USER":
                         if not ready:
                             username = text.split(" ")[1]
