@@ -127,6 +127,7 @@ def session(connection, client):
                         else:
                             if not already_set:
                                 already_set = True
+                                print(f"User {pending} set nick")
                     elif command == "USER":
                         if not ready:
                             username = text.split(" ")[1]
@@ -136,6 +137,7 @@ def session(connection, client):
                         if args[0] == "LS":
                             connection.sendall(bytes(f":{server}  CAP * LS :\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
+                        print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False}
                         lower_nicks[pending.lower()] = pending
