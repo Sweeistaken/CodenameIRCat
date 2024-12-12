@@ -224,6 +224,7 @@ def session(connection, client):
                                     print("starting pinger...")
                                     pending = pending2
                                     property_list[pending2]["ping_pending"] = False
+                                    property_list[pending2]["last_ping"] = time.time()
                                     threading.Thread(target=pinger, args=[pending, connection]).start()
                                     print(f"User {pending} set nick")
                         elif command == "PART":
