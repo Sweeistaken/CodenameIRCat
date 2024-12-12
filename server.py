@@ -66,15 +66,17 @@ def pinger(nick, connection):
     global property_list
     while nick in property_list:
         if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
-            print("Sent ping message to " + nick)
-            property_list[nick]["ping_pending"] = True
-            time.sleep(0.5)
-            connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+            if nick in property_list:
+                print("Sent ping message to " + nick)
+                property_list[nick]["ping_pending"] = True
+                time.sleep(0.5)
+                connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
         elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 255):
-            property_list[nick]["cause"] = "Ping timeout: 255 seconds"
-            connection.shutdown(socket.SHUT_WR)
-            connection.close()
-            break
+            if nick in property_list:
+                property_list[nick]["cause"] = "Ping timeout: 255 seconds"
+                connection.shutdown(socket.SHUT_WR)
+                connection.close()
+                break
 def session(connection, client):
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
