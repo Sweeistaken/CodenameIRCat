@@ -197,6 +197,19 @@ def session(connection, client):
                                 elif pending2.lower() in lower_nicks or pending2 in reserved:
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
+                                    print("Sending nickname change...")
+                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                    print("Moving config...")
+                                    property_list[pending2] = property_list.pop(pending)
+                                    nickname_list[pending2] = nickname_list.pop(pending)
+                                    del lower_nicks[pending.lower()]
+                                    lower_nicks[pending2.lower()] = pending2
+                                    print("starting pinger...")
+                                    pending = pending2
+                                    property_list[pending2]["ping_pending"] = False
+                                    property_list[pending2]["last_ping"] = time.time()
+                                    threading.Thread(target=pinger, args=[pending, connection]).start()
+                                    print(f"User {pending} set nick")
                                     print("Broadcasting nickname change...")
                                     # Broadcast the nickname change
                                     done = []
@@ -214,19 +227,6 @@ def session(connection, client):
                                                 channels_list[i].append(pending2)
                                             except:
                                                 print(traceback.format_exc())
-                                    print("Sending nickname change...")
-                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
-                                    print("Moving config...")
-                                    property_list[pending2] = property_list.pop(pending)
-                                    nickname_list[pending2] = nickname_list.pop(pending)
-                                    del lower_nicks[pending.lower()]
-                                    lower_nicks[pending2.lower()] = pending2
-                                    print("starting pinger...")
-                                    pending = pending2
-                                    property_list[pending2]["ping_pending"] = False
-                                    property_list[pending2]["last_ping"] = time.time()
-                                    threading.Thread(target=pinger, args=[pending, connection]).start()
-                                    print(f"User {pending} set nick")
                         elif command == "PART":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
