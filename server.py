@@ -197,17 +197,18 @@ def session(connection, client):
                                     # Broadcast the nickname change
                                     done = []
                                     for i, users in channels_list.items():
-                                    if pending in users:
-                                        for j in users:
-                                            if j != pending and not j in done:
-                                                nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                                done.append(j)
-                                        # Replace the nickname
-                                        try:
-                                            channels_list[i].remove(pending)
-                                            channels_list[i].append(pending2)
-                                        except:
-                                            print(traceback.format_exc())
+                                        if pending in users:
+                                            for j in users:
+                                                if j != pending and not j in done:
+                                                    nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                    done.append(j)
+                                            # Replace the nickname
+                                            try:
+                                                channels_list[i].remove(pending)
+                                                channels_list[i].append(pending2)
+                                            except:
+                                                print(traceback.format_exc())
+                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
                                     pending = pending2
