@@ -35,18 +35,12 @@ class IRCat_DATA_BROKER:
             open(data_path, "w").write("")
         self.conn = sqlite3.connect(data_path)
         db = self.conn.cursor()
-        db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='nickserv' ''')
-        if db.fetchall()[0]!=1:
-            print("Creating NickServ table...")
-            db.execute("""CREATE table nickserv (user varchar(255), modes varchar(255), hash varchar(255), nicks varchar(255))""")
-        db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='groups' ''')
-        if db.fetchall()[0]!=1:
-            print("Creating Groups table...")
-            db.execute("""CREATE table groups (name varchar(255), owner varchar(255))""")
-        db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='chanserv' ''')
-        if db.fetchall()[0]!=1:
-            print("Creating ChanServ table...")
-            db.execute("""CREATE table chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
+        print("Creating NickServ table...")
+        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), nicks varchar(255))""")
+        print("Creating Groups table...")
+        db.execute("""CREATE table IF NOT EXISTS groups (name varchar(255), owner varchar(255))""")
+        print("Creating ChanServ table...")
+        db.execute("""CREATE table IF NOT EXISTS chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
     def nickserv_identify(self, nick, password:str):
         db = self.conn.cursor()
         password = password.encode("UTF-8")
