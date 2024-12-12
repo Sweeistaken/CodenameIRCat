@@ -191,7 +191,7 @@ def session(connection, client):
                                 if pending2[0] == ":": pending2[1:]
                                 if "!" in pending2 or ":" in pending2 or "#" in pending2 or "*" in pending2:
                                     connection.sendall(bytes(f":{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
-                                elif pending.lower() in lower_nicks or pending in reserved:
+                                elif pending2.lower() in lower_nicks or pending2 in reserved:
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
                                     # Broadcast the nickname change
@@ -211,7 +211,10 @@ def session(connection, client):
                                     conection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
+                                    del lower_nicks[pending.lower()]
+                                    lower_nicks[pending2.lower()] = pending2
                                     pending = pending2
+                                    threading.Thread(target=pinger, args=[pending, connection]).start()
                                     print(f"User {pending} set nick")
                         elif command == "PART":
                             if len(args) == 0:
