@@ -43,7 +43,7 @@ user varchar(255),
 modes varchar(255),
 hash varchar(255),
 nicks varchar(255),
-);""")
+); """)
         self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='chanserv' ''')
         if self.db.fetchall()[0]!=1:
             print("Creating ChanServ table...")
@@ -54,7 +54,7 @@ params varchar(255),
 owner varchar(255),
 usermodes varchar(255),
 optimodes varchar(255),
-);""")
+); """)
 config = IRCat_DATA_BROKER()
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
