@@ -18,7 +18,7 @@ TODO:
    -  [ ] Wildcard logic (for +b and +q)
    -  [x] Send PING and wait for PONG
    -  [x] Reply PONG if received PING
-   -  [ ] Change of nicknames
+   -  [x] Change of nicknames
    -  [ ] Change of hostnames
    -  [ ] Away
 -  [ ] [Data file with SQLite](https://discuss.swee.codes/t/41/2)
