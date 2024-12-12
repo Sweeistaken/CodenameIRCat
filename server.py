@@ -449,6 +449,7 @@ def session(connection, client):
                     print(traceback.format_exc())
 try:
     while opened:
+        print("Waiting for connection...")
         connection, client = tcp_socket.accept()
         threading.Thread(target=session, daemon=True, args=[connection, client]).start()
 except:
