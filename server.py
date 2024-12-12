@@ -109,7 +109,7 @@ def session(connection, client):
                         args = text.split(" ")[1:]
                     except:
                         pass
-                    if command == "NICK" and not already_set:
+                    if command == "NICK" and not finished:
                         pending = text.split(" ")[1]
                         if pending[0] == ":": pending[1:]
                         if "!" in pending or ":" in pending or "#" in pending or "*" in pending:
@@ -146,7 +146,7 @@ def session(connection, client):
                         e = text.split(" ")[1]
                         print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
-                    elif (ready and already_set) and finished:
+                    elif finished:
                         if command == "JOIN":
                             channels = text.split(" ")[1]
                             for channelt in channels.split(","):
@@ -183,6 +183,35 @@ def session(connection, client):
                                 print(pending + " replied to PING.")
                                 property_list[pending]["last_ping"] = time.time()
                                 property_list[pending]["ping_pending"] = False
+                        if command == "NICK":
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                            else:
+                                pending2 = text.split(" ")[1]
+                                if pending2[0] == ":": pending2[1:]
+                                if "!" in pending2 or ":" in pending2 or "#" in pending2 or "*" in pending2:
+                                    connection.sendall(bytes(f":{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
+                                elif pending.lower() in lower_nicks or pending in reserved:
+                                    connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
+                                else:
+                                    # Broadcast the nickname change
+                                    done = []
+                                    for i, users in channels_list.items():
+                                    if pending in users:
+                                        for j in users:
+                                            if j != pending and not j in done:
+                                                nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                done.append(j)
+                                        # Replace the nickname
+                                        try:
+                                            channels_list[i].remove(pending)
+                                            channels_list[i].append(pending2)
+                                        except:
+                                            print(traceback.format_exc())
+                                    property_list[pending2] = property_list.pop(pending)
+                                    nickname_list[pending2] = nickname_list.pop(pending)
+                                    pending = pending2
+                                    print(f"User {pending} set nick")
                         elif command == "PART":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
