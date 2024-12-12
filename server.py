@@ -198,7 +198,7 @@ def session(connection, client):
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
                                     print("Sending nickname change...")
-                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
                                     print("Moving config...")
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
