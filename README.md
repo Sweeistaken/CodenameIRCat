@@ -1,4 +1,4 @@
-# Codename IRCat
+![IRCat Logo](https://git.swee.codes/swee/IRCat/raw/branch/main/ircat-invert.svg)
 
 Lightweight IRCd in Python
 
