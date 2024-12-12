@@ -34,16 +34,25 @@ class IRCat_DATA_BROKER:
             print("Creating database file...")
             open(data_path, "w").write("")
         self.conn = sqlite3.connect(data_path)
-        self.db = self.conn.cursor()
+        db = self.conn.cursor()
         self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='nickserv' ''')
         if self.db.fetchall()[0]!=1:
             print("Creating NickServ table...")
             self.db.execute("""CREATE table nickserv (user varchar(255), modes varchar(255), hash varchar(255), nicks varchar(255))""")
+        self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='groups' ''')
+        if self.db.fetchall()[0]!=1:
+            print("Creating Groups table...")
+            self.db.execute("""CREATE table groups (name varchar(255), owner varchar(255))""")
         self.db.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='chanserv' ''')
         if self.db.fetchall()[0]!=1:
             print("Creating ChanServ table...")
             self.db.execute("""CREATE table chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
-    def nickserv_identify(self, nick, password):
+    def nickserv_identify(self, nick, password:str):
+        db = self.conn.cursor()
+        password = password.encode("UTF-8")
+        db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
+        if self.db.fetchall() == []:
+            return ["Nickname doesn't exist."]
         
 config = IRCat_DATA_BROKER()
 ip = get('https://api.ipify.org').content.decode('utf8')
