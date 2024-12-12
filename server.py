@@ -208,7 +208,7 @@ def session(connection, client):
                                                 channels_list[i].append(pending2)
                                             except:
                                                 print(traceback.format_exc())
-                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                    conection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
                                     del lower_nicks[pending.lower()]
