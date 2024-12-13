@@ -189,6 +189,8 @@ def session(connection, client):
                         elif command == "NICK":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                            elif text.split(" ")[1] == pending:
+                                pass
                             else:
                                 pending2 = text.split(" ")[1]
                                 if pending2[0] == ":": pending2[1:]
