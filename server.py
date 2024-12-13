@@ -393,13 +393,13 @@ def session(connection, client):
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "IDENTIFY":
-                                
+                                pass
                             elif args[0].upper() == "VERSION":
                                 connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
                             else:
                                 connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :NickServ Usage:\r\n","UTF-8"))
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :IDENTIFY - Identifies your nickname\r\n","UTF-8"))
                                 connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                         
                         elif command == "RESTART":
