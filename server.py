@@ -36,7 +36,7 @@ class IRCat_DATA_BROKER:
         self.conn = sqlite3.connect(data_path)
         db = self.conn.cursor()
         print("Creating NickServ table...")
-        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), nicks varchar(255))""")
+        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), cloak varchar(255))""")
         print("Creating Groups table...")
         db.execute("""CREATE table IF NOT EXISTS groups (name varchar(255), owner varchar(255))""")
         print("Creating ChanServ table...")
@@ -58,9 +58,9 @@ tcp_socket.listen(1)
 opened=True
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   {"gitserv": "GitServ"} # Nicknames in lowercase
+lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
-property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"}} # Stores properties for active users and channels
+property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot"}} # Stores properties for active users and channels
 print("Now listening on port 6667")
 def pinger(nick, connection):
     global property_list
@@ -387,6 +387,20 @@ def session(connection, client):
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :GitServ Usage:\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
                                 connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
+                        elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv"):
+                            if command == "PRIVMSG":
+                                args = args[1:]
+                            if len(args) == 0:
+                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                            elif args[0].upper() == "IDENTIFY":
+                                
+                            elif args[0].upper() == "VERSION":
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
+                            else:
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :NickServ Usage:\r\n","UTF-8"))
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
+                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                         
                         elif command == "RESTART":
                             if "o" in property_list[pending]["modes"]:
