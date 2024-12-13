@@ -251,14 +251,14 @@ def session(connection, client):
                                         who_host = property_list[i]["host"]
                                         who_user = property_list[i]["username"]
                                         who_realname = property_list[i]["realname"]
-                                        connection.sendall(bytes(f":{server} 352 {pending} {who_user} ~{who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} 352 {pending} {channel} ~{who_user} {who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
                                 elif channel in nickname_list:
                                     who_host = property_list[channel]["host"]
                                     who_user = property_list[channel]["username"]
                                     who_realname = property_list[channel]["realname"]
-                                    connection.sendall(bytes(f":{server} 352 {pending} * {who_user} ~{who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 352 {pending} * ~{who_user} {who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
 
-                                connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{server} 315 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
