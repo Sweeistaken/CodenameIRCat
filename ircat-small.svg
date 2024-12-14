@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="ircat-small.svg"
+   inkscape:export-filename="favicon.ico"
+   inkscape:export-xdpi="1024"
+   inkscape:export-ydpi="1024"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="2.1568741"
+     inkscape:cx="-124.25389"
+     inkscape:cy="-38.249799"
+     inkscape:window-width="1920"
+     inkscape:window-height="1020"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect1763"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,1.5875,0,1 @ F,0,0,1,0,1.5875,0,1 @ F,0,0,1,0,1.5875,0,1 @ F,0,0,1,0,1.5875,0,1"
+       unit="px"
+       method="auto"
+       mode="F"
+       radius="6"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect1137"
+       d="M 9.0003308,2.801697 C 10.233569,2.799767 12.7,2.808647 12.7,2.808647 c 0,0 -0.01929,3.5645784 -0.01929,5.3469356 0,0.876752 -0.710748,1.5875 -1.5875,1.5875 H 9.0003308 c -0.876752,0 -1.5875,-0.710748 -1.5875,-1.5875 V 4.389197 c 0,-0.876752 0.710748,-1.5875 1.5875,-1.5875 z"
+       style="fill:#019cff;fill-opacity:1;stroke:none;stroke-width:0.328;stroke-dasharray:none"
+       sodipodi:nodetypes="cccssssc" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#0080fd;fill-opacity:1;stroke:none;stroke-width:0.264999"
+       x="-0.26469877"
+       y="9.0431061"
+       id="text790"><tspan
+         sodipodi:role="line"
+         id="tspan788"
+         style="font-size:7.76111px;fill:#0080fd;fill-opacity:1;stroke:none;stroke-width:0.265"
+         x="-0.26469877"
+         y="9.0431061">IR</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.76111px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.264999"
+       x="7.4778409"
+       y="9.0431061"
+       id="text790-3"><tspan
+         sodipodi:role="line"
+         id="tspan788-6"
+         style="font-size:7.76111px;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.265"
+         x="7.4778409"
+         y="9.0431061">C</tspan></text>
+  </g>
+</svg>
