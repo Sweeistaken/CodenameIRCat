@@ -5,7 +5,7 @@ Lightweight IRCd in Python
 * [Mastodon tag (for updates)](https://mastodon.swee.codes/tags/CodenameIRCat)
 * [Issue tracker](https://discuss.swee.codes/c/12)
 
-TODO:
+# To-Do list
 - [ ] Implement the base of an IRCd, using Libera.Chat as a reference
    -  [x] Add the (full) connection process
    -  [x] Add join/part, and it's requirements (WHO, etc)
