@@ -141,7 +141,7 @@ def session(connection, client):
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
-                        connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq NETWORK={displayname} CHANTYPES=# :are supported by this server\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 005 {pending} NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
                         
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
