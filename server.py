@@ -12,6 +12,15 @@ displayname = "foo"
 identifier = "somewhere in the universe"
 admin_nick = "admin"
 data_path  = ""
+motd = """
+  ____          _                                   ___ ____   ____      _   
+ / ___|___   __| | ___ _ __   __ _ _ __ ___   ___  |_ _|  _ \ / ___|__ _| |_ 
+| |   / _ \ / _` |/ _ \ '_ \ / _` | '_ ` _ \ / _ \  | || |_) | |   / _` | __|
+| |__| (_) | (_| |  __/ | | | (_| | | | | | |  __/  | ||  _ <| |__| (_| | |_ 
+ \____\___/ \__,_|\___|_| |_|\__,_|_| |_| |_|\___| |___|_| \_\\____\__,_|\__|
+https://ircat.xyz
+This server's configuration doesn't have a MOTD in its configuration, or is invalid."""
+motd_file = None
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
@@ -26,6 +35,10 @@ with open(sys.argv[1], 'r') as file:
     except:
         print("IRCat requires \"data-path\" in config.yml")
         sys.exit(1)
+    try: motd = data["motd"]
+    except: print("using fallback MOTD")
+    try: motd_file = data["motd-file"]
+    except: print("Not reading MOTD from a file.")
     file.close()
     print("Successfully loaded config!")
 class IRCat_DATA_BROKER:
@@ -142,13 +155,36 @@ def session(connection, client):
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 005 {pending} NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
-                        
+                        # connection.sendall(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8")) Not supported as there isn't multi-server capability (yet)
+                        ops = 0 # Placeholder, will replace with caclulating how much people have +o
+                        connection.sendall(bytes(f":{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
+                        chans = len(channels_list)
+                        connection.sendall(bytes(f":{server} 254 {pending} {chans} :channels formed\r\n", "UTF-8"))
+                        cleints = len(nickname_list)
+                        servers = 1
+                        connection.sendall(bytes(f":{server} 255 {pending} :I have {cleints} clients and {servers} servers\r\n", "UTF-8"))
+                        # Start the MOTD
+                        if motd_file != None:
+                            motd = open(motd_file).read()
+                        connection.sendall(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
+                        for i in motd.rstrip().split("\n"):
+                            connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
+                        # End the MOTD
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
                     elif command == "PING":
                         e = text.split(" ")[1]
                         print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
+                    elif command == "MOTD":
+                        if motd_file != None:
+                            motd = open(motd_file).read()
+                        connection.sendall(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
+                        for i in motd.rstrip().split("\n"):
+                            connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
                         if command == "JOIN":
                             channels = text.split(" ")[1]
