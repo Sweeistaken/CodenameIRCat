@@ -131,7 +131,7 @@ def session(connection, client):
                             ready = True
                     elif command == "CAP":
                         if args[0] == "LS":
-                            connection.sendall(bytes(f":{server}  CAP * LS :\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server}  CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
