@@ -92,6 +92,7 @@ def pinger(nick, connection):
                 connection.close()
                 break
 def session(connection, client):
+    global property_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
@@ -283,7 +284,6 @@ def session(connection, client):
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             else:
-                                global property_list
                                 channel = text.split(" ")[1]
                                 if channel in channels_list:
                                     for i in channels_list[channel]:
