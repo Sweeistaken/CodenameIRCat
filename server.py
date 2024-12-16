@@ -242,6 +242,22 @@ def session(connection, client):
                                 else:
                                     print("Sending nickname change...")
                                     connection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                    # Broadcast the nickname change
+                                    done = []
+                                    for i, users in channels_list.items():
+                                        if pending in users:
+                                            for j in users:
+                                                if j != pending and j != pending2 and not j in done:
+                                                    print("Broadcasting on " + j)
+                                                    nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                    done.append(j)
+                                            # Replace the nickname
+                                            try:
+                                                print("Changing on " + i)
+                                                channels_list[i].remove(pending)
+                                                channels_list[i].append(pending2)
+                                            except:
+                                                print(traceback.format_exc())
                                     print("Moving config...")
                                     property_list[pending2] = property_list.pop(pending)
                                     nickname_list[pending2] = nickname_list.pop(pending)
@@ -254,22 +270,6 @@ def session(connection, client):
                                     threading.Thread(target=pinger, args=[pending, connection]).start()
                                     print(f"User {pending} set nick")
                                     print("Broadcasting nickname change...")
-                                    # Broadcast the nickname change
-                                    done = []
-                                    for i, users in channels_list.items():
-                                        if pending in users:
-                                            for j in users:
-                                                if j != pending and j != pending2 and not j in done:
-                                                    print("Broadcasting on " + i)
-                                                    nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
-                                                    done.append(j)
-                                            # Replace the nickname
-                                            try:
-                                                print("Changing on " + i)
-                                                channels_list[i].remove(pending)
-                                                channels_list[i].append(pending2)
-                                            except:
-                                                print(traceback.format_exc())
                         elif command == "PART":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
@@ -534,7 +534,8 @@ def cleanup_manual():
                 i.remove(h)
                 for k in channels_list[j]:
                     if k != h and k in nickname_list:
-                        nickname[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
+                        nickname_list[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
+
 try:
     while opened:
         print("Waiting for connection...")
