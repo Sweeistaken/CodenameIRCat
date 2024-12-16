@@ -509,15 +509,18 @@ def session(connection, client):
                 if pending in users:
                     for j in users:
                         if j != pending and not j in done:
-                            nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
-                            done.append(j)
+                            try:
+                                nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                                done.append(j)
+                            except:
+                                print(traceback.format_exc())
                     # Remove the quitting user from the channel.
                     try:
                         channels_list[i].remove(pending)
                     except:
                         print(traceback.format_exc())
     except:
-        pass
+        print(traceback.format_exc())
     cleanup_manual()
 def cleanup():
     while True:
