@@ -1,5 +1,5 @@
 # To-Do list
-- [ ] Implement the base of an IRCd, using Libera.Chat as a reference
+- [ ] Implement the base of an IRCd, using Libera.Chat and RFC1459 as a reference
    -  [x] Add the (full) connection process
    -  [x] Add join/part, and it's requirements (WHO, etc)
    -  [x] Implement proper PRIVMSG
