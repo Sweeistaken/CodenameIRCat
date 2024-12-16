@@ -78,15 +78,15 @@ print("Now listening on port 6667")
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
-        if (time.time() - property_list[nick]["last_ping"]) > 60 and not property_list[nick]["ping_pending"]:
+        if (time.time() - property_list[nick]["last_ping"]) > 30 and not property_list[nick]["ping_pending"]:
             if nick in property_list:
                 print("Sent ping message to " + nick)
                 property_list[nick]["ping_pending"] = True
                 time.sleep(0.5)
                 connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > 255):
+        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > ping_timeout):
             if nick in property_list:
-                property_list[nick]["cause"] = "Ping timeout: 255 seconds"
+                property_list[nick]["cause"] = f"Ping timeout: {ping_timeout} seconds"
                 print("SHUTTING DOWN FOR " + nick)
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
@@ -147,6 +147,7 @@ def session(connection, client):
                         if args[0] == "LS":
                             connection.sendall(bytes(f":{server}  CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
+                        cleanup_manual()
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False}
@@ -492,25 +493,55 @@ def session(connection, client):
                 break
     finally:
         connection.close()
-    if "cause" in property_list[pending]:
-        cause = property_list[pending]["cause"]
-    if pending != "*":
-        del nickname_list[pending]
-        del property_list[pending]
-        del lower_nicks[pending.lower()]
-    if not safe_quit:
-        done = []
-        for i, users in channels_list.items():
-            if pending in users:
-                for j in users:
-                    if j != pending and not j in done:
-                        nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
-                        done.append(j)
-                # Remove the quitting user from the channel.
-                try:
-                    channels_list[i].remove(pending)
-                except:
-                    print(traceback.format_exc())
+    try:
+        if "cause" in property_list[pending]:
+            cause = property_list[pending]["cause"]
+        if pending != "*":
+            del nickname_list[pending]
+            del property_list[pending]
+            del lower_nicks[pending.lower()]
+        if not safe_quit:
+            done = []
+            for i, users in channels_list.items():
+                if pending in users:
+                    for j in users:
+                        if j != pending and not j in done:
+                            nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                            done.append(j)
+                    # Remove the quitting user from the channel.
+                    try:
+                        channels_list[i].remove(pending)
+                    except:
+                        print(traceback.format_exc())
+    except:
+        pass
+    cleanup_manual()
+def cleanup():
+    global channels_list
+    global property_list
+    while True:
+        time.sleep(15)
+        print("Cleaning up...")
+        for i, j in channels_list.items():
+            for h in i:
+                if not h in property_list:
+                    print("Found a detached connection: " + h)
+                    i.remove(h)
+                    for k in channels_list[j]:
+                        if k != h and k in nickname_list:
+                            nickname[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
+def cleanup_manual():
+    global channels_list
+    global property_list
+    print("Cleaning up...")
+    for i, j in channels_list.items():
+        for h in i:
+            if not h in property_list:
+                print("Found a detached connection: " + h)
+                i.remove(h)
+                for k in channels_list[j]:
+                    if k != h and k in nickname_list:
+                        nickname[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
 try:
     while opened:
         print("Waiting for connection...")
