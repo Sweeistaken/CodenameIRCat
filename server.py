@@ -21,6 +21,7 @@ motd = """
 https://ircat.xyz
 This server's configuration doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
+ping_timeout = 255
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
@@ -39,6 +40,8 @@ with open(sys.argv[1], 'r') as file:
     except: print("using fallback MOTD")
     try: motd_file = data["motd-file"]
     except: print("Not reading MOTD from a file.")
+    try: ping_timeout = int(data["ping-timeout"])
+    except: print("Using 255 as a ping timeout.")
     file.close()
     print("Successfully loaded config!")
 class IRCat_DATA_BROKER:
