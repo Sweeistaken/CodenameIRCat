@@ -520,24 +520,14 @@ def session(connection, client):
         pass
     cleanup_manual()
 def cleanup():
-    global channels_list
-    global property_list
     while True:
         time.sleep(15)
-        print("Cleaning up...")
-        for i, j in channels_list.items():
-            for h in i:
-                if not h in property_list:
-                    print("Found a detached connection: " + h)
-                    i.remove(h)
-                    for k in channels_list[j]:
-                        if k != h and k in nickname_list:
-                            nickname[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
+        cleanup_manual()
 def cleanup_manual():
     global channels_list
     global property_list
     print("Cleaning up...")
-    for i, j in channels_list.items():
+    for j, i in channels_list.items():
         for h in i:
             if not h in property_list:
                 print("Found a detached connection: " + h)
