@@ -359,6 +359,8 @@ def session(connection, client):
                             # Parse the quit message.
                             done = []
                             msg = text.split(" ")[1:]
+                            if msg[0] == ":":
+                                msg=msg[1:]
                             if len(msg) > 0:
                                 mse = " ".join(msg)
                                 msg = f"Quit: {mse}"
