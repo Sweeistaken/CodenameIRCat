@@ -1,0 +1,8 @@
+name: Check syntax
+on: [push]
+jobs:
+  check:
+    runs-on: debian-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m py_compile server.py
