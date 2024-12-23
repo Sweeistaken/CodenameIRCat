@@ -13,7 +13,7 @@
    -  [x] Reply PONG if received PING
    -  [x] Change of nicknames
    -  [ ] Change of hostnames
-   -  [ ] Away
+   -  [x] Away
 -  [ ] [Data file with SQLite](https://discuss.swee.codes/t/41/2)
 -  [ ] User Flags
    -  [ ] i (invisible)
