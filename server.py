@@ -19,7 +19,7 @@ motd = """
 | |__| (_) | (_| |  __/ | | | (_| | | | | | |  __/  | ||  _ <| |__| (_| | |_ 
  \____\___/ \__,_|\___|_| |_|\__,_|_| |_| |_|\___| |___|_| \_\\\\____\__,_|\__|
 https://ircat.xyz
-This server's configuration doesn't have a MOTD in its configuration, or is invalid."""
+This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 with open(sys.argv[1], 'r') as file:
@@ -76,7 +76,7 @@ reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
-property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot"}} # Stores properties for active users and channels
+property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False}} # Stores properties for active users and channels
 print("Now listening on port 6667")
 def pinger(nick, connection):
     global property_list
@@ -153,7 +153,7 @@ def session(connection, client):
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
-                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False}
+                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False}
                         lower_nicks[pending.lower()] = pending
                         threading.Thread(target=pinger, args=[pending, connection]).start()
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
@@ -284,6 +284,16 @@ def session(connection, client):
                                     channels_list[channel].remove(pending)
                                 except:
                                     print(traceback.format_exc())
+                        elif command == "AWAY":
+                            if len(args) == 0:
+                                property_list[pending]["away"] = False
+                                connection.sendall(bytes(f":{server} 305 {pending} :You are no longer marked as being away\r\n","UTF-8"))
+                            else:
+                                reasons = " ".join(args)
+                                if reasons[0] == ":": reasons = reasons[1:]
+                                property_list[pending]["away"] = True
+                                property_list[pending]["reason"] = reasons
+                                connection.sendall(bytes(f":{server} 306 {pending} :You have been marked as being away\r\n","UTF-8"))
                         elif command == "WHO":
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
@@ -294,12 +304,14 @@ def session(connection, client):
                                         who_host = property_list[i]["host"]
                                         who_user = property_list[i]["username"]
                                         who_realname = property_list[i]["realname"]
-                                        connection.sendall(bytes(f":{server} 352 {pending} {channel} ~{who_user} {who_host} {server} {i} H :0 {who_realname}\r\n","UTF-8"))
+                                        who_away = "G" if property_list[i]["away"] else "H"
+                                        connection.sendall(bytes(f":{server} 352 {pending} {channel} ~{who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
                                 elif channel in nickname_list:
                                     who_host = property_list[channel]["host"]
                                     who_user = property_list[channel]["username"]
                                     who_realname = property_list[channel]["realname"]
-                                    connection.sendall(bytes(f":{server} 352 {pending} * ~{who_user} {who_host} {server} {channel} H :0 {who_realname}\r\n","UTF-8"))
+                                    who_away = "G" if property_list[channel]["away"] else "H"
+                                    connection.sendall(bytes(f":{server} 352 {pending} * ~{who_user} {who_host} {server} {channel} {who_away} :0 {who_realname}\r\n","UTF-8"))
 
                                 connection.sendall(bytes(f":{server} 315 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
@@ -319,8 +331,12 @@ def session(connection, client):
                                         who_flags = None
                                     connection.sendall(bytes(f":{server} 311 {pending} {target} ~{who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
-                                    #connection.sendall(bytes(f":{server} 313 {target} :is an IRC operator\r\n","UTF-8")) # I haven't implemented modes yet.
-                                    #connection.sendall(bytes(f":{server} 317 {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
+                                    if "o" in who_flags: connection.sendall(bytes(f":{server} 313 {pending} {target} :is an IRC operator\r\n","UTF-8"))
+                                    who_away = property_list[target]["away"]
+                                    if who_away: 
+                                        who_reason = who_away = property_list[target]["reason"]
+                                        connection.sendall(bytes(f":{server} 301 {pending} {target} :{who_reason}\r\n","UTF-8"))
+                                    #connection.sendall(bytes(f":{server} 317 {pending} {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
                                     if who_flags != None and who_flags != "iw":
                                         connection.sendall(bytes(f":{server} 379 {pending} {target} :Is using modes +{who_flags}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
