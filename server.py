@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 __version__ = "0.0.1-pre-alpha"
-print(f"INTERNET RELAY CAT v{__version__}")
+print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt
 from requests import get
