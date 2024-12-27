@@ -381,8 +381,8 @@ def session(connection, client):
                                 msg = "Client Quit"
                             else:
                                 msg = text.split(" ")[1:]
-                                if msg[0] == ":":
-                                    msg=msg[1:]
+                                if msg[0][0] == ":":
+                                    msg[0]=msg[0][1:]
                                 if len(msg) > 0:
                                     mse = " ".join(msg)
                                     msg = f"Quit: {mse}"
