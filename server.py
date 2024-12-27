@@ -374,14 +374,15 @@ def session(connection, client):
                         elif command == "QUIT":
                             # Parse the quit message.
                             done = []
-                            msg = text.split(" ")[1:]
-                            if msg[0] == ":":
-                                msg=msg[1:]
-                            if len(msg) > 0:
-                                mse = " ".join(msg)
-                                msg = f"Quit: {mse}"
+                            if len(text.split(" ")) == 1:
+                                msg = "Client Quit"
                             else:
-                                msg = "Quit: " + pending
+                                msg = text.split(" ")[1:]
+                                if msg[0] == ":":
+                                    msg=msg[1:]
+                                if len(msg) > 0:
+                                    mse = " ".join(msg)
+                                    msg = f"Quit: {mse}"
                             text = f"QUIT :{msg}"
                             # Broadcast all users in the joined channels that the person quit.
                             for i, users in channels_list.items():
