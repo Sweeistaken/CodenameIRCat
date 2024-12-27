@@ -22,6 +22,7 @@ https://ircat.xyz
 This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
+restrict-ip = ''
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
@@ -42,6 +43,8 @@ with open(sys.argv[1], 'r') as file:
     except: print("Not reading MOTD from a file.")
     try: ping_timeout = int(data["ping-timeout"])
     except: print("Using 255 as a ping timeout.")
+    try: restrict-ip = data["restrict-ip"]
+    except: print("Listening on all hosts possible.")
     file.close()
     print("Successfully loaded config!")
 class IRCat_DATA_BROKER:
@@ -68,7 +71,7 @@ config = IRCat_DATA_BROKER()
 ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server_address = ('', 6667)
+server_address = (restrict-ip, 6667)
 tcp_socket.bind(server_address)
 tcp_socket.listen(1)
 opened=True
