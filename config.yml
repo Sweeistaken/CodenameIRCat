@@ -28,3 +28,7 @@ motd: |
 # The ping timeout in seconds, default is 255
 
 # ping-timeout: 255
+
+# Restrict what IP(s) the server runs on, separated by spaces, useful if you have alternate IPs/Networks
+
+# restrict-ip: 127.0.0.1
