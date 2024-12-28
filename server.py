@@ -68,7 +68,6 @@ class IRCat_DATA_BROKER:
             return ["Nickname doesn't exist."]
         
 config = IRCat_DATA_BROKER()
-ip = get('https://api.ipify.org').content.decode('utf8')
 tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_address = (restrict_ip, 6667)
@@ -97,7 +96,7 @@ def pinger(nick, connection):
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
                 break
-def session(connection, client, ip_to):
+def session(connection, client, ip):
     global property_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
