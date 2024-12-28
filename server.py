@@ -78,6 +78,7 @@ reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
+lower_chans = {} # Channel names in lowercase
 property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False}} # Stores properties for active users and channels
 print("Now listening on port 6667")
 def pinger(nick, connection):
