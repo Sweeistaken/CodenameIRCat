@@ -14,6 +14,7 @@
    -  [x] Change of nicknames
    -  [ ] Change of hostnames
    -  [x] Away
+   -  [ ] Multi-server support
 -  [ ] [Data file with SQLite](https://discuss.swee.codes/t/41/2)
 -  [ ] User Flags
    -  [ ] i (invisible)
@@ -63,5 +64,4 @@
    -  [ ] `away-notify`
    -  [ ] `tls` (STARTTLS)
    -  Will research later.
-
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
