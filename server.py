@@ -97,7 +97,7 @@ def pinger(nick, connection):
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
                 break
-def session(connection, client):
+def session(connection, client, ip_to):
     global property_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
@@ -198,6 +198,8 @@ def session(connection, client):
                             channels = text.split(" ")[1]
                             for channelt in channels.split(","):
                                 channel = channelt.strip()
+                                if channel.lower() in lower_chans:
+                                    channel = lower_chans[channel.lower()]
                                 success = True
                                 if channel in channels_list:
                                     if pending in channels_list[channel]:
@@ -209,6 +211,7 @@ def session(connection, client):
                                             channels_list[channel].append(pending)
                                         else:
                                             channels_list[channel] = [pending]
+                                            lower_chans[channel.lower()] = channel
                                     except:
                                         connection.sendall(bytes(f":{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                     print(channels_list)
@@ -565,7 +568,8 @@ try:
     while opened:
         print("Waiting for connection...")
         connection, client = tcp_socket.accept()
-        threading.Thread(target=session, daemon=True, args=[connection, client]).start()
+        ip_to = restrict_ip
+        threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
 except:
     print("Shutting down...")
     time.sleep(2)
