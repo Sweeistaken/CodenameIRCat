@@ -441,7 +441,7 @@ def session(connection, client, ip):
                             if command == "PRIVMSG":
                                 args = args[1:]
                                 if args[0][0] == ":":
-                                    args[0] == args[0][1:]
+                                    args[0] = args[0][1:]
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "PULL":
@@ -460,6 +460,8 @@ def session(connection, client, ip):
                         elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv"):
                             if command == "PRIVMSG":
                                 args = args[1:]
+                                if args[0][0] == ":":
+                                    args[0] = args[0][1:]
                             if len(args) == 0:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                             elif args[0].upper() == "IDENTIFY":
