@@ -57,7 +57,7 @@
    -  [ ] Map PASS
    -  [ ] Mock SASL PLAIN
 - [ ] SSL/TLS
-   -  [ ] Use a thread to accept connections on SSL port 6697
+   -  [x] Use a thread to accept connections on SSL port 6697
    -  [ ] Automatically reload the certificate if defined in config.
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
