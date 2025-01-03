@@ -104,7 +104,6 @@ lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lo
 channels_list = {} # Store channels and their user lists
 lower_chans = {} # Channel names in lowercase
 property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False}} # Stores properties for active users and channels
-print("Now listening on port 6667")
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
@@ -620,7 +619,9 @@ def ssl_session(sock2):
         print("Something went wrong...")
         print(traceback.format_exc())
 for ip, i in sockets.items():
+    print("Now listening on port 6667 with IP " + ip)
     threading.Thread(target=tcp_session, args=[i]).start()
 if ssl_option:
     for ip, i in sockets_ssl.items():
+        print("Now listening on SSL port 6697 with IP " + ip)
         threading.Thread(target=ssl_session, args=[i]).start()
