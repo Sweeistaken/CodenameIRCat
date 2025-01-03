@@ -32,3 +32,9 @@ motd: |
 # Restrict what IP(s) the server runs on, separated by spaces, useful if you have alternate IPs/Networks
 
 # restrict-ip: 127.0.0.1
+
+# SSL enable, certificate, and private key.
+
+# ssl: on
+# ssl_cert: /etc/letsencrypt/live/domain/fullchain.pem
+# ssl_pkey: /etc/letsencrypt/live/domain/privkey.pem
