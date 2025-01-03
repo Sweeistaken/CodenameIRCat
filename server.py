@@ -619,3 +619,8 @@ def ssl_session(sock2):
         sock.close()
         print("Something went wrong...")
         print(traceback.format_exc())
+for i in sockets:
+    threading.Thread(target=tcp_session, args=[i]).start()
+if ssl_option:
+    for i in sockets_ssl:
+        threading.Thread(target=ssl_session, args=[i]).start()
