@@ -604,20 +604,20 @@ def tcp_session(sock):
         print("Something went wrong...")
         print(traceback.format_exc())
 def ssl_session(sock2):
-    try:
-        while opened:
-            print("Waiting for connection...")
-            with context.wrap_socket(sock, server_side=True) as sock:
+    with context.wrap_socket(sock2, server_side=True) as sock:
+        try:
+            while opened:
+                print("Waiting for connection...")
                 connection, client = sock.accept()
                 ip_to = restrict_ip
                 threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
-    except:
-        print("Shutting down...")
-        time.sleep(2)
-        sock.shutdown(1)
-        sock.close()
-        print("Something went wrong...")
-        print(traceback.format_exc())
+        except:
+            print("Shutting down...")
+            time.sleep(2)
+            sock.shutdown(1)
+            sock.close()
+            print("Something went wrong...")
+            print(traceback.format_exc())
 for ip, i in sockets.items():
     print("Now listening on port 6667 with IP " + ip)
     threading.Thread(target=tcp_session, args=[i]).start()
