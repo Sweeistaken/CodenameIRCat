@@ -90,8 +90,8 @@ for i in restrict_ip.split(" "):
     sockets[i].listen(1)
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 if ssl_option:
-    context.load_cert_chain(certfile=ssl_cert)
-    context.load_keyfile(keyfile=ssl_pkey)
+    print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
+    ssl_context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
     for i in restrict_ip.split(" "):
         sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
