@@ -45,12 +45,10 @@ with open(sys.argv[1], 'r') as file:
     except: print("Using 255 as a ping timeout.")
     try: restrict_ip = data["restrict-ip"]
     except: print("Listening on all hosts possible.")
-    try: ssl_option = data["ssl"]
+    try: ssl_option = bool(data["ssl"])
     except: 
         print("SSL will be off.")
-        ssl_option = "error"
-    print([ssl_option])
-    ssl_option = ssl_option.strip().lower() == "on"
+        ssl_option = False
     if ssl_option:
         try: ssl_cert = data["ssl_cert"]
         except:
