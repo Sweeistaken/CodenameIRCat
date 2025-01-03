@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt
+import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -45,6 +45,18 @@ with open(sys.argv[1], 'r') as file:
     except: print("Using 255 as a ping timeout.")
     try: restrict_ip = data["restrict-ip"]
     except: print("Listening on all hosts possible.")
+    try: ssl_option = data["ssl"] == "on"
+    except: 
+        print("SSL will be off.")
+        ssl_option = False
+    if ssl_option:
+        try: ssl_cert = data["ssl_cert"]
+        except:
+            print("IRCat needs an SSL cert to use SSL!")
+            sys.exit(1)
+        try: ssl_pkey = data["ssl_pkey"]
+        except:
+            print("IRCat needs an SSL Private Key to use SSL!")
     file.close()
     print("Successfully loaded config!")
 class IRCat_DATA_BROKER:
@@ -68,11 +80,23 @@ class IRCat_DATA_BROKER:
             return ["Nickname doesn't exist."]
         
 config = IRCat_DATA_BROKER()
-tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-tcp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server_address = (restrict_ip, 6667)
-tcp_socket.bind(server_address)
-tcp_socket.listen(1)
+sockets = {}
+sockets_ssl = {}
+# Open the specified non-SSL sockets.
+for i in restrict_ip.split(" "):
+    sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sockets[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sockets[i].bind((i,6667))
+    sockets[i].listen(1)
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+if ssl_option:
+    context.load_cert_chain(certfile=ssl_cert)
+    context.load_keyfile(keyfile=ssl_pkey)
+    for i in restrict_ip.split(" "):
+        sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sockets_ssl[i].bind((i,6697))
+        sockets_ssl[i].listen(1)
 opened=True
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
@@ -97,7 +121,7 @@ def pinger(nick, connection):
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
                 break
-def session(connection, client, ip):
+def session(connection, client, ip, ssl=False):
     global property_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
@@ -566,14 +590,32 @@ def cleanup_manual():
                     if k != h and k in nickname_list:
                         nickname_list[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
 
-try:
-    while opened:
-        print("Waiting for connection...")
-        connection, client = tcp_socket.accept()
-        ip_to = restrict_ip
-        threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
-except:
-    print("Shutting down...")
-    time.sleep(2)
-    tcp_socket.shutdown(1)
-    tcp_socket.close()
+def tcp_session(sock):
+    try:
+        while opened:
+            print("Waiting for connection...")
+            connection, client = sock.accept()
+            ip_to = restrict_ip
+            threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
+    except:
+        print("Shutting down...")
+        time.sleep(2)
+        sock.shutdown(1)
+        sock.close()
+        print("Something went wrong...")
+        print(traceback.format_exc())
+def ssl_session(sock2):
+    try:
+        while opened:
+            print("Waiting for connection...")
+            with context.wrap_socket(sock, server_side=True) as sock:
+                connection, client = sock.accept()
+                ip_to = restrict_ip
+                threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
+    except:
+        print("Shutting down...")
+        time.sleep(2)
+        sock.shutdown(1)
+        sock.close()
+        print("Something went wrong...")
+        print(traceback.format_exc())
