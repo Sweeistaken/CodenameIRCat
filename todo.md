@@ -1,6 +1,6 @@
 # To-Do list
 - [ ] Implement the base of an IRCd, using Libera.Chat and RFC1459 as a reference
-   -  [x] Add the (full) connection process
+   -  [x] [Add the (full) connection process](https://mastodon.swee.codes/@swee/113659491393674897)
    -  [x] Add join/part, and it's requirements (WHO, etc)
    -  [x] Implement proper PRIVMSG
    -  [x] Broadcast QUIT
@@ -11,7 +11,7 @@
    -  [ ] Wildcard logic (for +b and +q)
    -  [x] Send PING and wait for PONG
    -  [x] Reply PONG if received PING
-   -  [x] Change of nicknames
+   -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887)
    -  [ ] Change of hostnames
    -  [x] Away
    -  [ ] Multi-server support
@@ -57,7 +57,7 @@
    -  [ ] Map PASS
    -  [ ] Mock SASL PLAIN
 - [ ] SSL/TLS
-   -  [x] Use a thread to accept connections on SSL port 6697
+   -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774)
    -  [ ] Automatically reload the certificate if defined in config.
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
