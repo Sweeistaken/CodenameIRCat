@@ -620,10 +620,6 @@ def tcp_session(sock):
                 ip_to = restrict_ip
                 threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
         except:
-            print("Shutting down...")
-            time.sleep(2)
-            sock.shutdown(1)
-            sock.close()
             print("Something went wrong...")
             print(traceback.format_exc())
 def ssl_session(sock2):
@@ -636,10 +632,6 @@ def ssl_session(sock2):
                     ip_to = restrict_ip
                     threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
             except:
-                print("Shutting down...")
-                time.sleep(2)
-                sock.shutdown(1)
-                sock.close()
                 print("Something went wrong...")
                 print(traceback.format_exc())
 for ip, i in sockets.items():
