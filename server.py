@@ -153,6 +153,8 @@ def session(connection, client, ip, ssl=False):
         except:
             hostname = client[0]
             connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
+        updateklines()
+        global banlist
         if ip in banlist:
             print("Specified IP is banned, killing now.")
             reason = banlist[ip]
