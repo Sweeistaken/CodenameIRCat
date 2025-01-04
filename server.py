@@ -23,6 +23,18 @@ This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 restrict_ip = ''
+global banlist
+banlist = {}
+def updateklines():
+    global banlist
+    try:
+        klines = open(data["klinepath"]).read().split("\n")
+        for i in klines:
+            specifiedip = klines.split(" ")[0]
+            specifiedreason = " ".join(klines.split(" ")[1:])
+            banlist[specifiedip] = specifiedreason
+    except:
+        banlist = {}
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
     try: server = data["host"]
@@ -57,6 +69,7 @@ with open(sys.argv[1], 'r') as file:
         try: ssl_pkey = data["ssl_pkey"]
         except:
             print("IRCat needs an SSL Private Key to use SSL!")
+    updateklines()
     file.close()
     print("Successfully loaded config!")
 class IRCat_DATA_BROKER:
@@ -140,6 +153,13 @@ def session(connection, client, ip, ssl=False):
         except:
             hostname = client[0]
             connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
+        if ip in banlist:
+            print("Specified IP is banned, killing now.")
+            reason = banlist[ip]
+            connection.sendall(bytes(f":{server} NOTICE * :{reason}\r\n","UTF-8"))
+            connection.sendall(bytes(f":{server} 465 * :You are banned from this server\r\n","UTF-8"))
+            connection.sendall(bytes(f"ERROR :Closing Link: {hostname} (K-Lined)\r\n","UTF-8"))
+            raise Exception("Killed connection, IP is banned.")
         while True:
             try:
                 data = connection.recv(2048)
