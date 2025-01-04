@@ -33,7 +33,10 @@ def updateklines():
             specifiedip = i.split(" ")[0]
             specifiedreason = " ".join(i.split(" ")[1:])
             banlist[specifiedip] = specifiedreason
+        print(f"Updated ban list! {banlist}")
     except:
+        print("Failed to update banlist...")
+        print(traceback.format_exc())
         banlist = {}
 with open(sys.argv[1], 'r') as file:
     data = yaml.safe_load(file)
