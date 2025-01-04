@@ -29,6 +29,7 @@ def updateklines():
     global banlist
     try:
         klines = open(data["klinepath"]).read().split("\n")
+        print(open(data["klinepath"]).read())
         for i in klines:
             specifiedip = i.split(" ")[0]
             specifiedreason = " ".join(i.split(" ")[1:])
