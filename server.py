@@ -155,9 +155,9 @@ def session(connection, client, ip, ssl=False):
             connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
         updateklines()
         global banlist
-        if ip in banlist:
+        if client[0] in banlist:
             print("Specified IP is banned, killing now.")
-            reason = banlist[ip]
+            reason = banlist[client[0]]
             connection.sendall(bytes(f":{server} NOTICE * :{reason}\r\n","UTF-8"))
             connection.sendall(bytes(f":{server} 465 * :You are banned from this server\r\n","UTF-8"))
             connection.sendall(bytes(f"ERROR :Closing Link: {hostname} (K-Lined)\r\n","UTF-8"))
