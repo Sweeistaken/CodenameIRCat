@@ -30,8 +30,8 @@ def updateklines():
     try:
         klines = open(data["klinepath"]).read().split("\n")
         for i in klines:
-            specifiedip = klines.split(" ")[0]
-            specifiedreason = " ".join(klines.split(" ")[1:])
+            specifiedip = i.split(" ")[0]
+            specifiedreason = " ".join(i.split(" ")[1:])
             banlist[specifiedip] = specifiedreason
     except:
         banlist = {}
