@@ -129,7 +129,14 @@ def pinger(nick, connection):
                 print("Sent ping message to " + nick)
                 property_list[nick]["ping_pending"] = True
                 time.sleep(0.5)
-                connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+                try:
+                    connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+                except Exception as ex:
+                    property_list[nick]["cause"] = "Send error: " + str(ex)
+                    print("SHUTTING DOWN FOR " + nick)
+                    connection.shutdown(socket.SHUT_WR)
+                    connection.close()
+                    break
         elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > ping_timeout):
             if nick in property_list:
                 property_list[nick]["cause"] = f"Ping timeout: {ping_timeout} seconds"
@@ -169,6 +176,9 @@ def session(connection, client, ip, ssl=False):
         while True:
             try:
                 data = connection.recv(2048)
+                if not data:
+                    cause = "Remote host closed the connection"
+                    break
             except Exception as ex:
                 cause = "Read error: " + str(ex)
                 break
@@ -564,11 +574,7 @@ def session(connection, client, ip, ssl=False):
                         
             except Exception as ex:
                 print(traceback.format_exc())
-                cause = "Read error: " + str(ex)
-                break
-            
-            if not data:
-                cause = "Remote host closed the connection"
+                cause = "Internal IRCat error: " + str(ex)
                 break
     finally:
         connection.close()
