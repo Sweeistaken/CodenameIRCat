@@ -120,7 +120,7 @@ nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
 channels_list = {} # Store channels and their user lists
 lower_chans = {} # Channel names in lowercase
-property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False}} # Stores properties for active users and channels
+property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot", "modes": "iw"},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False, "modes": "iw"}} # Stores properties for active users and channels
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
