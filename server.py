@@ -25,8 +25,8 @@ ping_timeout = 255
 restrict_ip = ''
 global banlist
 banlist = {}
-global modules
-modules = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
+global mods
+mods = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
 def updateklines():
     global banlist
     try:
@@ -92,23 +92,23 @@ for mod in modules:
             if not j in data:
                 raise Exception(f"Module {mod} requires {j} in configuration.")
         if temp_module.__ircat_type__ == "sql.provider":
-            if modules["sql_provider"] != None:
-                modules["sql_provider"] = temp_module
+            if mods["sql_provider"] != None:
+                mods["sql_provider"] = temp_module
             else:
                 raise Exception(f"Tried to import {mod} as an SQL provider, but something's already the SQL provider.")
         elif temp_module.__ircat_type__ == "command":
-            modules["command"].append(temp_module)
+            mods["command"].append(temp_module)
     except:
         print(f"Module {i} failed to load.")
         print(traceback.format_exc())
         sys.exit(1)
-if modules["sql_provider"] == None:
+if mods["sql_provider"] == None:
     print("IRCat needs an SQL provider.")
     sys.exit(1)
 sqlproviderequires = {}
-for i in modules["sql_provider"].__ircat_requires__:
+for i in mods["sql_provider"].__ircat_requires__:
     sqlproviderequires[i.replace("-", "_")] = sqlproviderequires
-config = modules["sql_provider"].broker(**sqlproviderequires)
+config = mods["sql_provider"].broker(**sqlproviderequires)
 sockets = {}
 sockets_ssl = {}
 # Open the specified non-SSL sockets.
