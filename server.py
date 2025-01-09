@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib.util
+import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -82,17 +82,18 @@ with open(sys.argv[1], 'r') as file:
     updateklines()
     file.close()
     print("Successfully loaded config!")
-for i in modules:
+for mod in modules:
+    i = mod
     if not os.path.isabs(i):
         i = os.path.dirname(__file__) + "/modules/" + i
     try:
-        print(f"Importing module {i}...")
-        temp_module = importlib.util.spec_from_file_location(f"{i}.py")
+        print(f"Importing module {mod}...")
+        temp_module = importlib.util.module_from_spec(importlib.util.spec_from_file_location(mod, f"{i}.py"))
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
             else:
-                raise Exception(f"Tried to import {i} as an SQL provider, but something's already the SQL provider.")
+                raise Exception(f"Tried to import {mod} as an SQL provider, but something's already the SQL provider.")
         elif temp_module.__ircat_type__ == "command":
             modules["command"].append(temp_module)
     except:
