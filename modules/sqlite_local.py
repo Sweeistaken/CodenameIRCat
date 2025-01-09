@@ -2,7 +2,7 @@
 import sqlite3
 __ircat_type__ = "sql.provider" # The type of module
 __ircat_requires__ = ["data-path"] # The required config.yml entries.
-class SQLiteDataBroker:
+class broker:
     def __init__(self, data_path):
         if not os.path.isfile(data_path):
             print("Creating database file...")
