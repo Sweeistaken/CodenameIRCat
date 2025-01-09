@@ -84,10 +84,10 @@ with open(sys.argv[1], 'r') as file:
     print("Successfully loaded config!")
 for i in modules:
     if not os.path.isabs(i):
-        i = "modules/" + i
+        i = os.path.dirname(__file__) + "/" + i
     try:
         print(f"Importing module {i}...")
-        temp_module = importlib.import_module(i)
+        temp_module = importlib.import_module(i + ".py")
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
