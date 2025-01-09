@@ -42,6 +42,7 @@ def updateklines():
         print(traceback.format_exc())
         banlist = {}
 with open(sys.argv[1], 'r') as file:
+    global data
     data = yaml.safe_load(file)
     try: server = data["host"]
     except: print("using fallback server address")
@@ -51,10 +52,6 @@ with open(sys.argv[1], 'r') as file:
     except: print("using fallback identifier")
     try: admin_nick = data["admin-nick"]
     except: print("using fallback admin nick")
-    try: data_path = data["data-path"]
-    except:
-        print("IRCat requires \"data-path\" in config.yml")
-        sys.exit(1)
     try: motd = data["motd"]
     except: print("using fallback MOTD")
     try: motd_file = data["motd-file"]
@@ -91,6 +88,9 @@ for mod in modules:
         spc = importlib.util.spec_from_file_location(mod, f"{i}.py")
         temp_module = importlib.util.module_from_spec(spc)
         spc.loader.exec_module(temp_module)
+        for j in temp_module.__ircat_requires__:
+            if not j in data:
+                raise exception(f"Module {mod} requires {j} in configuration.")
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
