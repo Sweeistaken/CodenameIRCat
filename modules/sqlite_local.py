@@ -1,7 +1,7 @@
 # IRCat module for local SQLite database (default)
 import sqlite3
 __ircat_type__ = "sql.provider" # The type of module
-__ircat_requires__ = [data_path] # The required config.yml entries.
+__ircat_requires__ = ["data_path"] # The required config.yml entries.
 class SQLiteDataBroker:
     def __init__(self):
         if not os.path.isfile(data_path):
