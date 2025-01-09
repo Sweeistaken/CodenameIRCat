@@ -107,7 +107,7 @@ if mods["sql_provider"] == None:
     sys.exit(1)
 sqlproviderequires = {}
 for i in mods["sql_provider"].__ircat_requires__:
-    sqlproviderequires[i.replace("-", "_")] = sqlproviderequires
+    sqlproviderequires[i.replace("-", "_")] = data[i]
 config = mods["sql_provider"].broker(**sqlproviderequires)
 sockets = {}
 sockets_ssl = {}
