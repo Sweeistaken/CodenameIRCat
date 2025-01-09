@@ -92,7 +92,7 @@ for mod in modules:
             if not j in data:
                 raise Exception(f"Module {mod} requires {j} in configuration.")
         if temp_module.__ircat_type__ == "sql.provider":
-            if mods["sql_provider"] != None:
+            if mods["sql_provider"] == None:
                 mods["sql_provider"] = temp_module
             else:
                 raise Exception(f"Tried to import {mod} as an SQL provider, but something's already the SQL provider.")
