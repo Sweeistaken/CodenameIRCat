@@ -105,7 +105,10 @@ for mod in modules:
 if modules["sql_provider"] == None:
     print("IRCat needs an SQL provider.")
     sys.exit(1)
-config = modules["sql_provider"].broker()
+sqlproviderequires = {}
+for i in modules["sql_provider"].__ircat_requires__:
+    sqlproviderequires[i.replace("-", "_")] = sqlproviderequires
+config = modules["sql_provider"].broker(**sqlproviderequires)
 sockets = {}
 sockets_ssl = {}
 # Open the specified non-SSL sockets.
