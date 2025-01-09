@@ -90,7 +90,7 @@ for mod in modules:
         spc.loader.exec_module(temp_module)
         for j in temp_module.__ircat_requires__:
             if not j in data:
-                raise exception(f"Module {mod} requires {j} in configuration.")
+                raise Exception(f"Module {mod} requires {j} in configuration.")
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
