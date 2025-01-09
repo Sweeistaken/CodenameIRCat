@@ -2,7 +2,7 @@
 __version__ = "0.0.1-pre-alpha"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt
+import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib.util
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -25,6 +25,8 @@ ping_timeout = 255
 restrict_ip = ''
 global banlist
 banlist = {}
+global mods
+mods = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
 def updateklines():
     global banlist
     try:
@@ -73,30 +75,36 @@ with open(sys.argv[1], 'r') as file:
         try: ssl_pkey = data["ssl_pkey"]
         except:
             print("IRCat needs an SSL Private Key to use SSL!")
+    try: modules = data["modules"]
+    except:
+        print("IRCat needs at least one module enabled.")
+        sys.exit(1)
     updateklines()
     file.close()
     print("Successfully loaded config!")
-class IRCat_DATA_BROKER:
-    def __init__(self):
-        if not os.path.isfile(data_path):
-            print("Creating database file...")
-            open(data_path, "w").write("")
-        self.conn = sqlite3.connect(data_path)
-        db = self.conn.cursor()
-        print("Creating NickServ table...")
-        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), cloak varchar(255))""")
-        print("Creating Groups table...")
-        db.execute("""CREATE table IF NOT EXISTS groups (name varchar(255), owner varchar(255))""")
-        print("Creating ChanServ table...")
-        db.execute("""CREATE table IF NOT EXISTS chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
-    def nickserv_identify(self, nick, password:str):
-        db = self.conn.cursor()
-        password = password.encode("UTF-8")
-        db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
-        if db.fetchall() == []:
-            return ["Nickname doesn't exist."]
-        
-config = IRCat_DATA_BROKER()
+for i in modules:
+    if not os.path.isabs(i):
+        i = "modules/" + i
+    try:
+        print(f"Importing module {i}...")
+        temp_module = importlib.import_module(i)
+        if temp_module.__ircat_type__ == "sql.provider":
+            global modules
+            if modules["sql_provider"] != None:
+                modules["sql_provider"] = temp_module
+            else:
+                raise Exception(f"Tried to import {i} as an SQL provider, but something's already the SQL provider.")
+        elif temp_module.__ircat_type__ == "command":
+            global modules
+            modules["command"].append(temp_module)
+    except:
+        print(f"Module {i} failed to load.")
+        print(traceback.format_exc())
+        sys.exit(1)
+if modules["sql_provider"] == None:
+    print("IRCat needs an SQL provider.")
+    sys.exit(1)
+config = modules["sql_provider"].broker()
 sockets = {}
 sockets_ssl = {}
 # Open the specified non-SSL sockets.
