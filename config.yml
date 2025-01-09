@@ -42,3 +42,7 @@ motd: |
 # A file used to store IP bans (K-Lines) and their reasons
 
 klinepath: /path/to/bans.txt
+
+# Use of modules in the /modules folder, or in an absolute path specified.
+modules:
+  - sqlite_local
