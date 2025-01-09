@@ -88,7 +88,9 @@ for mod in modules:
         i = os.path.dirname(__file__) + "/modules/" + i
     try:
         print(f"Importing module {mod}...")
-        temp_module = importlib.util.module_from_spec(importlib.util.spec_from_file_location(mod, f"{i}.py"))
+        spc = importlib.util.spec_from_file_location(mod, f"{i}.py")
+        temp_module = importlib.util.module_from_spec(spc)
+        spc.loader.exec_module(temp_module)
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
