@@ -87,7 +87,7 @@ for i in modules:
         i = os.path.dirname(__file__) + "/" + i
     try:
         print(f"Importing module {i}...")
-        temp_module = importlib.import_module(i + ".py")
+        temp_module = importlib.util.spec_from_file_location(f"{i}.py")
         if temp_module.__ircat_type__ == "sql.provider":
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
