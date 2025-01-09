@@ -84,7 +84,7 @@ with open(sys.argv[1], 'r') as file:
     print("Successfully loaded config!")
 for i in modules:
     if not os.path.isabs(i):
-        i = os.path.dirname(__file__) + "/" + i
+        i = os.path.dirname(__file__) + "/modules/" + i
     try:
         print(f"Importing module {i}...")
         temp_module = importlib.util.spec_from_file_location(f"{i}.py")
