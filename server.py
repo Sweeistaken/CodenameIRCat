@@ -25,8 +25,8 @@ ping_timeout = 255
 restrict_ip = ''
 global banlist
 banlist = {}
-global mods
-mods = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
+global modules
+modules = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
 def updateklines():
     global banlist
     try:
@@ -89,13 +89,11 @@ for i in modules:
         print(f"Importing module {i}...")
         temp_module = importlib.import_module(i)
         if temp_module.__ircat_type__ == "sql.provider":
-            global modules
             if modules["sql_provider"] != None:
                 modules["sql_provider"] = temp_module
             else:
                 raise Exception(f"Tried to import {i} as an SQL provider, but something's already the SQL provider.")
         elif temp_module.__ircat_type__ == "command":
-            global modules
             modules["command"].append(temp_module)
     except:
         print(f"Module {i} failed to load.")
