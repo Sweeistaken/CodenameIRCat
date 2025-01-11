@@ -8,6 +8,7 @@ class IRCatModule:
         "                                 .''." # Latest Supernets spambot!
     ]
     memory = {} # {nick: {channel: trustlevel}} one can also be {nick: True} if it is whitelisted for the session.
+    useSQLengine = False
     def __init__(self, ban_provider, sql):
         self.ban_provider = ban_provider
         if ban_provider == "sql":
