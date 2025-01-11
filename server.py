@@ -13,7 +13,7 @@ identifier = "somewhere in the universe"
 admin_nick = "admin"
 data_path  = ""
 motd = """
-  ____          _                                   ___ ____   ____      _   
+  ____          _                                   ___ ____   ____      _  F 
  / ___|___   __| | ___ _ __   __ _ _ __ ___   ___  |_ _|  _ \ / ___|__ _| |_ 
 | |   / _ \ / _` |/ _ \ '_ \ / _` | '_ ` _ \ / _ \  | || |_) | |   / _` | __|
 | |__| (_) | (_| |  __/ | | | (_| | | | | | |  __/  | ||  _ <| |__| (_| | |_ 
@@ -263,11 +263,11 @@ def session(connection, client, ip, ssl=False):
                         print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                     elif command == "LIST":
-                        connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name","UTF-8"))
+                        connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
                         for key, value in topic_list.items():
                             usersin = len(channels_list[key])
-                            connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}","UTF-8"))
-                        connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST","UTF-8"))
+                            connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
+                        connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
                     elif command == "MOTD":
                         if motd_file != None:
                             motd = open(motd_file).read()
