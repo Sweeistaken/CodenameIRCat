@@ -23,24 +23,8 @@ This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 restrict_ip = ''
-global banlist
-banlist = {}
 global mods
-mods = {"sql_provider": None, "command": [], "allsocket": [], "banprovider": None}
-def updateklines():
-    global banlist
-    try:
-        klines = open(data["klinepath"]).read().split("\n")
-        print(open(data["klinepath"]).read())
-        for i in klines:
-            specifiedip = i.split(" ")[0]
-            specifiedreason = " ".join(i.split(" ")[1:])
-            banlist[specifiedip] = specifiedreason
-        print(f"Updated ban list! {banlist}")
-    except:
-        print("Failed to update banlist...")
-        print(traceback.format_exc())
-        banlist = {}
+mods = {"sql_provider": None, "command": [], "allsocket": []}
 with open(sys.argv[1], 'r') as file:
     global data
     data = yaml.safe_load(file)
@@ -76,7 +60,6 @@ with open(sys.argv[1], 'r') as file:
     except:
         print("IRCat needs at least one module enabled.")
         sys.exit(1)
-    updateklines()
     file.close()
     print("Successfully loaded config!")
 for mod in modules:
@@ -195,15 +178,6 @@ def session(connection, client, ip, ssl=False):
         except:
             hostname = client[0]
             connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
-        updateklines()
-        global banlist
-        if client[0] in banlist:
-            print("Specified IP is banned, killing now.")
-            reason = banlist[client[0]]
-            connection.sendall(bytes(f":{server} 465 * :You are banned from this server\r\n","UTF-8"))
-            connection.sendall(bytes(f"ERROR :Closing Link: {hostname} (K-Lined: {reason})\r\n","UTF-8"))
-            time.sleep(3)
-            raise Exception("Killed connection, IP is banned.")
         while True:
             try:
                 data = connection.recv(2048)
