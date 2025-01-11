@@ -109,6 +109,7 @@ for i in mods['allsocket']:
         print(i.__ircat_fakechannels__)
         topic_list = {**topic_list, **i.__ircat_fakechannels__}
         for j, v in __ircat_fakechannels__.items():
+            print(j)
             channels_list[j] = ["NickServ"]
     except Exception as ex:
         print(str(ex))
