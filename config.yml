@@ -48,3 +48,5 @@ ban-provider: /path/to/bans.txt
 # Use of modules in the /modules folder, or in an absolute path specified.
 modules:
   - sqlite_local
+  - ban_engine
+  - protection_supernets
