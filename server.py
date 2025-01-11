@@ -106,9 +106,9 @@ for i in mods['allsocket']:
     if "sql" in i.__ircat_giveme__:
         requires["sql"] = config
     try:
+        print(i.__ircat_fakechannels__)
         topic_list = {**topic_list, **i.__ircat_fakechannels__}
         for i, v in __ircat_fakechannels__.items():
-            print('Adding fake channel' + i)
             channels_list[i] = ["NickServ"]
     except Exception as ex:
         print(str(ex))
