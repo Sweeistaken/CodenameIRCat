@@ -107,7 +107,7 @@ for i in mods['allsocket']:
     if "__ircat_fakechannels__" in dir(i):
         topic_list = topic_list | i.__ircat_fakechannels__
         for i, v in __ircat_fakechannels__.items():
-            channels_list[i] = []
+            channels_list[i] = ["NickServ"]
     socketListeners.append(i.IRCatModule(**requires))
 commandProviders = []
 for i in mods['command']:
