@@ -20,7 +20,7 @@ class IRCatModule:
             open(self.ban_provider, "a").write(f"\n{ip} Botnet detected!")
         raise Exception("Botnet detected!")
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
-        if validated:
+        if cachedNick != None:
             if cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] != 0:
                 print(value)
                 if "JOIN" in value:
