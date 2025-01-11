@@ -98,6 +98,8 @@ for mod in modules:
                 raise Exception(f"Tried to import {mod} as an SQL provider, but something's already the SQL provider.")
         elif temp_module.__ircat_type__ == "command":
             mods["command"].append(temp_module)
+        elif temp_module.__ircat_type__ == "allsocket":
+            mods["allsocket"].append(temp_module)
     except:
         print(f"Module {i} failed to load.")
         print(traceback.format_exc())
