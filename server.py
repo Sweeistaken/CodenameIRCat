@@ -104,7 +104,7 @@ for i in mods['allsocket']:
         requires[j.replace("-", "_")] = data[j]
     if "sql" in i.__ircat_giveme__:
         requires["sql"] = config
-    if __ircat_fakechannels__ in i:
+    if "__ircat_fakechannels__" in i:
         topic_list = topic_list | i.__ircat_fakechannels__
         for i, v in __ircat_fakechannels__.items():
             channels_list[i] = []
