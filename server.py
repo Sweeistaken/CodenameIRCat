@@ -107,6 +107,8 @@ for i in mods['allsocket']:
         requires["sql"] = config
     if __ircat_fakechannels__ in i:
         topic_list = topic_list | i.__ircat_fakechannels__
+        for i, v in __ircat_fakechannels__.items():
+            channels_list[i] = []
     socketListeners.append(i.IRCatModule(**requires))
 commandProviders = []
 for i in mods['command']:
@@ -293,6 +295,7 @@ def session(connection, client, ip, ssl=False):
                                         else:
                                             channels_list[channel] = [pending]
                                             lower_chans[channel.lower()] = channel
+                                            topic_list[channel] = "Topic is not implemented."
                                     except:
                                         connection.sendall(bytes(f":{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                     print(channels_list)
