@@ -21,7 +21,7 @@ class IRCatModule:
         raise Exception("Botnet detected!")
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if validated:
-            if self.memory[cachedNick + "|" + ip] != True:
+            if cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] != True:
                 if "JOIN" in value:
                     target = value.split(" ")[1]
                     self.memory[cachedNick + "|" + ip][target] = 1 # 1: Just joined the channel, continue observing.
