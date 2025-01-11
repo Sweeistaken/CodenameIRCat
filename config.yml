@@ -49,4 +49,4 @@ ban-provider: /path/to/bans.txt
 modules:
   - sqlite_local
   - ban_engine
-  - protection_supernets
+  - botnet_protect
