@@ -62,7 +62,6 @@ with open(sys.argv[1], 'r') as file:
         sys.exit(1)
     file.close()
     print("Successfully loaded config!")
-=
 for mod in modules:
     i = mod
     if not os.path.isabs(i):
