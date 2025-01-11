@@ -46,7 +46,8 @@ ban-provider: /path/to/bans.txt
 # ban-provider: sql
 
 # Use of modules in the /modules folder, or in an absolute path specified.
+# You want your protection modules BEFORE the ban engine.
 modules:
   - sqlite_local
-  - ban_engine
   - botnet_protect
+  - ban_engine
