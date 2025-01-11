@@ -21,7 +21,7 @@ class IRCatModule:
         raise Exception("Botnet detected!")
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if cachedNick != None:
-            if not (cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] == 0):
+            if not (ip in self.memory and self.memory[ip] == 0):
                 print(value)
                 if "JOIN" in value:
                     target = value.split(" ")[1]
@@ -31,7 +31,9 @@ class IRCatModule:
                 elif "PRIVMSG" in value:
                     target = value.split(" ")[1]
                     content = " ".join(value.split(" ")[2:])[1:]
-                    if content in self.sus_strings and (cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] == 1):
-                        self.ban(ip)
+                    if content in self.sus_strings and ( and ):
+                        if ip in self.memory:
+                            if self.memory[ip] == 1:
+                                self.ban(ip)
                     else:
                         self.memory[ip] = 0 # 0: Trust the connection  :3
