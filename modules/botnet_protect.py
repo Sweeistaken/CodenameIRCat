@@ -21,7 +21,7 @@ class IRCatModule:
         raise Exception("Botnet detected!")
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if cachedNick != None:
-            if cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] != 0:
+            if not (cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] == 0):
                 print(value)
                 if "JOIN" in value:
                     target = value.split(" ")[1]
