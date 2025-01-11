@@ -62,6 +62,7 @@ with open(sys.argv[1], 'r') as file:
         sys.exit(1)
     file.close()
     print("Successfully loaded config!")
+=
 for mod in modules:
     i = mod
     if not os.path.isabs(i):
@@ -87,6 +88,8 @@ for mod in modules:
         print(f"Module {i} failed to load.")
         print(traceback.format_exc())
         sys.exit(1)
+global topic_list
+topic_list = {}
 if mods["sql_provider"] == None:
     print("IRCat needs an SQL provider.")
     sys.exit(1)
@@ -102,6 +105,8 @@ for i in mods['allsocket']:
         requires[j.replace("-", "_")] = data[j]
     if "sql" in i.__ircat_giveme__:
         requires["sql"] = config
+    if __ircat_fakechannels__ in i:
+        topic_list = topic_list | i.__ircat_fakechannels__
     socketListeners.append(i.IRCatModule(**requires))
 commandProviders = []
 for i in mods['command']:
@@ -256,6 +261,12 @@ def session(connection, client, ip, ssl=False):
                         e = text.split(" ")[1]
                         print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
+                    elif command == "LIST":
+                        connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name","UTF-8"))
+                        for key, value in topic_list.items():
+                            usersin = len(channels_list[key])
+                            connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}","UTF-8"))
+                        connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST","UTF-8"))
                     elif command == "MOTD":
                         if motd_file != None:
                             motd = open(motd_file).read()
