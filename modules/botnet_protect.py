@@ -15,6 +15,7 @@ class IRCatModule:
             self.useSQLengine = True
             self.SQLengine = sql
     def ban(self, ip):
+        del self.memory[ip]
         if self.useSQLengine:
             cur = self.SQLengine.conn.cursor()
         else:
