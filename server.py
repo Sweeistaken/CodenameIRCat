@@ -184,9 +184,6 @@ def session(connection, client, ip, ssl=False):
                 if not data:
                     cause = "Remote host closed the connection"
                     break
-                for i in mods["allsocket"]:
-                    if "onSocket" in dir(i):
-                        i.onSocket(socket=connection, ip=client[0], value=data.decode(), cachedNick=pending if pending != "*" else None)
             except Exception as ex:
                 cause = "Read error: " + str(ex)
                 break
@@ -194,6 +191,9 @@ def session(connection, client, ip, ssl=False):
             try:
                 textt = data.decode()
                 for text in textt.replace("\r", "").split("\n"):
+                    for i in socketListeners:
+                        if "onSocket" in dir(i):
+                            i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None)
                     command = text.split(" ")[0].upper()
                     try:
                         args = text.split(" ")[1:]
@@ -225,7 +225,7 @@ def session(connection, client, ip, ssl=False):
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False}
                         lower_nicks[pending.lower()] = pending
-                        for i in mods["allsocket"]:
+                        for i in socketListeners:
                             if "onValidate" in dir(i):
                                 i.onValidate(socket=connection, ip=client[0])
                         threading.Thread(target=pinger, args=[pending, connection]).start()
