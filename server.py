@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-__version__ = "0.0.1-pre-alpha"
+__version__ = "0.0.4"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, ssl, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib
