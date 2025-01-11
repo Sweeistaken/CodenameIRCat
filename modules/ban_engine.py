@@ -5,12 +5,12 @@ __ircat_giveme__ ["sql"]
 class IRCatModule:
     memory = {} # {ip: [content]}
     useSQLengine = False
-    def __init__(self, ban_provider, host):
+    def __init__(self, ban_provider, host, sql):
         self.ban_provider = ban_provider
         if ban_provider == "sql":
             self.host = host
             self.useSQLengine = True
-            self.SQLengine = config
+            self.SQLengine = sql
     def onValidate(self, socket, ip):
         print("IP is banned, killing connection now...")
         reason = " ".join(i.split(" ")[1:])
