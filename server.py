@@ -191,6 +191,9 @@ def session(connection, client, ip, ssl=False):
                 if not data:
                     cause = "Remote host closed the connection"
                     break
+                for i in mods["allsocket"]:
+                    if "onSocket" in dir(i):
+                        i.onSocket(socket=connection, ip=client[0], value=data.decode(), cachedNick=pending if pending != "*" else None)
             except Exception as ex:
                 cause = "Read error: " + str(ex)
                 break
@@ -229,6 +232,9 @@ def session(connection, client, ip, ssl=False):
                         nickname_list[pending] = connection
                         property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False}
                         lower_nicks[pending.lower()] = pending
+                        for i in mods["allsocket"]:
+                            if "onValidate" in dir(i):
+                                i.onValidate(socket=connection, ip=client[0])
                         threading.Thread(target=pinger, args=[pending, connection]).start()
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
@@ -586,7 +592,7 @@ def session(connection, client, ip, ssl=False):
                         
             except Exception as ex:
                 print(traceback.format_exc())
-                cause = "Internal IRCat error: " + str(ex)
+                cause = "" + str(ex)
                 break
     finally:
         connection.close()
