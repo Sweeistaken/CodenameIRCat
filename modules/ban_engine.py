@@ -22,7 +22,7 @@ class IRCatModule:
         if self.useSQLengine:
             pass
         else:
-            bans = open(self.ban_provider).read.split("\n")
+            bans = open(self.ban_provider).read().split("\n")
             for i in bans:
                 if ip in i.split(" ")[0]:
                     print("IP is banned, killing connection now...")
