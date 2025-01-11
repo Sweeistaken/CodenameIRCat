@@ -1,7 +1,7 @@
 import os, sys, sqlite3
 __ircat_type__ = "allsocket"
 __ircat_requires__ = ["ban-provider", "host"]
-__ircat_giveme__ ["sql"]
+__ircat_giveme__ = ["sql"] # Only command and allsocket have these.
 class IRCatModule:
     memory = {} # {ip: [content]}
     useSQLengine = False
