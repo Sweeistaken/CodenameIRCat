@@ -1,7 +1,7 @@
 import os, sys, sqlite3
-from __main__ import config
 __ircat_type__ = "allsocket"
 __ircat_requires__ = ["ban-provider", "host"]
+__ircat_giveme__ ["sql"]
 class IRCatModule:
     memory = {} # {ip: [content]}
     useSQLengine = False
