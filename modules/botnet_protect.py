@@ -27,7 +27,8 @@ class IRCatModule:
                 if "JOIN" in value:
                     target = value.split(" ")[1]
                     self.memory[ip] = 1 # 1: Just joined the channel, continue observing.
-                    if target == "#IRCATSUCKS":
+                    print("Autoban> Somebody joined " + target)
+                    if target.lower() == "#ircatsucks":
                         self.ban(ip)
                 elif "PRIVMSG" in value:
                     target = value.split(" ")[1]
