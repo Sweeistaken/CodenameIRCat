@@ -32,7 +32,7 @@ class IRCatModule:
                     target = value.split(" ")[1]
                     content = " ".join(value.split(" ")[2:])[1:]
                     print([content])
-                    if content in sus_strings and self.memory[ip] == 1:
+                    if content in self.sus_strings and self.memory[ip] == 1:
                         self.ban(ip)
                     else:
                         self.memory[ip] = 0 # 0: Trust the connection  :3
