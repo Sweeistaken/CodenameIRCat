@@ -7,7 +7,7 @@ class IRCatModule:
     useSQLengine = False
     def __init__(self, ban_provider, host, sql):
         self.ban_provider = ban_provider
-        self.host
+        self.host = host
         if ban_provider == "sql":
             self.useSQLengine = True
             self.SQLengine = sql
