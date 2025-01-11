@@ -111,6 +111,23 @@ sqlproviderequires = {}
 for i in mods["sql_provider"].__ircat_requires__:
     sqlproviderequires[i.replace("-", "_")] = data[i]
 config = mods["sql_provider"].broker(**sqlproviderequires)
+global socketListeners
+socketListeners = []
+for i in mods['allsocket']:
+    requires = {}
+    for j in i.__ircat_requires__:
+        requires[j.replace("-", "_")] = data[j]
+    if "sql" in i.__ircat_giveme__:
+        requires["sql"] = config
+    socketListeners.append(i.IRCatModule(**requires))
+commandProviders = []
+for i in mods['command']:
+    requires = {}
+    for j in i.__ircat_requires__:
+        requires[j.replace("-", "_")] = data[j]
+    if "sql" in i.__ircat_giveme__:
+        requires["sql"] = config
+    commandProviders.append(i.IRCatModule(**requires))
 sockets = {}
 sockets_ssl = {}
 # Open the specified non-SSL sockets.
