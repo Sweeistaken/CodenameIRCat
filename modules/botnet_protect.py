@@ -22,6 +22,7 @@ class IRCatModule:
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if validated:
             if cachedNick + "|" + ip in self.memory and self.memory[cachedNick + "|" + ip] != 0:
+                print(value)
                 if "JOIN" in value:
                     target = value.split(" ")[1]
                     self.memory[ip] = 1 # 1: Just joined the channel, continue observing.
