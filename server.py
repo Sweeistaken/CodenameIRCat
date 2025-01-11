@@ -193,7 +193,7 @@ def session(connection, client, ip, ssl=False):
                 for text in textt.replace("\r", "").split("\n"):
                     for i in socketListeners:
                         if "onSocket" in dir(i):
-                            i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None)
+                            i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None, validated=finished)
                     command = text.split(" ")[0].upper()
                     try:
                         args = text.split(" ")[1:]
