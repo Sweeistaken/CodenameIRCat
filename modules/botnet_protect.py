@@ -23,15 +23,15 @@ class IRCatModule:
         raise Exception("Botnet detected!")
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if cachedNick != None:
-            if not (ip in self.memory and self.memory[ip] == 0):
-                print(value)
-                if "JOIN" in value:
-                    target = value.split(" ")[1]
-                    self.memory[ip] = 1 # 1: Just joined the channel, continue observing.
-                    print("Autoban> Somebody joined " + target)
-                    if target.lower() == "#ircatsucks":
-                        self.ban(ip)
-                elif "PRIVMSG" in value:
+            print(value)
+            if "JOIN" in value:
+                target = value.split(" ")[1]
+                self.memory[ip] = 1 # 1: Just joined the channel, continue observing.
+                print("Autoban> Somebody joined " + target)
+                if target.lower() == "#ircatsucks":
+                    self.ban(ip)
+            elif "PRIVMSG" in value:
+                if not (ip in self.memory and self.memory[ip] == 0):
                     target = value.split(" ")[1]
                     content = " ".join(value.split(" ")[2:])[1:]
                     if content in self.sus_strings:
