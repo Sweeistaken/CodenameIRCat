@@ -89,6 +89,7 @@ for mod in modules:
         sys.exit(1)
 global topic_list
 topic_list = {}
+channels_list = {} # Store channels and their user lists
 if mods["sql_provider"] == None:
     print("IRCat needs an SQL provider.")
     sys.exit(1)
@@ -108,8 +109,8 @@ for i in mods['allsocket']:
         topic_list = topic_list | i.__ircat_fakechannels__
         for i, v in __ircat_fakechannels__.items():
             channels_list[i] = ["NickServ"]
-    except:
-        pass
+    except Exception as ex:
+        print(str(ex))
     socketListeners.append(i.IRCatModule(**requires))
 commandProviders = []
 for i in mods['command']:
@@ -140,7 +141,6 @@ opened=True
 reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
-channels_list = {} # Store channels and their user lists
 lower_chans = {} # Channel names in lowercase
 property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot", "modes": "iw", "away": False},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False, "modes": "iw"}} # Stores properties for active users and channels
 def pinger(nick, connection):
