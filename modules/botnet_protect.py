@@ -31,7 +31,7 @@ class IRCatModule:
                 elif "PRIVMSG" in value:
                     target = value.split(" ")[1]
                     content = " ".join(value.split(" ")[2:])[1:]
-                    if content in self.sus_strings and ( and ):
+                    if content in self.sus_strings:
                         if ip in self.memory:
                             if self.memory[ip] == 1:
                                 self.ban(ip)
