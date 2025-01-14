@@ -580,7 +580,7 @@ def session(connection, client, ip, ssl=False):
                                     print("Sending to "+ target + " Channel")
                                     if pending in channels_list[target]:
                                         print(channels_list[target])
-                                        for i in channels_list[channel]:
+                                        for i in channels_list[target]:
                                             try:
                                                 if i != pending:
                                                     print(i)
