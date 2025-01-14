@@ -575,10 +575,13 @@ def session(connection, client, ip, ssl=False):
                                 if target.lower() in lower_nicks:
                                     target = lower_nicks[target.lower()]
                                 if target in channels_list:
+                                    print("Sending to "+ target + " Channel")
                                     if pending in channels_list[target]:
                                         for i in channels_list[channel]:
                                             try:
                                                 if i != pending:
+                                                    print(i)
+                                                    print(f":{pending}!~{username}@{hostname} {text}\r\n")
                                                     nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                             except:
                                                 pass
