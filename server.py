@@ -169,6 +169,8 @@ def pinger(nick, connection):
                 break
 def session(connection, client, ip, ssl=False):
     global property_list
+    global channels_list
+    global nickname_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
@@ -577,14 +579,17 @@ def session(connection, client, ip, ssl=False):
                                 if target in channels_list:
                                     print("Sending to "+ target + " Channel")
                                     if pending in channels_list[target]:
+                                        print(channels_list[target])
                                         for i in channels_list[channel]:
                                             try:
                                                 if i != pending:
                                                     print(i)
                                                     print(f":{pending}!~{username}@{hostname} {text}\r\n")
                                                     nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                else:
+                                                    print(i + " Is the current user!")
                                             except:
-                                                pass
+                                                print(traceback.format_exc)
                                 elif target in nickname_list:
                                     nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
                                 else:
