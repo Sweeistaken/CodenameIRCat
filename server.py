@@ -129,7 +129,7 @@ for i in restrict_ip.split(" "):
     sockets[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 if ssl_option:
     print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
     context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
