@@ -15,6 +15,8 @@
    -  [ ] Change of hostnames
    -  [x] Away
    -  [ ] Multi-server support
+   -  [ ] `LIST`
+   -  [ ] `TOPIC`
 -  [ ] [Data file with SQLite](https://discuss.swee.codes/t/41/2)
 -  [ ] User Flags
    -  [ ] i (invisible)
