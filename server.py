@@ -130,6 +130,8 @@ for i in restrict_ip.split(" "):
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+context.options |= ssl.OP_NO_TLSv1 # Disable TLS 1.0
+context.options |= ssl.OP_NO_TLSv1_1 # Disable TLS 1.1
 if ssl_option:
     print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
     context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
