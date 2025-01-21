@@ -1,8 +1,11 @@
 name: Check syntax
-on: [push,workflow_dispatch]
+on: [push,pull_request,workflow_dispatch]
 jobs:
   check:
-    runs-on: debian-latest
+    runs-on: alpine
     steps:
+      - uses: https://git.swee.codes/swee/setup-alpine@main
+        with:
+          additional: python3
       - uses: actions/checkout@v4
       - run: python -m py_compile server.py
