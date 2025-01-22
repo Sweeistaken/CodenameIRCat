@@ -28,7 +28,7 @@ class IRCatModule:
                 if command == "PRIVMSG":
                     args = args[1:]
                     args[0] = args[0][1:] if args[0][0] == ":" else args[0]
-                if args[0].lower() == "identify":
+                if len(args) > 0 and args[0].lower() == "identify":
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Feature not implemented in PawServ plugin yet.\r\n", "UTF-8"))
                 else:
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :NickServ Usage:\r\n","UTF-8"))
