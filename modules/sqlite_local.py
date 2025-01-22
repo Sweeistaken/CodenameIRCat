@@ -8,7 +8,7 @@ class broker:
         if not os.path.isfile(data_path):
             print("Creating database file...")
             open(data_path, "w").write("")
-        self.conn = sqlite3.connect(data_path)
+        self.conn = sqlite3.connect(data_path, check_same_thread=False)
         self.fnet = Fernet(fernet_key)
         db = self.conn.cursor()
         db.execute("""CREATE table IF NOT EXISTS bans (ip varchar(255), reason varchar(255))""")
