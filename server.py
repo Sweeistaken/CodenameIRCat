@@ -292,7 +292,7 @@ def session(connection, client, ip, ssl=False):
                     elif finished:
                         processedExternally = False
                         for i in commandProviders:
-                            if i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending]):
+                            if i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection):
                                 processedExternally = True
                                 break
                         if processedExternally:
