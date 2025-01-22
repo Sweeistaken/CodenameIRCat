@@ -13,7 +13,7 @@ identifier = "somewhere in the universe"
 admin_nick = "admin"
 data_path  = ""
 motd = """
-  ____          _                                   ___ ____   ____      _  F 
+  ____          _                                   ___ ____   ____      _  
  / ___|___   __| | ___ _ __   __ _ _ __ ___   ___  |_ _|  _ \ / ___|__ _| |_ 
 | |   / _ \ / _` |/ _ \ '_ \ / _` | '_ ` _ \ / _ \  | || |_) | |   / _` | __|
 | |__| (_) | (_| |  __/ | | | (_| | | | | | |  __/  | ||  _ <| |__| (_| | |_ 
@@ -120,6 +120,14 @@ for i in mods['command']:
         requires[j.replace("-", "_")] = data[j]
     if "sql" in i.__ircat_giveme__:
         requires["sql"] = config
+    try:
+        print(i.__ircat_fakeusers__)
+        property_list = {**property_list, **i.__ircat_fakeusers__}
+        for j, v in i.__ircat_fakeusers__.items():
+            nickname_list.append(j)
+            lower_nicks[j.lower()] = j
+    except Exception as ex:
+        print(str(ex))
     commandProviders.append(i.IRCatModule(**requires))
 sockets = {}
 sockets_ssl = {}
@@ -141,11 +149,10 @@ if ssl_option:
         sockets_ssl[i].bind((i,6697))
         sockets_ssl[i].listen(1)
 opened=True
-reserved = ["nickserv", "chanserv", "gitserv"] # Reserved nicknames
 nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   {"gitserv": "GitServ", "nickserv": "NickServ"} # Nicknames in lowercase
+lower_nicks =   {"gitserv": "GitServ"} # Nicknames in lowercase
 lower_chans = {} # Channel names in lowercase
-property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Updates bot", "modes": "iw", "away": False},"NickServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Codename IRCat Integrated services - Login bot", "away": False, "modes": "iw"}} # Stores properties for active users and channels
+property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
@@ -218,7 +225,7 @@ def session(connection, client, ip, ssl=False):
                         if "!" in pending or ":" in pending or "#" in pending or "*" in pending:
                             connection.sendall(bytes(f":{server} 432 * {pending} :Erroneus nickname\r\n","UTF-8"))
                             pending = "*"
-                        elif pending.lower() in lower_nicks or pending in reserved:
+                        elif pending.lower() in lower_nicks:
                             connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                             pending = "*"
                         else:
@@ -283,7 +290,14 @@ def session(connection, client, ip, ssl=False):
                             connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
-                        if command == "JOIN":
+                        processedExternally = False
+                        for i in commandProviders:
+                            if i.command():
+                                processedExternally = True
+                                break
+                        if processedExternally:
+                            pass
+                        elif command == "JOIN":
                             channels = text.split(" ")[1]
                             for channelt in channels.split(","):
                                 channel = channelt.strip()
@@ -333,7 +347,7 @@ def session(connection, client, ip, ssl=False):
                                 if pending2[0] == ":": pending2[1:]
                                 if "!" in pending2 or ":" in pending2 or "#" in pending2 or "*" in pending2:
                                     connection.sendall(bytes(f":{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
-                                elif pending2.lower() in lower_nicks or pending2 in reserved:
+                                elif pending2.lower() in lower_nicks:
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
                                     print("Sending nickname change...")
