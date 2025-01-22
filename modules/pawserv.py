@@ -68,7 +68,8 @@ class IRCatModule:
                 elif len(args) > 0 and args[0].lower() == "identify":
                     nck = nick if len(args) == 2 else args[2]
                     temp = self.sql.nickserv_identify(nick=nck, password=args[1])
-                    if temp:
+                    print(temp)
+                    if temp != False:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Now, it would've been a successful identification, but this is work in progress.\r\n", "UTF-8"))
                     else:
                         if nick in self.memory:
