@@ -21,7 +21,7 @@ __ircat_fakeusers__ = {
 class IRCatModule:
     def __init__(self, sql, smtp_host, smtp_port, smtp_starttls, smtp_username, smtp_password, name):
         self.sql = sql
-        self.smtp_host = smtp_host
+        self.smtp_server = smtp_host
         self.smtp_port = smtp_port
         self.smtp_starttls = smtp_starttls
         self.smtp_username = smtp_username
