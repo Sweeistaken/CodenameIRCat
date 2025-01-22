@@ -55,7 +55,7 @@ class IRCatModule:
                             server.ehlo()
                             server.login(self.smtp_username, self.smtp_password)
                             server.sendmail(self.smtp_username, args[2], message)
-                        memory[nick] = [token, args[1], args[2]]
+                        self.memory[nick] = [token, args[1], args[2]]
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Needs 3 arguments, nickname, password, and email.\r\n", "UTF-8"))
                 if len(args) > 0 and args[0].lower() == "identify":
