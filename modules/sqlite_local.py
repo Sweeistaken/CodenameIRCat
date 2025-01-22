@@ -1,6 +1,6 @@
 # IRCat module for local SQLite database (default)
 import sqlite3, os, traceback
-from cryptography import Fernet
+from cryptography.fernet import Fernet
 __ircat_type__ = "sql.provider" # The type of module
 __ircat_requires__ = ["data-path", "fernet-key"] # The required config.yml entries.
 class broker:
