@@ -283,7 +283,14 @@ def session(connection, client, ip, ssl=False):
                             connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
-                        if command == "JOIN":
+                        processedExternally = False
+                        for i in commandProviders:
+                            if i.command():
+                                processedExternally = True
+                                break
+                        if processedExternally:
+                            pass
+                        elif command == "JOIN":
                             channels = text.split(" ")[1]
                             for channelt in channels.split(","):
                                 channel = channelt.strip()
