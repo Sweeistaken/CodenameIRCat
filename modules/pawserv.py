@@ -44,7 +44,7 @@ class IRCatModule:
                             connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Nickname doesn't exist, try registering again?\r\n", "UTF-8"))
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid verification.\r\n", "UTF-8"))
-                if len(args) > 0 and args[0].lower() == "register":
+                elif len(args) > 0 and args[0].lower() == "register":
                     if len(args) == 3:
                         if not nick in self.memory:
                             context = ssl.create_default_context()
@@ -62,7 +62,7 @@ class IRCatModule:
                             connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :A verification is already pending.\r\n", "UTF-8"))
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Needs 3 arguments, nickname, password, and email.\r\n", "UTF-8"))
-                if len(args) > 0 and args[0].lower() == "identify":
+                elif len(args) > 0 and args[0].lower() == "identify":
                     temp = self.sql.nickserv_identify(nick=nick if len(args) == 2 else args[2], password=args[1])
                     if temp:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Now, it would've been a successful identification, but this is work in progress.\r\n", "UTF-8"))
