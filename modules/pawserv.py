@@ -27,7 +27,7 @@ class command:
             if command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv"):
                 if command == "PRIVMSG":
                     args = args[1:]
-                    args[0] = args[0][1:] if args[0][0] == ":"
+                    args[0] = args[0][1:] if args[0][0] == ":" else args[0]
                 if args[0].lower() == "identify":
                     connection.sendall(Bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Feature not implemented in PawServ plugin yet.", "UTF-8"))
                 elif:
