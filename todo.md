@@ -54,8 +54,8 @@
    -  [ ] ident support
 - [ ] Authentication
    -  [ ] Make the server able to change the client's host
-   -  [ ] Store credentials in an SQLite3 file.
-   -  [ ] Map NickServ IDENTIFY
+   -  [x] Store credentials in an SQLite3 file.
+   -  [x] Map NickServ IDENTIFY
    -  [ ] Map PASS
    -  [ ] Mock SASL PLAIN
 - [ ] SSL/TLS
