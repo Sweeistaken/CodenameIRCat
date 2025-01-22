@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib
@@ -274,7 +274,6 @@ def session(connection, client, ip, ssl=False):
                         finished = True
                     elif command == "PING":
                         e = text.split(" ")[1]
-                        print("Replying with \"" + str([f":{server} PONG {server} :{e}\r\n"]) + "\"")
                         connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                     elif command == "LIST":
                         connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
@@ -335,7 +334,7 @@ def session(connection, client, ip, ssl=False):
                                 print("Successfully pre-loaded /NAMES list")
                         elif command == "PONG":
                             e = text.split(" ")[1]
-                            if e == server:
+                            if e == server or e == f":{server}":
                                 print(pending + " replied to PING.")
                                 property_list[pending]["last_ping"] = time.time()
                                 property_list[pending]["ping_pending"] = False
