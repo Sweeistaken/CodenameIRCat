@@ -18,7 +18,7 @@ __ircat_fakeusers__ = {
         "away": False
         }
     }
-class command:
+class IRCatModule:
     def __init__(self, sql):
         self.sql = sql
         print("PawServ loaded!")
