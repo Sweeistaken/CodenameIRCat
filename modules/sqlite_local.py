@@ -23,7 +23,8 @@ class broker:
             return False
         else:
             try:
-                return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")) == password else False
+                print(self.fnet.decrypt(bytes(e[0][2], "UTF-8")))
+                return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password else False
             except:
                 print(traceback.format_exc())
                 return False
