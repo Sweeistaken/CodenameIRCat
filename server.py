@@ -109,7 +109,7 @@ for i in mods['allsocket']:
         print(i.__ircat_fakechannels__)
         topic_list = {**topic_list, **i.__ircat_fakechannels__}
         for j, v in i.__ircat_fakechannels__.items():
-            channels_list[j] = ["NickServ"]
+            channels_list[j] = ["CatServ"]
     except Exception as ex:
         print(str(ex))
     socketListeners.append(i.IRCatModule(**requires))
@@ -150,9 +150,9 @@ if ssl_option:
         sockets_ssl[i].listen(1)
 opened=True
 nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   {"gitserv": "GitServ"} # Nicknames in lowercase
+lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
 lower_chans = {} # Channel names in lowercase
-property_list = {"GitServ": {"host": "IRCatCore", "username": "IRCat", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
+property_list = {"CatServ": {"host": "IRCatCore", "username": "Meow", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
@@ -541,7 +541,7 @@ def session(connection, client, ip, ssl=False):
                                     else:
                                         connection.sendall(bytes(f":{server} 505 {pending} :Cant change mode for other users\r\n","UTF-8"))
 
-                        elif command == "GITSERV" or (command == "PRIVMSG" and args[0].lower() == "gitserv"):
+                        elif command == "CATSERV" or (command == "PRIVMSG" and args[0].lower() == "catserv"):
                             if command == "PRIVMSG":
                                 args = args[1:]
                                 if args[0][0] == ":":
@@ -551,33 +551,16 @@ def session(connection, client, ip, ssl=False):
                             elif args[0].upper() == "PULL":
                                 updater = subprocess.run(["git", "pull"], stdout=subprocess.PIPE)
                                 if updater.stdout.decode().strip() == "Already up to date.":
-                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
                                 else:
-                                    connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
-                            elif args[0].upper() == "VERSION":
-                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
-                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
+                            elif args[0].upper() == "VERSION"
+                                connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
                             else:
-                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :GitServ Usage:\r\n","UTF-8"))
-                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
-                                connection.sendall(bytes(f":GitServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
-                        elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv"):
-                            if command == "PRIVMSG":
-                                args = args[1:]
-                                if args[0][0] == ":":
-                                    args[0] = args[0][1:]
-                            if len(args) == 0:
-                                connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
-                            elif args[0].upper() == "IDENTIFY":
-                                pass
-                            elif args[0].upper() == "VERSION":
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
-                            else:
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :NickServ Usage:\r\n","UTF-8"))
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :IDENTIFY - Identifies your nickname\r\n","UTF-8"))
-                                connection.sendall(bytes(f":NickServ!~IRCat@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
-                        
+                                connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :CatServ Usage:\r\n","UTF-8"))
+                                connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
+                                connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                         elif command == "RESTART":
                             if "o" in property_list[pending]["modes"]:
                                 tcp_socket.shutdown(socket.SHUT_RDWR)
