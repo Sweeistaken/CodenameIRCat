@@ -2,8 +2,8 @@
 __version__ = "0.0.4"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib
-from OpenSSL import SSL as ssl
+import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, bcrypt, importlib
+from OpenSSL import SSL
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
