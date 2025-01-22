@@ -1,5 +1,5 @@
 # Replacement for services bots.
-import traceback, smtplib, uuid
+import traceback, smtplib, uuid, ssl
 __ircat_type__ = "command"
 __ircat_requires__ = ["name", "smtp_host", "smtp_port", "smtp_starttls", "smtp_username", "smtp_password"]
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
