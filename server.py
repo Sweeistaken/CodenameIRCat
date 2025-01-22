@@ -128,7 +128,6 @@ for i in mods['command']:
         print(i.__ircat_fakeusers__)
         property_list = {**property_list, **i.__ircat_fakeusers__}
         for j, v in i.__ircat_fakeusers__.items():
-            nickname_list.append(j)
             lower_nicks[j.lower()] = j
     except Exception as ex:
         print(str(ex))
