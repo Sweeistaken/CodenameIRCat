@@ -45,11 +45,11 @@
    -  [x] `NAMES`
    -  [x] `WHOIS`
    -  [ ] `WHOWAS`
-- [ ] Implement services.
+- [ ] [Implement services.](modules/pawserv.py)
    -  [ ] Nickserv
    -  [ ] ChanServ
-   -  [x] GitServ (Custom user for pull)
-   -  [ ] Link `PRIVMSG *serv` to `*serv`
+   -  [x] CatServ (Outside of PawServ)
+   -  [x] Link `PRIVMSG *serv` to `*serv`
 - [ ] Extra (not planned) features
    -  [ ] ident support
 - [ ] Authentication
