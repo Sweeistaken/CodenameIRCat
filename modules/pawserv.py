@@ -29,10 +29,14 @@ class IRCatModule:
                     args = args[1:]
                     args[0] = args[0][1:] if args[0][0] == ":" else args[0]
                 if len(args) > 0 and args[0].lower() == "identify":
-                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Feature not implemented in PawServ plugin yet.\r\n", "UTF-8"))
+                    temp = self.sql.nickserv_identify(nick=nick if len(args) == 2 else args[2], password=args[1])
+                    if temp:
+                        pass
+                    else:
+                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid username/password.\r\n", "UTF-8"))
                 else:
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :NickServ Usage:\r\n","UTF-8"))
-                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :IDENTIFY <nick> pass - Identifies your nickname\r\n","UTF-8"))
+                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :IDENTIFY pass <nick> - Identifies your nickname\r\n","UTF-8"))
                 return True
             else:
                 return False
