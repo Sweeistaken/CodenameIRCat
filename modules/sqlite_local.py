@@ -23,13 +23,12 @@ class broker:
             return False
         else:
             try:
-                open("temp", "w").write(self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode())
                 return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password else False
             except:
-                open("temp", "w").write(traceback.format_exc())
                 print(traceback.format_exc())
                 return False
     def nickserv_register(self, nick, password, email):
         hashed = self.fnet.encrypt(bytes(password, "UTF-8")).decode()
         db = self.conn.cursor()
         db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?, ?);", [nick, hashed, f"user/{nick}", email])
+        self.conn.commit()
