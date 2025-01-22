@@ -267,8 +267,8 @@ def session(connection, client, ip, ssl=False):
                             motd = open(motd_file).read()
                         connection.sendall(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
                         for i in motd.rstrip().split("\n"):
-                            connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
-                        connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server} 372 {pending} :- {i}\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         # End the MOTD
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
@@ -299,6 +299,8 @@ def session(connection, client, ip, ssl=False):
                             pass
                         elif command == "JOIN":
                             channels = text.split(" ")[1]
+                            if channels[0][0] == ":":
+                                channels[0] = channels[0][1:]
                             for channelt in channels.split(","):
                                 channel = channelt.strip()
                                 if channel.lower() in lower_chans:
