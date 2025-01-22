@@ -14,10 +14,10 @@
    -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887)
    -  [ ] Change of hostnames
    -  [x] Away
-   -  [ ] Multi-server support
-   -  [ ] `LIST`
+   -  [ ] [Multi-server support](https://discuss.swee.codes/t/72)
+   -  [x] `LIST`
    -  [ ] `TOPIC`
--  [ ] [Data file with SQLite](https://discuss.swee.codes/t/41/2)
+-  [ ] [Database support](https://discuss.swee.codes/t/71)
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
