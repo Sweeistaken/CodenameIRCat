@@ -46,16 +46,20 @@ class IRCatModule:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid verification.\r\n", "UTF-8"))
                 if len(args) > 0 and args[0].lower() == "register":
                     if len(args) == 3:
-                        context = ssl.create_default_context()
-                        token = str(uuid.uuid4())
-                        message = f"\\nSubject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email,\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
-                        with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                            server.ehlo()
-                            server.starttls(context=context)
-                            server.ehlo()
-                            server.login(self.smtp_username, self.smtp_password)
-                            server.sendmail(self.smtp_username, args[2], message)
-                        self.memory[nick] = [token, args[1], args[2]]
+                        if not nick in self.memory:
+                            context = ssl.create_default_context()
+                            token = str(uuid.uuid4())
+                            message = f"\\nSubject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
+                            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                                server.ehlo()
+                                server.starttls(context=context)
+                                server.ehlo()
+                                server.login(self.smtp_username, self.smtp_password)
+                                server.sendmail(self.smtp_username, args[2], message)
+                            self.memory[nick] = [token, args[1], args[2]]
+                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Email sent, please verify.\r\n", "UTF-8"))
+                        else:
+                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :A verification is already pending.\r\n", "UTF-8"))
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Needs 3 arguments, nickname, password, and email.\r\n", "UTF-8"))
                 if len(args) > 0 and args[0].lower() == "identify":
