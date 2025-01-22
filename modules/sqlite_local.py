@@ -23,13 +23,10 @@ class broker:
             return False
         else:
             try:
-                print(e)
-                print(nick)
-                print(password)
-                print(e[0][2])
-                print(self.fnet.decrypt(bytes(e[0][2], "UTF-8")))
+                open("temp", "w").write(self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode())
                 return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password else False
             except:
+                open("temp", "w").write(traceback.format_exc())
                 print(traceback.format_exc())
                 return False
     def nickserv_register(self, nick, password, email):
