@@ -12,7 +12,7 @@ class broker:
         self.fnet = Fernet(fernet_key)
         db = self.conn.cursor()
         db.execute("""CREATE table IF NOT EXISTS bans (ip varchar(255), reason varchar(255))""")
-        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), cloak varchar(255))""")
+        db.execute("""CREATE table IF NOT EXISTS nickserv (user varchar(255), modes varchar(255), hash varchar(255), cloak varchar(255), email varchar(255))""")
         db.execute("""CREATE table IF NOT EXISTS groups (name varchar(255), owner varchar(255))""")
         db.execute("""CREATE table IF NOT EXISTS chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
     def nickserv_identify(self, nick, password:str):
@@ -27,3 +27,7 @@ class broker:
             except:
                 print(traceback.format_exc())
                 return False
+    def nickserv_register(self, nick, password, email):
+        hashed = self.fnet.encrypt(password).decode()
+        db = self.conn.cursor()
+        db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?, ?);", [nick, hashed, f"user/{nick}", email])
