@@ -42,7 +42,7 @@
    -  [ ] `MODE <external user>`
    -  [ ] `RESTART`
 - [ ] Extra commands
-   -  [ ] `USERS`
+   -  [x] `NAMES`
    -  [x] `WHOIS`
    -  [ ] `WHOWAS`
 - [ ] Implement services.
