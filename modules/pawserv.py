@@ -1,4 +1,5 @@
 # Replacement for services bots.
+import traceback
 __ircat_type__ = "command"
 __ircat_requires__ = []
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
@@ -36,4 +37,5 @@ class command:
             else:
                 return False
         except:
+            print(traceback.format_exc())
             return False
