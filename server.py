@@ -115,6 +115,9 @@ for i in mods['allsocket']:
         print(str(ex))
     socketListeners.append(i.IRCatModule(**requires))
 commandProviders = []
+nickname_list = {} # Stores nicknames and the respective sockets
+lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
+property_list = {"CatServ": {"host": "IRCatCore", "username": "Meow", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
 for i in mods['command']:
     requires = {}
     for j in i.__ircat_requires__:
@@ -150,10 +153,7 @@ if ssl_option:
         sockets_ssl[i].bind((i,6697))
         sockets_ssl[i].listen(1)
 opened=True
-nickname_list = {} # Stores nicknames and the respective sockets
-lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
 lower_chans = {} # Channel names in lowercase
-property_list = {"CatServ": {"host": "IRCatCore", "username": "Meow", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
 def pinger(nick, connection):
     global property_list
     while nick in property_list:
