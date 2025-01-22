@@ -554,7 +554,7 @@ def session(connection, client, ip, ssl=False):
                                     connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
                                 else:
                                     connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
-                            elif args[0].upper() == "VERSION"
+                            elif args[0].upper() == "VERSION":
                                 connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
                             else:
