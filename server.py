@@ -273,8 +273,11 @@ def session(connection, client, ip, ssl=False):
                         connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
                         finished = True
                     elif command == "PING":
-                        e = text.split(" ")[1]
-                        connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
+                        try:
+                            e = text.split(" ")[1]
+                            connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
+                        except:
+                            connection.sendall(bytes(f":{server} PONG {server}\r\n","UTF-8"))
                     elif command == "LIST":
                         connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
                         for key, value in topic_list.items():
