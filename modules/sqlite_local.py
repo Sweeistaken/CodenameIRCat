@@ -23,6 +23,9 @@ class broker:
             return False
         else:
             try:
+                print(e)
+                print(nick)
+                print(password)
                 print(e[0][2])
                 print(self.fnet.decrypt(bytes(e[0][2], "UTF-8")))
                 return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password else False
