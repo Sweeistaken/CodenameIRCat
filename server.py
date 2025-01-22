@@ -299,8 +299,8 @@ def session(connection, client, ip, ssl=False):
                             pass
                         elif command == "JOIN":
                             channels = text.split(" ")[1]
-                            if channels[0][0] == ":":
-                                channels[0] = channels[0][1:]
+                            if channels[0] == ":":
+                                channels = channels[1:]
                             for channelt in channels.split(","):
                                 channel = channelt.strip()
                                 if channel.lower() in lower_chans:
