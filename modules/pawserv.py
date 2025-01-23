@@ -58,7 +58,7 @@ class IRCatModule:
                             message = f"\\\nSubject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
                             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                                 server.ehlo()
-                                if self.starttls:
+                                if self.smtp_starttls:
                                     server.starttls(context=context)
                                     server.ehlo()
                                 server.login(self.smtp_username, self.smtp_password)
