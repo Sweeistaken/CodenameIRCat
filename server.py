@@ -140,9 +140,30 @@ for i in restrict_ip.split(" "):
     sockets[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
+allowedVersions = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3", "SSLv2", "SSLv3"]
+foundVersions = []
 context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-context.options |= ssl.OP_NO_TLSv1 # Disable TLS 1.0
-context.options |= ssl.OP_NO_TLSv1_1 # Disable TLS 1.1
+for i in context.get_ciphers():
+    if not i["protocol"] in foundVersions:
+        foundVersions.append(i["protocol"])
+if not "TLSv1.0" in foundVersions:
+    print("[WARN] SSL Context doesn't support TLS 1.0!")
+    context.options |= ssl.OP_NO_TLSv1 # Disable TLS 1.0
+if not "TLSv1.1" in foundVersions:
+    print("[WARN] SSL Context doesn't support TLS 1.1!")
+    context.options |= ssl.OP_NO_TLSv1_1 # Disable TLS 1.1
+if not "TLSv1.2" in foundVersions:
+    print("[WARN] SSL Context doesn't support TLS 1.1!")
+    context.options |= ssl.OP_NO_TLSv1_2 # Disable TLS 1.2
+if not "TLSv1.3" in foundVersions:
+    print("[WARN] SSL Context doesn't support TLS 1.1!")
+    context.options |= ssl.OP_NO_TLSv1_3 # Disable TLS 1.3
+if not "SSLv2" in foundVersions:
+    print("[WARN] SSL Context doesn't support SSL 2!")
+    context.options |= ssl.OP_NO_SSLv2 # Disable SSL 2
+if not "SSLv3" in foundVersions:
+    print("[WARN] SSL Context doesn't support SSL 3!")
+    context.options |= ssl.OP_NO_SSLv3 # Disable SSL 3
 if ssl_option:
     print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
     context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
