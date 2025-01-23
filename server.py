@@ -138,6 +138,7 @@ sockets_ssl = {}
 for i in restrict_ip.split(" "):
     sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sockets[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sockets[i].settimeout(None)
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
 allowedVersions = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3", "SSLv2", "SSLv3"]
@@ -170,6 +171,7 @@ if ssl_option:
     for i in restrict_ip.split(" "):
         sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sockets_ssl[i].settimeout(None)
         sockets_ssl[i].bind((i,6697))
         sockets_ssl[i].listen(1)
 opened=True
@@ -262,7 +264,7 @@ def session(connection, client, ip, isssl=False):
                     elif command == "CAP":
                         usesIRCv3 = True
                         if args[0].upper() == "LS":
-                            connection.sendall(bytes(f":{server} CAP * LS :ircat.xyz/foo sasl=PLAIN\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server} CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
                         elif args[0].upper() == "REQ":
                             if args[1].lower() == ":sasl":
                                 pass
