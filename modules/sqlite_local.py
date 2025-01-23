@@ -30,5 +30,5 @@ class broker:
     def nickserv_register(self, nick, password, email):
         hashed = self.fnet.encrypt(bytes(password, "UTF-8")).decode()
         db = self.conn.cursor()
-        db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?, ?);", [nick, hashed, f"user/{nick}", email])
+        db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
         self.conn.commit()
