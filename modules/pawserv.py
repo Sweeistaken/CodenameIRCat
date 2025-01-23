@@ -8,14 +8,19 @@ __ircat_fakeusers__ = {
         "host": "PawServ",
         "username": "Meow", 
         "realname": "PawServ plugin - Identification bot", 
-        "modes": "iw", "away": False
+        "modes": "iw", 
+        "away": False,
+        "identified": False,
+        "ssl": False
         }, 
     "ChanServ": {
         "host": "PawServ", 
         "username": "Meow", 
         "realname": "PawServ plugin - Channel management bot", 
         "modes": "iw", 
-        "away": False
+        "away": False,
+        "identified": False,
+        "ssl": False
         }
     }
 class IRCatModule:
