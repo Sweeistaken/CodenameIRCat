@@ -307,9 +307,6 @@ def session(connection, client, ip, isssl=False):
                             connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
-                        for i in commandProviders:
-                            if "__ircat_property_override__" dir(i):
-                                
                         processedExternally = False
                         for i in commandProviders:
                             cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection)
