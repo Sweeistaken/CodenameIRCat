@@ -32,3 +32,8 @@ class broker:
         db = self.conn.cursor()
         db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
         self.conn.commit()
+    def nickserv_isexist(self, nick):
+        db = self.conn.cursor()
+        db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
+        e = db.fetchall()
+        return e != []
