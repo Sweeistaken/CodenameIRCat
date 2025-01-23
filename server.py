@@ -25,7 +25,7 @@ motd_file = None
 ping_timeout = 255
 restrict_ip = ''
 global mods
-mods = {"sql_provider": None, "command": [], "allsocket": []}
+mods = {"sql_provider": None, "command": [], "allsocket": [], "identified": False, "ssl": False}
 with open(sys.argv[1], 'r') as file:
     global data
     data = yaml.safe_load(file)
