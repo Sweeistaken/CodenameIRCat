@@ -210,6 +210,8 @@ def session(connection, client, ip, isssl=False):
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
     cause = "Unknown" # The cause of the unexpected exit
+    usesIRCv3 = False
+    CAPEND = False
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -258,9 +260,16 @@ def session(connection, client, ip, isssl=False):
                             realname = " ".join(text.split(" ")[4:])[1:]
                             ready = True
                     elif command == "CAP":
-                        if args[0] == "LS":
-                            connection.sendall(bytes(f":{server}  CAP * LS :ircat.xyz/foo sasl=PLAIN\r\n", "UTF-8"))
-                    elif (ready and already_set) and not finished:
+                        usesIRCv3 = True
+                        if args[0].upper() == "LS":
+                            connection.sendall(bytes(f":{server} CAP * LS :ircat.xyz/foo sasl=PLAIN\r\n", "UTF-8"))
+                        elif args[0].upper() == "REQ":
+                            if args[1].lower() == ":sasl":
+                                pass
+                                #connection.sendall(f":{server} CAP * ACK :sasl")
+                        elif args[0].upper() == "END":
+                            CAPEND = True
+                    elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
