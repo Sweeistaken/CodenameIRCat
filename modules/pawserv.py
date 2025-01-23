@@ -1,7 +1,7 @@
 # Replacement for services bots.
 import traceback, smtplib, uuid, ssl
 __ircat_type__ = "command"
-__ircat_requires__ = ["name", "smtp_host", "smtp_port", "smtp_starttls", "smtp_username", "smtp_password"]
+__ircat_requires__ = ["name", "smtp_host", "smtp_port", "smtp_starttls", "smtp_username", "smtp_password", "host"]
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
 __ircat_fakeusers__ = {
     "NickServ": {
@@ -19,7 +19,7 @@ __ircat_fakeusers__ = {
         }
     }
 class IRCatModule:
-    def __init__(self, sql, smtp_host, smtp_port, smtp_starttls, smtp_username, smtp_password, name):
+    def __init__(self, sql, smtp_host, smtp_port, smtp_starttls, smtp_username, smtp_password, name, host):
         self.sql = sql
         self.smtp_server = smtp_host
         self.smtp_port = smtp_port
@@ -27,6 +27,7 @@ class IRCatModule:
         self.smtp_username = smtp_username
         self.smtp_password = smtp_password
         self.net_name = name
+        self.hostname = host
         self.memory = {} # {nick: [authtoken, password, email]}
         print("PawServ loaded!")
     def command(self, command, args, ip, nick, connection, user):
@@ -43,6 +44,8 @@ class IRCatModule:
                                 nck = args[1].lower()
                                 connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Done, you may now identify as {nck}.\r\n", "UTF-8"))
                                 del self.memory[args[1].lower()]
+                            else:
+                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid verification.\r\n", "UTF-8"))
                         else:
                             connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Nickname doesn't exist, try registering again?\r\n", "UTF-8"))
                     else:
@@ -52,11 +55,12 @@ class IRCatModule:
                         if not nick in self.memory:
                             context = ssl.create_default_context()
                             token = str(uuid.uuid4())
-                            message = f"\\nSubject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
+                            message = f"\\\nSubject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
                             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                                 server.ehlo()
-                                server.starttls(context=context)
-                                server.ehlo()
+                                if self.starttls:
+                                    server.starttls(context=context)
+                                    server.ehlo()
                                 server.login(self.smtp_username, self.smtp_password)
                                 server.sendmail(self.smtp_username, args[2], message)
                             self.memory[nick.lower()] = [token, args[1], args[2]]
@@ -69,7 +73,10 @@ class IRCatModule:
                     nck = nick if len(args) == 2 else args[2]
                     temp = self.sql.nickserv_identify(nick=nck.lower(), password=args[1])
                     if temp != False:
-                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Now, it would've been a successful identification, but this is work in progress.\r\n", "UTF-8"))
+                        hostmask = user["host"]
+                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You are now identified as {nck}.\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":{self.hostname} 900 {nick} {hostmask} {nck} :You are now logged in as {nck}.\r\n", "UTF-8"))
+                        return {"success": True, "identify": temp}
                     else:
                         if nick.lower() in self.memory:
                             connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Your account isn't verified, please verify now.\r\n", "UTF-8"))
@@ -79,9 +86,9 @@ class IRCatModule:
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :NickServ Usage:\r\n","UTF-8"))
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :IDENTIFY pass <nick> - Identifies your nickname\r\n","UTF-8"))
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :REGISTER pass email - Register your nickname\r\n","UTF-8"))
-                return True
+                return {"success": True}
             else:
-                return False
+                return {"success": False}
         except:
             print(traceback.format_exc())
-            return False
+            return {"success": False}
