@@ -9,9 +9,6 @@ host: 127.0.0.1
 # The identifier for this server, such as the location (Used in whois)
 identifier: somewhere in the universe
 
-# The nickserv account to automatically be IRC opped
-admin-nick: admin
-
 # The path of the data file to be used by NickServ, ChanServ, etc
 # This MUST be a file path.
 # Recommended to use a .db extension because it is an SQLite database
@@ -45,9 +42,18 @@ ban-provider: /path/to/bans.txt
 
 # ban-provider: sql
 
+# Mail server settings for PawServ
+
+smtp_host: smtp.example.com
+smtp_port: 25
+smtp_starttls: off
+smtp_username: pawserv@example.com
+smtp_password: examplePassword
+
 # Use of modules in the /modules folder, or in an absolute path specified.
 # You want your protection modules BEFORE the ban engine.
 modules:
   - sqlite_local
   - botnet_protect
   - ban_engine
+  - pawserv
