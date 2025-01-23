@@ -615,8 +615,6 @@ def session(connection, client, ip, isssl=False):
                                 connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                         elif command == "RESTART":
                             if "o" in property_list[pending]["modes"]:
-                                tcp_socket.shutdown(socket.SHUT_RDWR)
-                                tcp_socket.close()
                                 global opened
                                 opened = False
                             else:
@@ -732,8 +730,11 @@ def ssl_session(sock2):
                 print(traceback.format_exc())
 for ip, i in sockets.items():
     print("Now listening on port 6667 with IP " + ip)
-    threading.Thread(target=tcp_session, args=[i]).start()
+    threading.Thread(target=tcp_session, args=[i], daemon=True).start()
 if ssl_option:
     for ip, i in sockets_ssl.items():
         print("Now listening on SSL port 6697 with IP " + ip)
-        threading.Thread(target=ssl_session, args=[i]).start()
+        threading.Thread(target=ssl_session, args=[i], daemon=True).start()
+while opened:
+    pass
+print("Shutting down...")
