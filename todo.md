@@ -57,7 +57,6 @@
    -  [x] Store credentials in an SQLite3 file.
    -  [x] Map NickServ IDENTIFY
    -  [ ] Map PASS
-   -  [ ] Mock SASL PLAIN
 - [ ] SSL/TLS
    -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774)
    -  [ ] Automatically reload the certificate if defined in config.
@@ -65,5 +64,6 @@
    -  [x] List capabilities (`CAP LS 302`)
    -  [ ] `away-notify`
    -  [ ] `tls` (STARTTLS)
+   -  [ ] `sasl`
    -  Will research later.
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
