@@ -259,7 +259,7 @@ def session(connection, client, ip, isssl=False):
                             ready = True
                     elif command == "CAP":
                         if args[0] == "LS":
-                            connection.sendall(bytes(f":{server}  CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server}  CAP * LS :ircat.xyz/foo sasl=PLAIN\r\n", "UTF-8"))
                     elif (ready and already_set) and not finished:
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
