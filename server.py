@@ -197,7 +197,7 @@ def pinger(nick, connection):
                 connection.shutdown(socket.SHUT_WR)
                 connection.close()
                 break
-def session(connection, client, ip, ssl=False):
+def session(connection, client, ip, isssl=False):
     global property_list
     global channels_list
     global nickname_list
@@ -264,7 +264,7 @@ def session(connection, client, ip, ssl=False):
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
-                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False}
+                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False, "identified": False, "ssl": isssl}
                         lower_nicks[pending.lower()] = pending
                         for i in socketListeners:
                             if "onValidate" in dir(i):
@@ -299,12 +299,6 @@ def session(connection, client, ip, ssl=False):
                             connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
                         except:
                             connection.sendall(bytes(f":{server} PONG {server}\r\n","UTF-8"))
-                    elif command == "LIST":
-                        connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
-                        for key, value in topic_list.items():
-                            usersin = len(channels_list[key])
-                            connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
-                        connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
                     elif command == "MOTD":
                         if motd_file != None:
                             motd = open(motd_file).read()
@@ -313,9 +307,29 @@ def session(connection, client, ip, ssl=False):
                             connection.sendall(bytes(f":{server} 376 {pending} :- {i}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 372 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
+                        for i in commandProviders:
+                            if "__ircat_property_override__" dir(i):
+                                
                         processedExternally = False
                         for i in commandProviders:
-                            if i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection):
+                            cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection)
+                            if cmdrun["success"]:
+                                if "identify" in cmdrun:
+                                    if cmdrun["identify"] == "logout":
+                                        if "o" in property_list[pending]["modes"]:
+                                            connection.sendall(bytes(f":{pending} MODE {pending} -o\r\n","UTF-8"))
+                                        if not "i" in property_list[pending]["modes"]:
+                                            connection.sendall(bytes(f":{pending} MODE {pending} +i\r\n","UTF-8"))
+                                        if not "w" in property_list[pending]["modes"]:
+                                            connection.sendall(bytes(f":{pending} MODE {pending} +w\r\n","UTF-8"))
+                                        property_list[pending]["modes"] = "iw"
+                                        property_list[pending]["identified"] = False
+                                    else:
+                                        property_list[pending]["identified"] = True
+                                        property_list[pending]["identusername"] = cmdrun["identify"][0]
+                                        temp_mode = cmdrun["identify"][1]
+                                        property_list[pending]["modes"] = temp_mode
+                                        connection.sendall(bytes(f":{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
                                 processedExternally = True
                                 break
                         if processedExternally:
@@ -356,6 +370,12 @@ def session(connection, client, ip, ssl=False):
                                             connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                 connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                 print("Successfully pre-loaded /NAMES list")
+                        elif command == "LIST":
+                            connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
+                            for key, value in topic_list.items():
+                                usersin = len(channels_list[key])
+                                connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
+                            connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
                         elif command == "PONG":
                             e = text.split(" ")[1]
                             if e == server or e == f":{server}":
@@ -460,6 +480,12 @@ def session(connection, client, ip, ssl=False):
                                     who_user = property_list[target]["username"]
                                     who_realname = property_list[target]["realname"]
                                     who_host = property_list[target]["host"]
+                                    who_identified = property_list[target]["identified"]
+                                    who_ssl = property_list[target]["ssl"]
+                                    if who_identified:
+                                        who_identifying = property_list[target]["identusername"]
+                                    else:
+                                        who_identifying = None
                                     try:
                                         who_flags = property_list[target]["modes"]
                                     except:
@@ -471,6 +497,10 @@ def session(connection, client, ip, ssl=False):
                                     if who_away: 
                                         who_reason = who_away = property_list[target]["reason"]
                                         connection.sendall(bytes(f":{server} 301 {pending} {target} :{who_reason}\r\n","UTF-8"))
+                                    if who_identified:
+                                        connection.sendall(bytes(f":{server} 330 {pending} {target} {who_identifying} :is logged in as\r\n","UTF-8"))
+                                    if who_ssl:
+                                        connection.sendall(bytes(f":{server} 671 {pending} {target} :is using a secure connection\r\n","UTF-8"))
                                     #connection.sendall(bytes(f":{server} 317 {pending} {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
                                     if who_flags != None and who_flags != "iw":
                                         connection.sendall(bytes(f":{server} 379 {pending} {target} :Is using modes +{who_flags}\r\n","UTF-8"))
@@ -699,7 +729,7 @@ def ssl_session(sock2):
                     print("Waiting for connection...")
                     connection, client = sock.accept()
                     ip_to = restrict_ip
-                    threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
+                    threading.Thread(target=session, daemon=True, args=[connection, client, ip_to, True]).start()
             except:
                 print("Something went wrong...")
                 print(traceback.format_exc())
