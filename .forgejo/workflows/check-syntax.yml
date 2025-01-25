@@ -7,4 +7,4 @@ jobs:
         with:
           additional: python3
       - uses: actions/checkout@v4
-      - run: python -m py_compile server.py
+      - run: python -m compileall .
