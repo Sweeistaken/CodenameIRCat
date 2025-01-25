@@ -45,7 +45,7 @@ class IRCatModule:
                     if len(args) == 3:
                         if args[1].lower() in self.memory:
                             if args[2] == self.memory[args[1].lower()][0]:
-                                self.sql.nickserv_register(nick=args[1].lower(), password=self.memory[args[1]][1], email=self.memory[args[1]][2])
+                                self.sql.nickserv_register(nick=args[1].lower(), password=self.memory[args[1].lower()][1], email=self.memory[args[1].lower()][2])
                                 nck = args[1].lower()
                                 connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Done, you may now identify as {nck}.\r\n", "UTF-8"))
                                 del self.memory[args[1].lower()]
