@@ -147,8 +147,6 @@ context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
 for i in context.get_ciphers():
     if not i["protocol"] in foundVersions:
         foundVersions.append(i["protocol"])
-context.options |= ssl.OP_NO_SSLv2 # Disable SSL 2
-context.options |= ssl.OP_NO_SSLv3 # Disable SSL 3
 if ssl_option:
     print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
     context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
