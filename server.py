@@ -244,7 +244,7 @@ def session(connection, client, ip, isssl=False):
                             realname = " ".join(text.split(" ")[4:])[1:]
                             ready = True
                     elif command == "CAP":
-                        usesIRCv3 = True
+                        #usesIRCv3 = True
                         if args[0].upper() == "LS":
                             connection.sendall(bytes(f":{server} CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
                         elif args[0].upper() == "REQ":
