@@ -230,7 +230,7 @@ def session(connection, client, ip, isssl=False):
                         pass
                     if command == "NICK" and not finished:
                         pending = text.split(" ")[1]
-                        if pending[0] == ":": pending[1:]
+                        if pending[0] == ":": pending = pending[1:]
                         if "!" in pending or ":" in pending or "#" in pending or "*" in pending:
                             connection.sendall(bytes(f":{server} 432 * {pending} :Erroneus nickname\r\n","UTF-8"))
                             pending = "*"
@@ -381,7 +381,7 @@ def session(connection, client, ip, isssl=False):
                                 pass
                             else:
                                 pending2 = text.split(" ")[1]
-                                if pending2[0] == ":": pending2[1:]
+                                if pending2[0] == ":": pending2 = pending2[1:]
                                 if "!" in pending2 or ":" in pending2 or "#" in pending2 or "*" in pending2:
                                     connection.sendall(bytes(f":{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
                                 elif pending2.lower() in lower_nicks:
