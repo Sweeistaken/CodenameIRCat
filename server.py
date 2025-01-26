@@ -36,7 +36,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
             return {"success": False, "response": f"Could not connect to your ident server: {ex}"}
         serverport = "6697" if ssll else "6667"
         try:
-            identsender.sendall(bytes(f"{clientport} , {serverport}\r\n", "UTF-8"))
+            identsender.sendall(bytes(f"{serverport}, {clientport}\r\n", "UTF-8"))
             responsee = identsender.recv(2048).decode()
             print(responsee)
         except Exception as ex:
@@ -51,15 +51,13 @@ def getident(hostt:str, clientport:int, ssll:bool):
             for i, v in enumerate(responsee.split(" ")):
                 if i == 0 and v != str({clientport}):
                     return {"success": False, "response": "The ident server sent an invalid client port."}
-                elif i == 1 and v != ",":
-                    return {"success": False, "response": "The ident server sent an invalid response."}
-                elif i == 2 and v != serverport:
+                elif i == 1 and v != serverport:
                     return {"success": False, "response": "The ident server doesn't know what the server port is."}
-                elif i == 3 and v != ":":
+                elif i == 2 and v != ":":
                     return {"success": False, "response": "The ident server sent an invalid response."}
-                elif i == 5 and v != ":":
+                elif i == 4 and v != ":":
                     return {"success": False, "response": "The ident server sent an invalid response."}
-                elif i == 6:
+                elif i == 5:
                     return {"success": True, "response": v}
         return {"success": False, "response": "Unknown error."}
     except:
