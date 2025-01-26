@@ -50,7 +50,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
             return {"success": False, "response": "The connection was closed."}
         else:
             for i, v in enumerate(responsee.split(" ")):
-                if i == 0 and v != str({clientport}):
+                if i == 0 and v[:-1] != str({clientport}):
                     return {"success": False, "response": "The ident server sent an invalid client port."}
                 elif i == 1 and v != serverport:
                     return {"success": False, "response": "The ident server doesn't know what the server port is."}
