@@ -758,7 +758,7 @@ def tcp_session(sock):
         except:
             print("Something went wrong...")
             print(traceback.format_exc())
-def ssl_session(sock2):
+def ssl_session(sock):
     while True:
         try:
             while opened:
