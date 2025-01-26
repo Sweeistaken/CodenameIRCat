@@ -29,7 +29,7 @@ def isalphanumeric(text:str):
 def getident(hostt:str, clientport:int, ssll:bool):
     try:
         identsender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        identsender.timeout = 5
+        identsender.settimeout(5)
         try:
             identsender.connect((hostt, 113))
         except:
