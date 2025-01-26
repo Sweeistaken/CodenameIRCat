@@ -251,7 +251,8 @@ def session(connection, client, ip, isssl=False):
         try:
             identQuery = getident(client[0], client[1], isssl)
             responseee = identQuery["response"]
-            if identQuery["success"]:
+            print(identQUery)
+            if identQuery["success"] == True:
                 connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: {responseee}\r\n","UTF-8"))
             else:
                 connection.sendall(bytes(f":{server} NOTICE * :*** Got ident! {responseee}\r\n","UTF-8"))
