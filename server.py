@@ -36,11 +36,11 @@ def getident(hostt:str, clientport:int, ssll:bool):
             return {"success": False, "response": f"Could not connect to your ident server: {ex}"}
         serverport = "6697" if ssll else "6667"
         try:
-            identsender.send(bytes(f"{clientport} , {serverport}\r\n", "UTF-8"))
+            identsender.sendall(bytes(f"{clientport} , {serverport}\r\n", "UTF-8"))
             responsee = identserver.recv(2048).decode()
             print(responsee)
-        except:
-            return {"success": False, "response": "Could not send packets to your server."}
+        except Exception as ex:
+            return {"success": False, "response": f"Could not send packets to your server: {ex}"}
         if "ERROR : NO-USER" in responsee:
             return {"success": False, "response": "No user was found by the server."}
         elif "ERROR :" in responsee:
