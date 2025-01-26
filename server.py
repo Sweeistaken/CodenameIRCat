@@ -754,7 +754,7 @@ def tcp_session(sock):
                 print("Waiting for connection...")
                 connection, client = sock.accept()
                 ip_to = restrict_ip
-                threading.Thread(target=session, daemon=True, args=[context.wrap_socket(connection, client, ip_to]).start()
+                threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
         except:
             print("Something went wrong...")
             print(traceback.format_exc())
