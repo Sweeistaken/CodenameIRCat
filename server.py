@@ -32,8 +32,8 @@ def getident(hostt:str, clientport:int, ssll:bool):
         identsender.settimeout(5)
         try:
             identsender.connect((hostt, 113))
-        except:
-            return {"success": False, "response": "Could not connect to your ident server."}
+        except Exception as ex:
+            return {"success": False, "response": f"Could not connect to your ident server: {ex}"}
         serverport = "6697" if ssll else "6667"
         try:
             identsender.send(bytes(f"{clientport} , {serverport}\r\n", "UTF-8"))
