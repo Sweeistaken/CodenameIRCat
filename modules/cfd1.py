@@ -25,7 +25,7 @@ class broker:
         return query[0].results
     def parse2sqlite(self, results):
         temp = []
-        for k, v in results:
+        for k, v in results.items():
             temp.append(v)
         return temp
     def nickserv_identify(self, nick, password:str):
