@@ -38,29 +38,26 @@ def getident(hostt:str, clientport:int, ssll:bool):
         serverport = "6697" if ssll else "6667"
         try:
             identsender.sendall(bytes(f"{clientport}, {serverport}\r\n", "UTF-8"))
-            responsee = identsender.recv(2048).decode()
+            responsee = identsender.recv(2048).decode().replace(" ", "").replace("\r", "").replace("\n", "")
             print(responsee)
         except Exception as ex:
             return {"success": False, "response": f"Could not send packets to your server: {ex}"}
-        if "ERROR : NO-USER" in responsee:
+        if "ERROR:NO-USER" in responsee:
             return {"success": False, "response": "No user was found by the server."}
-        elif "ERROR :" in responsee:
+        elif "ERROR:" in responsee:
             return {"success": False, "response": "The ident server had an error"}
         elif responsee == "":
             return {"success": False, "response": "The connection was closed."}
         else:
-            for i, v in enumerate(responsee.split(" ")):
-                print(v)
-                if i == 0 and v[:-1] != str({clientport}):
-                    return {"success": False, "response": "The ident server sent an invalid client port."}
-                elif i == 1 and v != serverport:
-                    return {"success": False, "response": "The ident server doesn't know what the server port is."}
-                elif i == 2 and v != ":":
-                    return {"success": False, "response": "The ident server sent an invalid response."}
-                elif i == 4 and v != ":":
-                    return {"success": False, "response": "The ident server sent an invalid response."}
-                elif i == 5:
-                    return {"success": True, "response": v}
+            print(responsee.split(",")[0])
+            print(responsee.split(",")[1].split(":")[0])
+
+            if responsee.split(",")[0] != str({clientport}):
+                return {"success": False, "response": "The ident server sent an invalid client port."}
+            elif responsee.split(",")[1].split(":")[0] != serverport:
+                return {"success": False, "response": "The ident server doesn't know what the server port is."}
+            else:
+                return {"success": True, "response": responsee.split(",")[1].split(":")[3]}
         return {"success": False, "response": "Unknown error."}
     except:
         print(traceback.format_exc())
