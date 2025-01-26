@@ -45,7 +45,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
         if "ERROR:NO-USER" in responsee:
             return {"success": False, "response": "No user was found by the server."}
         elif "ERROR:" in responsee:
-            return {"success": False, "response": "The ident server had an error"}
+            return {"success": False, "response": "The ident server had an error."}
         elif responsee == "":
             return {"success": False, "response": "The connection was closed."}
         else:
