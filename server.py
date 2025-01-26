@@ -179,15 +179,7 @@ for i in restrict_ip.split(" "):
     sockets[i].settimeout(None)
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
-allowedVersions = ["TLSv1.0", "TLSv1.1", "TLSv1.2", "TLSv1.3", "SSLv2", "SSLv3"]
-foundVersions = []
-context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-for i in context.get_ciphers():
-    if not i["protocol"] in foundVersions:
-        foundVersions.append(i["protocol"])
 if ssl_option:
-    print(f"Loading SSL cert {ssl_cert} with key {ssl_pkey}")
-    context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
     for i in restrict_ip.split(" "):
         sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -767,6 +759,8 @@ def tcp_session(sock):
             print("Something went wrong...")
             print(traceback.format_exc())
 def ssl_session(sock2):
+    context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
     with context.wrap_socket(sock2, server_side=True) as sock:
         while True:
             try:
