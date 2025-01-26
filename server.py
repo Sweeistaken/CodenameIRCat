@@ -30,6 +30,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
     try:
         identsender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         identsender.settimeout(5)
+        responsee = ""
         try:
             identsender.connect((hostt, 113))
         except Exception as ex:
