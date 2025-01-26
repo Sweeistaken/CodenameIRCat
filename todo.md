@@ -12,7 +12,6 @@
    -  [x] Send PING and wait for PONG
    -  [x] Reply PONG if received PING
    -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887)
-   -  [ ] Change of hostnames
    -  [x] Away
    -  [ ] [Multi-server support](https://discuss.swee.codes/t/72)
    -  [x] `LIST`
@@ -40,7 +39,7 @@
 - [ ] Destructive features for IRCOPS
    -  [ ] `KILL <user> <comment>`
    -  [ ] `MODE <external user>`
-   -  [ ] `RESTART`
+   -  [x] `RESTART`
 - [ ] Extra commands
    -  [x] `NAMES`
    -  [x] `WHOIS`
@@ -50,10 +49,9 @@
    -  [ ] ChanServ
    -  [x] CatServ (Outside of PawServ)
    -  [x] Link `PRIVMSG *serv` to `*serv`
-- [ ] Extra (not planned) features
-   -  [ ] ident support
+- [x] Extra ~~(not planned)~~ features
+   -  [x] ident support
 - [ ] Authentication
-   -  [ ] Make the server able to change the client's host
    -  [x] Store credentials in an SQLite3 file.
    -  [x] Map NickServ IDENTIFY
    -  [ ] Map PASS
