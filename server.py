@@ -257,6 +257,8 @@ def session(connection, client, ip, isssl=False):
                 connection.sendall(bytes(f":{server} NOTICE * :*** Got ident! {responseee}\r\n","UTF-8"))
             clident = responseee
             rident = responseee
+        except:
+            connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while True:
             try:
                 data = connection.recv(2048)
