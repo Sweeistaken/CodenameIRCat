@@ -24,6 +24,46 @@ This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 restrict_ip = ''
+def isalphanumeric(text:str):
+    return False
+def getident(hostt:str, clientport:int, ssll:bool):
+    try:
+        identsender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        identsender.timeout = 5
+        try:
+            identsender.connect((hostt, 113))
+        except:
+            return {"success": False, "response": "Could not connect to your ident server."}
+        serverport = "6697" if ssll else "6667"
+        try:
+            identsender.send(bytes(f"{clientport} , {serverport}\r\n", "UTF-8"))
+            responsee = identserver.recv(2048).decode()
+            print(responsee)
+        except:
+            return {"success": False, "response": "Could not send packets to your server."}
+        if "ERROR : NO-USER" in responsee:
+            return {"success": False, "response": "No user was found by the server."}
+        elif "ERROR :" in responsee:
+            return {"success": False, "response": "The ident server had an error"}
+        elif reponsee = "":
+            return {"success": False, "response": "The connection was closed."}
+        else:
+            for i, v in enumerate(responsee.split(" ")):
+                if i == 0 and v != str({clientport}):
+                    return {"success": False, "response": "The ident server sent an invalid client port."}
+                elif i == 1 and v != ",":
+                    return {"success": False, "response": "The ident server sent an invalid response."}
+                elif i == 2 and v != serverport:
+                    return {"success": False, "response": "The ident server doesn't know what the server port is."}
+                elif i == 3 and v != ":":
+                    return {"success": False, "response": "The ident server sent an invalid response."}
+                elif i == 5 and v != ":":
+                    return {"success": False, "response": "The ident server sent an invalid response."}
+                elif i == 6:
+                    return {"success": True, "response": v}
+        return {"success": False, "response": "Unknown error."}
+    except:
+        return {"success": False, "response": "Unknown error."}
 global mods
 mods = {"sql_provider": None, "command": [], "allsocket": [], "identified": False, "ssl": False}
 with open(sys.argv[1], 'r') as file:
@@ -190,21 +230,33 @@ def session(connection, client, ip, isssl=False):
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
     username = "oreo" # Username/ident specified by client
+    rident = "~oreo"
     hostname = "" # Hostname, can be IP or domain
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
     cause = "Unknown" # The cause of the unexpected exit
     usesIRCv3 = False
     CAPEND = False
+    clident = None
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
+        connection.sendall(bytes(f":{server} NOTICE * :*** Checking your ident...\r\n","UTF-8"))
         try:
             hostname = socket.gethostbyaddr(client[0])[0]
-            connection.sendall(bytes(f":{server} NOTICE * :*** Got it! {hostname}\r\n","UTF-8"))
+            connection.sendall(bytes(f":{server} NOTICE * :*** Got hostname! {hostname}\r\n","UTF-8"))
         except:
             hostname = client[0]
             connection.sendall(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
+        try:
+            identQuery = getident(client[0], client[1], isssl)
+            responseee = identQuery["response"]
+            if identQuery["success"]:
+                connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: {responseee}\r\n","UTF-8"))
+            else:
+                connection.sendall(bytes(f":{server} NOTICE * :*** Got ident! {responseee}\r\n","UTF-8"))
+            clident = responseee
+            rident = responseee
         while True:
             try:
                 data = connection.recv(2048)
@@ -257,12 +309,14 @@ def session(connection, client, ip, isssl=False):
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
                         nickname_list[pending] = connection
-                        property_list[pending] = {"host": hostname, "username": username, "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False, "identified": False, "ssl": isssl}
+                        property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False, "identified": False, "ssl": isssl}
                         lower_nicks[pending.lower()] = pending
                         for i in socketListeners:
                             if "onValidate" in dir(i):
                                 i.onValidate(socket=connection, ip=client[0])
                         threading.Thread(target=pinger, args=[pending, connection]).start()
+                        if clident == None:
+                            rident = f"~{username}"
                         connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
@@ -351,7 +405,7 @@ def session(connection, client, ip, isssl=False):
                                     print(channels_list)
                                     for i in channels_list[channel]:
                                         try:
-                                            nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} JOIN {channel}\r\n","UTF-8"))
+                                            nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
                                         except:
                                             pass
                                 # Code re-used in the NAMES command
@@ -387,7 +441,7 @@ def session(connection, client, ip, isssl=False):
                                     connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                 else:
                                     print("Sending nickname change...")
-                                    connection.sendall(bytes(f":{pending}!~{username}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{pending}!{rident}@{hostname} NICK {pending2}\r\n","UTF-8"))
                                     # Broadcast the nickname change
                                     done = []
                                     for i, users in channels_list.items():
@@ -395,7 +449,7 @@ def session(connection, client, ip, isssl=False):
                                             for j in users:
                                                 if j != pending and j != pending2 and not j in done:
                                                     print("Broadcasting on " + j)
-                                                    nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                    nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                     done.append(j)
                                             # Replace the nickname
                                             try:
@@ -423,7 +477,7 @@ def session(connection, client, ip, isssl=False):
                                 channel = text.split(" ")[1]
                                 for i in channels_list[channel]:
                                     try:
-                                        nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                        nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                     except:
                                         pass
                                 try:
@@ -451,13 +505,13 @@ def session(connection, client, ip, isssl=False):
                                         who_user = property_list[i]["username"]
                                         who_realname = property_list[i]["realname"]
                                         who_away = "G" if property_list[i]["away"] else "H"
-                                        connection.sendall(bytes(f":{server} 352 {pending} {channel} ~{who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
+                                        connection.sendall(bytes(f":{server} 352 {pending} {channel} {who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
                                 elif channel in nickname_list:
                                     who_host = property_list[channel]["host"]
                                     who_user = property_list[channel]["username"]
                                     who_realname = property_list[channel]["realname"]
                                     who_away = "G" if property_list[channel]["away"] else "H"
-                                    connection.sendall(bytes(f":{server} 352 {pending} * ~{who_user} {who_host} {server} {channel} {who_away} :0 {who_realname}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 352 {pending} * {who_user} {who_host} {server} {channel} {who_away} :0 {who_realname}\r\n","UTF-8"))
 
                                 connection.sendall(bytes(f":{server} 315 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                         elif command == "WHOIS":
@@ -481,7 +535,7 @@ def session(connection, client, ip, isssl=False):
                                         who_flags = property_list[target]["modes"]
                                     except:
                                         who_flags = None
-                                    connection.sendall(bytes(f":{server} 311 {pending} {target} ~{who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
                                     connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
                                     if "o" in who_flags: connection.sendall(bytes(f":{server} 313 {pending} {target} :is an IRC operator\r\n","UTF-8"))
                                     who_away = property_list[target]["away"]
@@ -518,11 +572,11 @@ def session(connection, client, ip, isssl=False):
                                         for i in channels_list[channel]:
                                             try:
                                                 if i != pending:
-                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                    nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                             except:
                                                 pass
                                 elif target in nickname_list:
-                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                    nickname_list[target].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                 else:
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
@@ -545,7 +599,7 @@ def session(connection, client, ip, isssl=False):
                                 if pending in users:
                                     for j in users:
                                         if j != pending and not j in done:
-                                            nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                            nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                             done.append(j)
                                     # Remove the quitting user from the channel.
                                     try:
@@ -554,7 +608,7 @@ def session(connection, client, ip, isssl=False):
                                         print(traceback.format_exc())
                             # Confirm QUIT and close the socket.
                             try:
-                                connection.sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                connection.sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                 connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                             finally:
                                 connection.close()
@@ -627,14 +681,14 @@ def session(connection, client, ip, isssl=False):
                                             try:
                                                 if i != pending:
                                                     print(i)
-                                                    print(f":{pending}!~{username}@{hostname} {text}\r\n")
-                                                    nickname_list[i].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                                    print(f":{pending}!{rident}@{hostname} {text}\r\n")
+                                                    nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                 else:
                                                     print(i + " Is the current user!")
                                             except:
                                                 print(traceback.format_exc)
                                 elif target in nickname_list:
-                                    nickname_list[target].sendall(bytes(f":{pending}!~{username}@{hostname} {text}\r\n","UTF-8"))
+                                    nickname_list[target].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                 else:
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
@@ -670,7 +724,7 @@ def session(connection, client, ip, isssl=False):
                     for j in users:
                         if j != pending and not j in done:
                             try:
-                                nickname_list[j].sendall(bytes(f":{pending}!~{username}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                                nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
                                 done.append(j)
                             except:
                                 print(traceback.format_exc())
@@ -697,7 +751,7 @@ def cleanup_manual():
                 i.remove(h)
                 for k in channels_list[j]:
                     if k != h and k in nickname_list:
-                        nickname_list[k].sendall(f":{h}!~DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
+                        nickname_list[k].sendall(f":{h}!DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
 
 def tcp_session(sock):
     while True:
