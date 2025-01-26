@@ -701,7 +701,8 @@ def session(connection, client, ip, isssl=False):
                             # Unknown command
                             cmd = text.split(" ")[0]
                             connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
-                        
+            except ssl.SSLEOFError:
+                print("EOF occured...")
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "" + str(ex)
