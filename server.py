@@ -251,7 +251,7 @@ def session(connection, client, ip, isssl=False):
         try:
             identQuery = getident(client[0], client[1], isssl)
             responseee = identQuery["response"]
-            print(identQUery)
+            print(identQuery)
             if identQuery["success"] == True:
                 connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: {responseee}\r\n","UTF-8"))
             else:
@@ -259,6 +259,7 @@ def session(connection, client, ip, isssl=False):
             clident = responseee
             rident = responseee
         except:
+            print(traceback.format_exc())
             connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while True:
             try:
