@@ -55,9 +55,9 @@
    -  [x] Store credentials in an SQLite3 file.
    -  [x] Map NickServ IDENTIFY
    -  [ ] Map PASS
-- [ ] SSL/TLS
+- [x] SSL/TLS
    -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774)
-   -  [ ] Automatically reload the certificate if defined in config.
+   -  [x] Automatically reload the certificate if defined in config.
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`)
    -  [ ] `away-notify`
