@@ -36,7 +36,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
             return {"success": False, "response": f"Could not connect to your ident server: {ex}"}
         serverport = "6697" if ssll else "6667"
         try:
-            identsender.sendall(bytes(f"{serverport}, {clientport}\r\n", "UTF-8"))
+            identsender.sendall(bytes(f"{clientport}, {serverport}\r\n", "UTF-8"))
             responsee = identsender.recv(2048).decode()
             print(responsee)
         except Exception as ex:
