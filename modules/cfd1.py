@@ -1,6 +1,6 @@
 import os, traceback
 from cryptography.fernet import Fernet
-from cloudflare import Cloudflare
+from cloudflare import Cloudflare # Please make sure you install this module from pip, not package manager.
 __ircat_type__ = "sql.provider" # The type of module
 __ircat_requires__ = ["cf_accountid", "cf_apitoken", "cf_d1database", "fernet-key"] # The required config.yml entries.
 class broker:
