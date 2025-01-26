@@ -289,7 +289,8 @@ def session(connection, client, ip, isssl=False):
                     elif command == "PING":
                         try:
                             e = text.split(" ")[1]
-                            connection.sendall(bytes(f":{server} PONG {server} :{e}\r\n","UTF-8"))
+                            e = f":{e}" if e[0] != ":" else e
+                            connection.sendall(bytes(f":{server} PONG {server} {e}\r\n","UTF-8"))
                         except:
                             connection.sendall(bytes(f":{server} PONG {server}\r\n","UTF-8"))
                     elif command == "MOTD":
