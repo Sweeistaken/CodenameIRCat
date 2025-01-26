@@ -63,6 +63,7 @@ def getident(hostt:str, clientport:int, ssll:bool):
                     return {"success": True, "response": v}
         return {"success": False, "response": "Unknown error."}
     except:
+        print(traceback.format_exc())
         return {"success": False, "response": "Unknown error."}
 global mods
 mods = {"sql_provider": None, "command": [], "allsocket": [], "identified": False, "ssl": False}
