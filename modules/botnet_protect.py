@@ -2,7 +2,7 @@ import threading
 __ircat_type__ = "allsocket"
 __ircat_requires__ = ["ban-provider"]
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
-__ircat_fakechannels__ = {"#IRCATSUCKS": "🅱️0tn3t pr0t3ct10n, do not join."}
+__ircat_fakechannels__ = {"#IRCATSUCKS": "B0tn3t pr0t3ct10n, do not join."}
 class IRCatModule:
     sus_strings = [
         "                                 .''.", # 2025 new year
