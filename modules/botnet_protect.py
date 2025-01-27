@@ -31,14 +31,14 @@ class IRCatModule:
                 self.memory[ip] = 1 # 1: Just joined the channel, continue observing.
                 print("Autoban> Somebody joined " + target)
                 if target.lower() == "#ircatsucks":
-                    self.ban(ip)
-            elif "PRIVMSG" in value:
-                if not (ip in self.memory and self.memory[ip] == 0):
+                    self.ban(ip) # Ruh roh
+            elif "PRIVMSG" in value
+                if not (ip in self.memory and self.memory[ip] == 0): # Continue observing
                     target = value.split(" ")[1]
                     content = " ".join(value.split(" ")[2:])[1:]
                     if content in self.sus_strings:
-                        if ip in self.memory:
+                        if ip in self.memory: # Hey stinky! YOU'RE BANNED
                             if self.memory[ip] == 1:
                                 self.ban(ip)
                     else:
-                        self.memory[ip] = 0 # 0: Trust the connection  :3
+                        self.memory[ip] = 0 # 0: Trust the connection :3
