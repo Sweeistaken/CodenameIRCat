@@ -2,10 +2,11 @@ import threading
 __ircat_type__ = "allsocket"
 __ircat_requires__ = ["ban-provider"]
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
-__ircat_fakechannels__ = {"#IRCATSUCKS": "WHATEVER YOU DO, DO NOT JOIN IF YOU ARE HUMAN"}
+__ircat_fakechannels__ = {"#IRCATSUCKS": "🅱️0tn3t pr0t3ct10n, do not join."}
 class IRCatModule:
     sus_strings = [
-        "                                 .''." # Latest Supernets spambot!
+        "                                 .''.", # 2025 new year
+        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" # "The United States of America" LATEST
     ]
     memory = {} # {nick: {channel: trustlevel}} one can also be {nick: True} if it is whitelisted for the session.
     useSQLengine = False
@@ -15,12 +16,13 @@ class IRCatModule:
             self.useSQLengine = True
             self.SQLengine = sql
     def ban(self, ip):
-        del self.memory[ip]
+        del self.memory[ip] # Forget this all happened
+        # Add the ban
         if self.useSQLengine:
-            cur = self.SQLengine.conn.cursor()
+            self.SQLengine.addban(ip, "Botnet detected!") # Use the SQL provider if {'ban-provider': 'sql'}
         else:
-            open(self.ban_provider, "a").write(f"\n{ip} Botnet detected!")
-        raise Exception("Botnet detected!")
+            open(self.ban_provider, "a").write(f"\n{ip} Botnet detected!") # Else, write on the banfile.
+        raise Exception("Botnet detected!") # Kill the connection
     def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
         if cachedNick != None:
             print(value)
