@@ -2,9 +2,11 @@ import threading
 __ircat_type__ = "allsocket"
 __ircat_requires__ = ["ban-provider"]
 __ircat_giveme__ = ["sql"] # Only command and allsocket have these.
-__ircat_fakechannels__ = {"#IRCATSUCKS": "B0tn3t pr0t3ct10n, do not join."}
+__ircat_fakechannels__ = {"#IRCATSUCKS": "B0tn3t pr0t3ct10n, do not join."} # Fake channels that plugins control.
 class IRCatModule:
     sus_strings = [
+        # Known SupernetS botnet texts
+        # Contribute here: https://discuss.swee.codes/t/61
         "                                 .''.", # 2025 new year
         "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" # "The United States of America" LATEST
     ]
