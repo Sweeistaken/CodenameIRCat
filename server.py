@@ -172,9 +172,6 @@ for i in mods['command']:
     commandProviders.append(i.IRCatModule(**requires))
 sockets = {}
 sockets_ssl = {}
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-context.minimum_version = ssl.TLSVersion.TLSv1
-context.set_ciphers('DEFAULT:@SECLEVEL=0')
 # Open the specified non-SSL sockets.
 for i in restrict_ip.split(" "):
     sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -767,6 +764,9 @@ def ssl_session(sock):
     while True:
         try:
             while opened:
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+                context.minimum_version = ssl.TLSVersion.TLSv1
+                context.set_ciphers('DEFAULT:@SECLEVEL=0')
                 context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
                 print("Waiting for connection...")
                 connection, client = sock.accept()
