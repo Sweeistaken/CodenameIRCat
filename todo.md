@@ -13,10 +13,10 @@
    -  [x] Reply PONG if received PING
    -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887)
    -  [x] Away
-   -  [ ] [Multi-server support](https://discuss.swee.codes/t/72)
+   -  [ ] Multi-server support
    -  [x] `LIST`
    -  [ ] `TOPIC`
--  [ ] [Database support](https://discuss.swee.codes/t/71)
+-  [ ] [Database support](https://discuss.swee.codes/t/41)
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [ ] o (IRCOP)
