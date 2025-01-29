@@ -305,6 +305,10 @@ def session(connection, client, ip, isssl=False):
                                 #connection.sendall(f":{server} CAP * ACK :sasl")
                         elif args[0].upper() == "END":
                             CAPEND = True
+                    elif command == "WEBIRC" and not finished:
+                        if args[0] == data["webirc_pass"]:
+                            hostname = args[2]
+                            connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
                     elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
@@ -667,7 +671,6 @@ def session(connection, client, ip, isssl=False):
                                 opened = False
                             else:
                                 connection.sendall(bytes(f":{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
-
                         elif command == "PRIVMSG":
                             if len(args) >= 2:
                                 target = text.split(" ")[1]
