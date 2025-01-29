@@ -258,7 +258,7 @@ def session(connection, client, ip, isssl=False):
                 if not data:
                     cause = "Remote host closed the connection"
                     break
-            except ssl.SSLEOFError::
+            except ssl.SSLEOFError:
                 pass
             except ssl.SSLZeroReturnError:
                 cause = "Remote host closed the connection"
