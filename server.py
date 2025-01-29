@@ -65,8 +65,9 @@ def getident(hostt:str, clientport:int, ssll:bool):
 global mods
 mods = {"sql_provider": None, "command": [], "allsocket": [], "identified": False, "ssl": False}
 with open(sys.argv[1], 'r') as file:
-    global data
+    global data2
     data = yaml.safe_load(file)
+    data2 = data
     try: server = data["host"]
     except: print("using fallback server address")
     try: displayname = data["name"]
@@ -307,7 +308,7 @@ def session(connection, client, ip, isssl=False):
                             CAPEND = True
                     elif command == "WEBIRC" and not finished:
                         try:
-                            if args[0] == data["webirc_pass"]:
+                            if args[0] == data2["webirc_pass"]:
                                 hostname = args[2]
                                 connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
                         except:
