@@ -306,9 +306,13 @@ def session(connection, client, ip, isssl=False):
                         elif args[0].upper() == "END":
                             CAPEND = True
                     elif command == "WEBIRC" and not finished:
-                        if args[0] == data["webirc_pass"]:
-                            hostname = args[2]
-                            connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
+                        try:
+                            if args[0] == data["webirc_pass"]:
+                                hostname = args[2]
+                                connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
+                        except:
+                            print(traceback.format_exc())
+                            break
                     elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                         cleanup_manual()
                         print(f"User {pending} successfully logged in.")
