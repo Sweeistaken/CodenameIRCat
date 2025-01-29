@@ -199,7 +199,7 @@ def pinger(nick, connection):
                 try:
                     connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
                 except Exception as ex:
-                    print(traceback.format_exc)
+                    print(traceback.format_exc())
                     property_list[nick]["cause"] = "Send error: " + str(ex)
                     print("SHUTTING DOWN FOR " + nick)
                     connection.shutdown(socket.SHUT_WR)
