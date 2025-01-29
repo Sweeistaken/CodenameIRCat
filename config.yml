@@ -50,6 +50,9 @@ smtp_starttls: off
 smtp_username: pawserv@example.com
 smtp_password: examplePassword
 
+# If you setup a webchat, enter the passphrase for it.
+webirc_pass: helloworld
+
 # Use of modules in the /modules folder, or in an absolute path specified.
 # You want your protection modules BEFORE the ban engine.
 modules:
