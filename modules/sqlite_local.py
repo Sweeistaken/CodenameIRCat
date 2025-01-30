@@ -19,6 +19,7 @@ class broker:
         db = self.conn.cursor()
         db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
         e = db.fetchall()
+        db.execute("SELECT * FROM groups WHERE ")
         if e == []:
             return False
         else:
@@ -34,6 +35,16 @@ class broker:
         self.conn.commit()
     def nickserv_isexist(self, nick):
         db = self.conn.cursor()
-        db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
+        db.execute("SELECT * FROM nickserv WHERE user=?;", [nick.lower()])
         e = db.fetchall()
-        return e != []
+        db.execute("SELECT * FROM groups WHERE name=?;", [nick.lower()])
+        f = db.fetchall()
+        return e != [] or f != []
+    def nickserv_group(self, nick, account):
+        db = self.conn.cursor()
+        db.execute("INSERT INTO groups VALUES (?, ?);", [nick.lower(), account.lower()])
+        self.conn.commit()
+    def nickserv_drop(self, account):
+        db = self.conn.cursor()
+        db.execute("DELETE FROM nickserv WHERE user=?;", [account.lower()])
+        db.execute("DELETE FROM groups WHERE owner=?;", [account.lower()])
