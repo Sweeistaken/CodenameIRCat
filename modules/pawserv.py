@@ -58,6 +58,17 @@ class IRCatModule:
                             connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Nickname doesn't exist, try registering again?\r\n", "UTF-8"))
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid verification.\r\n", "UTF-8"))
+                elif len(args) > 0 and args[0].lower() == "group":
+                    if len(args) == 1:
+                        if user["identified"]:
+                            if not self.sql.nickserv_isexist(nick.lower()):
+                                self.sql.nickserv_group(nick, user["identusername"])
+                            else:
+                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Nickname {nick} already exists.\r\n", "UTF-8"))
+                        else:
+                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You are not logged in.\r\n", "UTF-8"))
+                    else:
+                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Does not requre arguments\r\n", "UTF-8"))
                 elif len(args) > 0 and args[0].lower() == "register":
                     if len(args) == 3:
                         if not self.sql.nickserv_isexist(nick.lower()):
