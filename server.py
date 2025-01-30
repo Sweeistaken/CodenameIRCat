@@ -230,7 +230,7 @@ def session(connection, client, ip, isssl=False):
     usesIRCv3 = False
     CAPEND = False
     clident = None
-    pendingCommands = [] # list of commands that were executed before verification
+    pendingCommands = "" # list of commands that were executed before verification
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -368,8 +368,8 @@ def session(connection, client, ip, isssl=False):
                             connection.sendall(bytes(f":{server} 372 {pending} :- {i}\r\n", "UTF-8"))
                         connection.sendall(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                     elif finished:
-                        pendingCommands.append(text)
-                        for comd in pendingCommands:
+                        pendingCommands += text
+                        for comd in pendingCommands.split("\r\n"):
                             command = comd.split(" ")[0].upper()
                             args = comd.split(" ")[1:]
                             text = comd
@@ -717,9 +717,9 @@ def session(connection, client, ip, isssl=False):
                                 # Unknown command
                                 cmd = text.split(" ")[0]
                                 connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
-                        pendingCommands = []
+                        pendingCommands = ""
                     else:
-                        pendingCommands.append(text)
+                        pendingCommands += text
             except ssl.SSLEOFError:
                 print("EOF occured...")
             except Exception as ex:
