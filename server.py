@@ -311,7 +311,7 @@ def session(connection, client, ip, isssl=False):
                         try:
                             if args[0] == data2["webirc_pass"]:
                                 hostname = args[2]
-                                client[0] = args[3]
+                                client = (args[3], client[1])
                                 connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
                                 if hostname != client[0]:
                                     connection.sendall(bytes(f":{server} NOTICE * :*** Got WebIRC hostname! {hostname}\r\n", "UTF-8"))
@@ -372,6 +372,7 @@ def session(connection, client, ip, isssl=False):
                         for comd in pendingCommands:
                             command = comd.split(" ")[0].upper()
                             args = comd.split(" ")[1:]
+                            text = comd
                             processedExternally = False
                             for i in commandProviders:
                                 cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection)
