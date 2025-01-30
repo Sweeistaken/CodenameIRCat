@@ -723,6 +723,7 @@ def session(connection, client, ip, isssl=False):
                             pendingCommands = ""
                         else:
                             pendingCommands += text
+                    textt = ""
             except ssl.SSLEOFError:
                 print("EOF occured...")
             except Exception as ex:
