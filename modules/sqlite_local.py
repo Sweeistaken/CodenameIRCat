@@ -17,9 +17,12 @@ class broker:
         db.execute("""CREATE table IF NOT EXISTS chanserv (name varchar(255), modes varchar(255), params varchar(255), owner varchar(255), usermodes varchar(255), optimodes varchar(255))""")
     def nickserv_identify(self, nick, password:str):
         db = self.conn.cursor()
+        db.execute("SELECT * FROM groups WHERE name=?", [nick])
+        f = db.fetchall()
+        if f != []:
+            nick = f[0][1]
         db.execute("SELECT * FROM nickserv WHERE user=?;", [nick])
         e = db.fetchall()
-        db.execute("SELECT * FROM groups WHERE ")
         if e == []:
             return False
         else:
