@@ -709,16 +709,15 @@ def session(connection, client, ip, isssl=False):
                                         connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                 else:
                                     connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                            # Ignore empty text
+                            elif text.split(" ")[0] == "":
+                                pass
+                            else:
+                                # Unknown command
+                                cmd = text.split(" ")[0]
+                                connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
                     else:
                         pendingCommands.append(text)
-
-                        # Ignore empty text
-                        elif text.split(" ")[0] == "":
-                            pass
-                        else:
-                            # Unknown command
-                            cmd = text.split(" ")[0]
-                            connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
             except ssl.SSLEOFError:
                 print("EOF occured...")
             except Exception as ex:
