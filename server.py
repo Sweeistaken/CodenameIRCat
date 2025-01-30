@@ -717,6 +717,7 @@ def session(connection, client, ip, isssl=False):
                                 # Unknown command
                                 cmd = text.split(" ")[0]
                                 connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
+                        pendingCommands = []
                     else:
                         pendingCommands.append(text)
             except ssl.SSLEOFError:
