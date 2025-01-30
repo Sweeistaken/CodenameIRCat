@@ -70,44 +70,51 @@ class IRCatModule:
                     else:
                         connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Does not requre arguments\r\n", "UTF-8"))
                 elif len(args) > 0 and args[0].lower() == "register":
-                    if len(args) == 3:
-                        if not self.sql.nickserv_isexist(nick.lower()):
-                            if not nick in self.memory:
-                                context = ssl.create_default_context()
-                                token = str(uuid.uuid4())
-                                message = f"Subject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
-                                with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                                    server.ehlo()
-                                    if self.smtp_starttls:
-                                        server.starttls(context=context)
+                    if not user["identified"]:
+                        if len(args) == 3:
+                            if not self.sql.nickserv_isexist(nick.lower()):
+                                if not nick in self.memory:
+                                    context = ssl.create_default_context()
+                                    token = str(uuid.uuid4())
+                                    message = f"Subject: {self.net_name} Account Verification\n\nHi,\nIt appears you have tried to register an account ({nick}) with this email on {self.net_name},\nIf you did not register an account, feel free to delete this email.\nIf you did, use this command:\n/nickserv verify {nick} {token}"
+                                    with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                                         server.ehlo()
-                                    server.login(self.smtp_username, self.smtp_password)
-                                    server.sendmail(self.smtp_username, args[2], message)
-                                self.memory[nick.lower()] = [token, args[1], args[2]]
-                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Email sent, please verify.\r\n", "UTF-8"))
+                                        if self.smtp_starttls:
+                                            server.starttls(context=context)
+                                            server.ehlo()
+                                        server.login(self.smtp_username, self.smtp_password)
+                                        server.sendmail(self.smtp_username, args[2], message)
+                                    self.memory[nick.lower()] = [token, args[1], args[2]]
+                                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Email sent, please verify.\r\n", "UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :A verification is already pending.\r\n", "UTF-8"))
                             else:
-                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :A verification is already pending.\r\n", "UTF-8"))
+                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :The user {nick} already exists.\r\n", "UTF-8"))
                         else:
-                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :The user {nick} already exists.\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Needs 3 arguments, nickname, password, and email.\r\n", "UTF-8"))
                     else:
-                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Needs 3 arguments, nickname, password, and email.\r\n", "UTF-8"))
+                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You're already logged in.\r\n", "UTF-8"))
                 elif len(args) > 0 and args[0].lower() == "identify":
-                    nck = nick if len(args) == 2 else args[2]
-                    temp = self.sql.nickserv_identify(nick=nck.lower(), password=args[1])
-                    if temp != False:
-                        hostmask = user["host"]
-                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You are now identified as {nck}.\r\n", "UTF-8"))
-                        connection.sendall(bytes(f":{self.hostname} 900 {nick} {hostmask} {nck} :You are now logged in as {nck}.\r\n", "UTF-8"))
-                        return {"success": True, "identify": temp}
-                    else:
-                        if nick.lower() in self.memory:
-                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Your account isn't verified, please verify now.\r\n", "UTF-8"))
+                    if not user["identified"]:
+                        nck = nick if len(args) == 2 else args[2]
+                        temp = self.sql.nickserv_identify(nick=nck.lower(), password=args[1])
+                        if temp != False:
+                            hostmask = user["host"]
+                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You are now identified as {nck}.\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{self.hostname} 900 {nick} {hostmask} {nck} :You are now logged in as {nck}.\r\n", "UTF-8"))
+                            return {"success": True, "identify": temp}
                         else:
-                            connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid username/password.\r\n", "UTF-8"))
+                            if nick.lower() in self.memory:
+                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Your account isn't verified, please verify now.\r\n", "UTF-8"))
+                            else:
+                                connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :Invalid username/password.\r\n", "UTF-8"))
+                    else:
+                        connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :You're already logged in.\r\n", "UTF-8"))
                 else:
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :NickServ Usage:\r\n","UTF-8"))
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :IDENTIFY pass <nick> - Identifies your nickname\r\n","UTF-8"))
                     connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :REGISTER pass email - Register your nickname\r\n","UTF-8"))
+                    connection.sendall(bytes(f":NickServ!Meow@PawServ NOTICE {nick} :GROUP - Allows you to sign in to your account with different nicknames\r\n","UTF-8"))
                 return {"success": True}
             else:
                 return {"success": False}
