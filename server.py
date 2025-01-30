@@ -778,7 +778,7 @@ def ssl_session(sock):
         try:
             while opened:
                 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-                context.minimum_version = ssl.TLSVersion.TLSv1
+                context.minimum_version = ssl.TLSVersion.TLSv1_2
                 context.set_ciphers('DEFAULT:@SECLEVEL=0')
                 context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
                 print("Waiting for connection...")
