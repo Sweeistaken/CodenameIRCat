@@ -230,6 +230,7 @@ def session(connection, client, ip, isssl=False):
     usesIRCv3 = False
     CAPEND = False
     clident = None
+    pendingCommands = [] # list of commands that were executed before verification
     try:
         print("Connected to client IP: {}".format(client))
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
@@ -704,8 +705,8 @@ def session(connection, client, ip, isssl=False):
                                     connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                             else:
                                 connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
-
-
+                    else:
+                        pendingCommands.append(text)
 
                         # Ignore empty text
                         elif text.split(" ")[0] == "":
