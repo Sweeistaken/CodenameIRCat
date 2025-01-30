@@ -29,6 +29,9 @@ class broker:
             temp.append(v)
         return temp
     def nickserv_identify(self, nick, password:str):
+        f = self.cfexec("SELECT * FROM groups WHERE name=?;", [nick])
+        if len(f) != 0:
+            nick = f[0]["owner"]
         e = self.cfexec("SELECT * FROM nickserv WHERE user=?;", [nick])
         if len(e) == 0:
             return False
@@ -43,4 +46,10 @@ class broker:
         e = self.cfexec("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
     def nickserv_isexist(self, nick):
         e = self.cfexec("SELECT * FROM nickserv WHERE user=?;", [nick])
-        return len(e) != 0
+        f = self.cfexec("SELECT * FROM groups WHERE name=?;", [nick])
+        return len(e) != 0 or len(f) != 0
+    def nickserv_group(self, nick, account):
+        self.cfexec("INSERT INTO groups VALUES (?, ?);", [nick.lower(), account.lower()])
+    def nickserv_drop(self, account):
+        self.cfexec("DELETE FROM nickserv WHERE user=?;", [account.lower()])
+        self.cfexec("DELETE FROM groups WHERE owner=?;", [account.lower()])
