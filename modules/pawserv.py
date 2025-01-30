@@ -40,7 +40,7 @@ class IRCatModule:
             if command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
                 if command == "PASS":
                     command = "NICKSERV"
-                    args = ["IDENTIFY", args[1]]
+                    args = ["IDENTIFY", args[0]]
                 if command == "PRIVMSG":
                     args = args[1:]
                     args[0] = args[0][1:] if args[0][0] == ":" else args[0]
