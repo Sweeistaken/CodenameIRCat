@@ -235,6 +235,9 @@ def session(connection, client, ip, isssl=False):
     textt = ""
     try:
         print("Connected to client IP: {}".format(client))
+        if isssl:
+            tlsver = connection.version()
+            print(f"Got SSL version: {tlsver}")
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
         connection.sendall(bytes(f":{server} NOTICE * :*** Checking your ident...\r\n","UTF-8"))
         try:
