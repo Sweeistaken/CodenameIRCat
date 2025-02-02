@@ -235,6 +235,7 @@ def session(connection, client, ip, isssl=False):
     textt = ""
     try:
         print("Connected to client IP: {}".format(client))
+        connection.do_handshake()
         if isssl:
             tlsver = connection.version()
             print(f"Got SSL version: {tlsver}")
