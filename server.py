@@ -233,6 +233,7 @@ def session(connection, client, ip, isssl=False):
     pendingCommands = "" # list of commands that were executed before verification
     unfinished = False
     textt = ""
+    pendingSend = "" # Text that should be sent to the client
     try:
         print("Connected to client IP: {}".format(client))
         connection.do_handshake()
@@ -801,7 +802,8 @@ def ssl_session(sock):
                 print("Waiting for connection...")
                 connection, client = sock.accept()
                 ip_to = restrict_ip
-                threading.Thread(target=session, daemon=True, args=[context.wrap_socket(connection, server_side=True), client, ip_to, True]).start()
+                conn = context.wrap_socket(connection, server_side=True)
+                threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
             print(traceback.format_exc())
