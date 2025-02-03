@@ -365,9 +365,9 @@ def session(connection, client, ip, isssl=False):
                             try:
                                 e = text.split(" ")[1]
                                 e = f":{e}" if e[0] != ":" else e
-                                connection.sendall(bytes(f":{server} PONG {server} {e}\r\n","UTF-8"))
+                                pendingSend += ":{server} PONG {server} {e}\r\n"
                             except:
-                                connection.sendall(bytes(f":{server} PONG {server}\r\n","UTF-8"))
+                                pendingSend += ":{server} PONG {server}\r\n"
                         elif command == "MOTD":
                             if motd_file != None:
                                 motd = open(motd_file).read()
@@ -729,6 +729,8 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
+                    connection.sendall(bytes(pendingSend, "UTF-8"))
+                    pendingSend = ""
             except ssl.SSLEOFError:
                 print("EOF occured...")
             except Exception as ex:
