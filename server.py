@@ -381,7 +381,7 @@ def session(connection, client, ip, isssl=False):
                             connection.sendall(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
                             pendingCommands += text
-                            for comd in pendingCommands.split("\r\n"):
+                            for comd in pendingCommands.replace("\r", "").split("\n"):
                                 command = comd.split(" ")[0].upper()
                                 args = comd.split(" ")[1:]
                                 text = comd
