@@ -24,8 +24,12 @@ This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 restrict_ip = ''
-def isalphanumeric(text:str):
-    return False
+def isalphanumeric(text:str, channel=False):
+    alphanumericity = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+=-_[]{};$%^*\\|'\",.<>?/`~" + ("#" if channel else ""))
+    for i in text:
+        if not i in alphanumericity:
+            return False
+    return True
 def getident(hostt:str, clientport:int, ssll:bool):
     try:
         identsender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -340,8 +344,8 @@ def session(connection, client, ip, isssl=False):
                                 rident = f"~{username}"
                             connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
                             connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow ovmsitnlbkq\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq,k,l,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
+                            connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
                             # connection.sendall(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8")) Not supported as there isn't multi-server capability (yet)
                             ops = 0 # Placeholder, will replace with caclulating how much people have +o
                             connection.sendall(bytes(f":{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
