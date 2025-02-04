@@ -244,6 +244,7 @@ def session(connection, client, ip, isssl=False):
             connection.do_handshake()
             tlsver = connection.version()
             print(f"Got SSL version: {tlsver}")
+        connection.settimeout(None)
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
         connection.sendall(bytes(f":{server} NOTICE * :*** Checking your ident...\r\n","UTF-8"))
         try:
@@ -272,11 +273,14 @@ def session(connection, client, ip, isssl=False):
                     cause = "Remote host closed the connection"
                     break
             except ssl.SSLEOFError:
+                print("EOF occurred.")
                 pass
             except ssl.SSLZeroReturnError:
+                print(traceback.format_exc())
                 cause = "Remote host closed the connection"
                 break
             except Exception as ex:
+                print(traceback.format_exc())
                 cause = "Read error: " + str(ex)
                 break
             print("Received data: {}".format(data))
@@ -738,8 +742,6 @@ def session(connection, client, ip, isssl=False):
                     textt = ""
                     connection.sendall(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
-            except ssl.SSLEOFError:
-                print("EOF occured...")
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "" + str(ex)
