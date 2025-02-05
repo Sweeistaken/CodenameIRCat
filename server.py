@@ -341,8 +341,11 @@ def session(connection, client, ip, isssl=False):
                                     else:
                                         capsuccess = False
                                         break
+                                capper = " ".join(capabilities)
                                 if capsuccess:
-                                    connection.sendall(bytes(f":{server} CAP * ACK :{capabilities}", "UTF-8"))
+                                    connection.sendall(bytes(f":{server} CAP * ACK :{capper}", "UTF-8"))
+                                else:
+                                    connection.sendall(bytes(f":{server} CAP * NAK :{capper}", "UTF-8"))
                             elif args[0].upper() == "END":
                                 CAPEND = True
                         elif command == "WEBIRC" and not finished:
@@ -395,9 +398,9 @@ def session(connection, client, ip, isssl=False):
                             try:
                                 e = text.split(" ")[1]
                                 e = f":{e}" if e[0] != ":" else e
-                                pendingSend += f":{server} PONG {server} {e}\r\n"
+                                pendingSend += f"{tags}:{server} PONG {server} {e}\r\n"
                             except:
-                                pendingSend += f":{server} PONG {server}\r\n"
+                                pendingSend += f"{tags}:{server} PONG {server}\r\n"
                         elif command == "MOTD":
                             if motd_file != None:
                                 motd = open(motd_file).read()
@@ -744,7 +747,7 @@ def session(connection, client, ip, isssl=False):
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
-                                                        print(traceback.format_exc)
+                                                        print(traceback.format_exc())
                                         elif target in nickname_list:
                                             nickname_list[target].sendall(bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         else:
