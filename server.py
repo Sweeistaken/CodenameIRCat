@@ -343,9 +343,9 @@ def session(connection, client, ip, isssl=False):
                                         break
                                 capper = " ".join(capabilities)
                                 if capsuccess:
-                                    connection.sendall(bytes(f":{server} CAP * ACK :{capper}", "UTF-8"))
+                                    connection.sendall(bytes(f":{server} CAP * ACK :{capper}\r\n", "UTF-8"))
                                 else:
-                                    connection.sendall(bytes(f":{server} CAP * NAK :{capper}", "UTF-8"))
+                                    connection.sendall(bytes(f":{server} CAP * NAK :{capper}\r\n", "UTF-8"))
                             elif args[0].upper() == "END":
                                 CAPEND = True
                         elif command == "WEBIRC" and not finished:
