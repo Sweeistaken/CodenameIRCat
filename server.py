@@ -186,7 +186,11 @@ for i in restrict_ip.split(" "):
     sockets[i].listen(1)
 if ssl_option:
     for i in restrict_ip.split(" "):
-        sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ctx = SSL.Context(SSL.SSLv23_METHOD)
+        ctx.set_options(SSL.OP_NO_SSLv2)
+        ctx.use_privatekey_file (ssl_pkey)
+        ctx.use_certificate_file(ssl_cert)
+        sockets_ssl[i] = SSL.Connection(ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sockets_ssl[i].settimeout(None)
         sockets_ssl[i].bind((i,6697))
@@ -203,6 +207,8 @@ def pinger(nick, connection):
                 time.sleep(0.5)
                 try:
                     connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+                except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
+                    pass
                 except Exception as ex:
                     print(traceback.format_exc())
                     property_list[nick]["cause"] = "Send error: " + str(ex)
@@ -288,10 +294,10 @@ def session(connection, client, ip, isssl=False):
                 if not data:
                     cause = "Remote host closed the connection"
                     break
-            except ssl.SSLEOFError:
-                print("EOF occurred.")
+            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
+                print("Skipable error occurred.")
                 pass
-            except ssl.SSLZeroReturnError:
+            except SSL.ZeroReturnError:
                 print(traceback.format_exc())
                 cause = "Remote host closed the connection"
                 break
@@ -768,6 +774,13 @@ def session(connection, client, ip, isssl=False):
                     textt = ""
                     connection.sendall(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
+            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
+                print("Skipable error occurred.")
+                pass
+            except SSL.ZeroReturnError:
+                print(traceback.format_exc())
+                cause = "Remote host closed the connection"
+                break
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "" + str(ex)
@@ -832,14 +845,8 @@ def ssl_session(sock):
     while True:
         try:
             while opened:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-                context.minimum_version = ssl.TLSVersion.TLSv1_2
-                context.set_ciphers('DEFAULT:@SECLEVEL=0')
-                context.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
-                print("Waiting for connection...")
-                connection, client = sock.accept()
+                conn, client = sock.accept()
                 ip_to = restrict_ip
-                conn = context.wrap_socket(connection, server_side=True)
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
