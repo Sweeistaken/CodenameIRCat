@@ -226,7 +226,7 @@ def session(connection, client, ip, isssl=False):
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
     username = "oreo" # Username/ident specified by client
-    rident = "~oreo"
+    rident = "~oreo" # Real ident
     hostname = "" # Hostname, can be IP or domain
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
@@ -243,6 +243,10 @@ def session(connection, client, ip, isssl=False):
         tags = ""
         if "server-time" in IRCv3Features:
             tags += "@time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z"
+            # >>> datetime.datetime.now(datetime.timezone.utc).isoformat()
+            # '2025-02-05T00:15:50.370474+00:00'
+            #                         ^^^^^^^^^
+            #      Cutting these off the string
         return tags + (" " if tags != "" else "")
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
@@ -360,7 +364,7 @@ def session(connection, client, ip, isssl=False):
                             lower_nicks[pending.lower()] = pending
                             for i in socketListeners:
                                 if "onValidate" in dir(i):
-                                    i.onValidate(socket=connection, ip=client[0])
+                                    i.onValidate(socket=connection, ip=client[0], v3cap=IRCv3Features)
                             threading.Thread(target=pinger, args=[pending, connection]).start()
                             if clident == None:
                                 rident = f"~{username}"
@@ -409,7 +413,7 @@ def session(connection, client, ip, isssl=False):
                                 text = comd
                                 processedExternally = False
                                 for i in commandProviders:
-                                    cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection)
+                                    cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection, v3cap=IRCv3Features)
                                     if cmdrun["success"]:
                                         if "identify" in cmdrun:
                                             if cmdrun["identify"] == "logout":
