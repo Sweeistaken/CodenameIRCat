@@ -241,24 +241,10 @@ def session(connection, client, ip, isssl=False):
     pendingCommands = "" # list of commands that were executed before verification
     unfinished = False
     textt = ""
-    nonlocal last_ping
-    nonlocal ping_pending
     last_ping = time.time()
     ping_pending = False
     pendingSend = "" # Text that should be sent to the client
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
-    def ping(): # Ping
-        if pending != "*":
-            if (time.time() - last_ping) > 30 and not ping_pending:
-                print(f"Sending ping msg to {pending}")
-                ping_pending = True
-                time.sleep(0.5)
-                connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-            elif ping_pending and (time.time() - last_ping) > ping_timeout:
-                cause = f"Ping timeout: {ping_timeout} seconds"
-                print(f"{pending} timed out.")
-                return True
-        return False
     def tags(): # Get IRCv3 tags
         tags = ""
         if "server-time" in IRCv3Features:
@@ -324,8 +310,16 @@ def session(connection, client, ip, isssl=False):
             print("Received data: {}".format(data))
             try:
                 textt += data.decode()
-                if ping():
-                    break
+                if pending != "*":
+                    if (time.time() - last_ping) > 30 and not ping_pending:
+                        print(f"Sending ping msg to {pending}")
+                        ping_pending = True
+                        time.sleep(0.5)
+                        connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+                    elif ping_pending and (time.time() - last_ping) > ping_timeout:
+                        cause = f"Ping timeout: {ping_timeout} seconds"
+                        print(f"{pending} timed out.")
+                        break
                 if textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
