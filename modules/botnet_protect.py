@@ -25,7 +25,7 @@ class IRCatModule:
         else:
             open(self.ban_provider, "a").write(f"\n{ip} Botnet detected!") # Else, write on the banfile.
         raise Exception("Botnet detected!") # Kill the connection
-    def onSocket(self, ip, socket, value, cachedNick=None, validated=False):
+    def onSocket(self, ip, socket, value, cachedNick=None, validated=False, *args, **kwargs):
         if cachedNick != None:
             print(value)
             if "JOIN" in value:
