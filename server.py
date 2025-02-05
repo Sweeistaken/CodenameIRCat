@@ -250,6 +250,7 @@ def session(connection, client, ip, isssl=False):
         return tags + (" " if tags != "" else "")
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
+        tags = ""
         if "server-time" in othercap:
             tags += "@time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z"
         return tags + (" " if tags != "" else "")
