@@ -5,6 +5,10 @@ print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
 from OpenSSL import SSL
 from requests import get
+def verify_cb(conn, cert, errnum, depth, ok):
+    # This obviously has to be updated
+    print(f'Got certificate: {cert.get_subject()}')
+    return ok
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
     sys.exit(1)
