@@ -241,6 +241,8 @@ def session(connection, client, ip, isssl=False):
     pendingCommands = "" # list of commands that were executed before verification
     unfinished = False
     textt = ""
+    nonlocal last_ping
+    nonlocal ping_pending
     last_ping = time.time()
     ping_pending = False
     pendingSend = "" # Text that should be sent to the client
@@ -863,9 +865,9 @@ def ssl_session(sock):
                 ctx.use_privatekey_file(ssl_pkey)
                 ctx.use_certificate_chain_file(ssl_cert)
                 conn = SSL.Connection(ctx, connection)
-                conn.settimeout(5)
                 conn.set_accept_state()
                 conn.do_handshake()
+                conn.settimeout(5)
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
