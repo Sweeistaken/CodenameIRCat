@@ -63,5 +63,6 @@
    -  [ ] `away-notify`
    -  [ ] `tls` (STARTTLS)
    -  [ ] `sasl`
+   -  [x] `server-time`
    -  Will research later.
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
