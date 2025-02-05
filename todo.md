@@ -51,7 +51,7 @@
    -  [x] Link `PRIVMSG *serv` to `*serv`
 - [x] Extra ~~(not planned)~~ features
    -  [x] ident support
-- [ ] Authentication
+- [x] Authentication
    -  [x] Store credentials in an SQLite3 file.
    -  [x] Map NickServ IDENTIFY
    -  [x] Map PASS
