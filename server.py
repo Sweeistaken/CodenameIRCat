@@ -305,7 +305,7 @@ def session(connection, client, ip, isssl=False):
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
                             if "onSocket" in dir(i):
-                                i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None, validated=finished, v3cap=IRCv3Features)
+                                i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None, validated=finished, v3tag=tags())
                         command = text.split(" ")[0].upper()
                         try:
                             args = text.split(" ")[1:]
@@ -413,7 +413,7 @@ def session(connection, client, ip, isssl=False):
                                 text = comd
                                 processedExternally = False
                                 for i in commandProviders:
-                                    cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection, v3cap=IRCv3Features)
+                                    cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection, v3tag=tags())
                                     if cmdrun["success"]:
                                         if "identify" in cmdrun:
                                             if cmdrun["identify"] == "logout":
