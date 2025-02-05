@@ -190,12 +190,7 @@ for i in restrict_ip.split(" "):
     sockets[i].listen(1)
 if ssl_option:
     for i in restrict_ip.split(" "):
-        ctx = SSL.Context(SSL.SSLv23_METHOD)
-        ctx.set_options(SSL.OP_NO_SSLv2)
-        ctx.set_verify(SSL.VERIFY_PEER|SSL.VERIFY_FAIL_IF_NO_PEER_CERT, verify_cb)
-        ctx.use_privatekey_file (ssl_pkey)
-        ctx.use_certificate_file(ssl_cert)
-        sockets_ssl[i] = SSL.Connection(ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+        sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sockets_ssl[i].settimeout(None)
         sockets_ssl[i].bind((i,6697))
@@ -850,8 +845,16 @@ def ssl_session(sock):
     while True:
         try:
             while opened:
-                conn, client = sock.accept()
+                connection, client = sock.accept()
                 ip_to = restrict_ip
+                ctx = SSL.Context(SSL.SSLv23_METHOD)
+                ctx.set_options(SSL.OP_NO_SSLv2)
+                ctx.set_verify(SSL.VERIFY_PEER, verify_cb)
+                ctx.use_privatekey_file (ssl_pkey)
+                ctx.use_certificate_file(ssl_cert)
+                conn = SSL.Connection(ctx, connection)
+                conn.set_accept_state()
+                conn.do_handshake()
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
