@@ -262,10 +262,10 @@ def session(connection, client, ip, isssl=False):
         return tags + (" " if tags != "" else "")
     try:
         print("Connected to client IP: {}".format(client))
-        if isssl:
-            connection.do_handshake()
-            tlsver = connection.version()
-            print(f"Got SSL version: {tlsver}")
+        #if isssl:
+        #    connection.do_handshake()
+        #    tlsver = connection.version()
+        #    print(f"Got SSL version: {tlsver}")
         connection.settimeout(None)
         connection.sendall(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
         connection.sendall(bytes(f":{server} NOTICE * :*** Checking your ident...\r\n","UTF-8"))
