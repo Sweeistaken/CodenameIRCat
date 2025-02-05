@@ -11,7 +11,7 @@ class IRCatModule:
         if ban_provider == "sql":
             self.useSQLengine = True
             self.SQLengine = sql
-    def onValidate(self, socket, ip):
+    def onValidate(self, socket, ip, *args, **kwargs):
         bans = open(self.ban_provider).read().split("\n")
         for i in bans:
             if ip in i.split(" ")[0]:
