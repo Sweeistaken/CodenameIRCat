@@ -846,7 +846,7 @@ def ssl_session(sock):
                 ctx = SSL.Context(SSL.SSLv23_METHOD)
                 ctx.set_options(SSL.OP_NO_SSLv2)
                 ctx.use_privatekey_file(ssl_pkey)
-                ctx.use_certificate_file(ssl_cert)
+                ctx.use_certificate_chain_file(ssl_cert)
                 conn = SSL.Connection(ctx, connection)
                 conn.set_accept_state()
                 conn.do_handshake()
