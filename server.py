@@ -188,6 +188,7 @@ if ssl_option:
     for i in restrict_ip.split(" "):
         ctx = SSL.Context(SSL.SSLv23_METHOD)
         ctx.set_options(SSL.OP_NO_SSLv2)
+        ctx.set_verify(SSL.VERIFY_PEER|SSL.VERIFY_FAIL_IF_NO_PEER_CERT, verify_cb)
         ctx.use_privatekey_file (ssl_pkey)
         ctx.use_certificate_file(ssl_cert)
         sockets_ssl[i] = SSL.Connection(ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
