@@ -245,8 +245,6 @@ def session(connection, client, ip, isssl=False):
     ping_pending = False
     pendingSend = "" # Text that should be sent to the client
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
-    connection.setblocking(False)
-    connection.settimeout(5)
     def tags(): # Get IRCv3 tags
         tags = ""
         if "server-time" in IRCv3Features:
@@ -292,6 +290,8 @@ def session(connection, client, ip, isssl=False):
             connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while True:
             try:
+                connection.setblocking(False)
+                connection.settimeout(5)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
