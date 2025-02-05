@@ -290,7 +290,6 @@ def session(connection, client, ip, isssl=False):
             connection.sendall(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while True:
             try:
-                connection.setblocking(False)
                 connection.settimeout(5)
                 data = connection.recv(2048)
                 if not data:
