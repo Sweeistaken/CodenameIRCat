@@ -45,7 +45,7 @@
    -  [x] `WHOIS`
    -  [ ] `WHOWAS`
 - [ ] [Implement services.](modules/pawserv.py)
-   -  [ ] Nickserv
+   -  [x] Nickserv
    -  [ ] ChanServ
    -  [x] CatServ (Outside of PawServ)
    -  [x] Link `PRIVMSG *serv` to `*serv`
@@ -54,7 +54,7 @@
 - [ ] Authentication
    -  [x] Store credentials in an SQLite3 file.
    -  [x] Map NickServ IDENTIFY
-   -  [ ] Map PASS
+   -  [x] Map PASS
 - [x] SSL/TLS
    -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774)
    -  [x] Automatically reload the certificate ~~if defined in config.~~
