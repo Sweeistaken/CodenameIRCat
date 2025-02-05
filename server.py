@@ -245,6 +245,8 @@ def session(connection, client, ip, isssl=False):
     ping_pending = False
     pendingSend = "" # Text that should be sent to the client
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
+    connection.setblocking(False)
+    connection.settimeout(5)
     def tags(): # Get IRCv3 tags
         tags = ""
         if "server-time" in IRCv3Features:
@@ -861,7 +863,6 @@ def ssl_session(sock):
                 conn = SSL.Connection(ctx, connection)
                 conn.set_accept_state()
                 conn.do_handshake()
-                conn.settimeout(5)
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
