@@ -2,7 +2,7 @@
 __version__ = "0.0.5"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib
+import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
 from OpenSSL import SSL
 from requests import get
 if not len(sys.argv) == 2:
