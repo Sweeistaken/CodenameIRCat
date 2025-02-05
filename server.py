@@ -252,7 +252,7 @@ def session(connection, client, ip, isssl=False):
                 ping_pending = True
                 time.sleep(0.5)
                 connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-            else (ping_pending and (time.time() - last_ping) > ping_timeout):
+            elif ping_pending and (time.time() - last_ping) > ping_timeout:
                 cause = f"Ping timeout: {ping_timeout} seconds"
                 print(f"{pending} timed out.")
                 return True
