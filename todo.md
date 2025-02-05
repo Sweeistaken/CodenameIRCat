@@ -52,7 +52,7 @@
 - [x] Extra ~~(not planned)~~ features
    -  [x] ident support
 - [x] Authentication
-   -  [x] Store credentials in an SQLite3 file.
+   -  [x] Store credentials in ~~an SQLite3 file.~~ database engine
    -  [x] Map NickServ IDENTIFY
    -  [x] Map PASS
 - [x] SSL/TLS
