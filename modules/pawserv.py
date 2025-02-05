@@ -35,7 +35,7 @@ class IRCatModule:
         self.hostname = host
         self.memory = {} # {nick: [authtoken, password, email]}
         print("PawServ loaded!")
-    def command(self, command, args, ip, nick, connection, user, v3tags, *args, **kwargs):
+    def command(self, command, args, ip, nick, connection, user, v3tags, *nkwargs, **kwargs):
         try:
             if command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
                 if command == "PASS":
