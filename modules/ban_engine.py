@@ -21,7 +21,7 @@ class IRCatModule:
                 socket.sendall(bytes(f":{host} 465 * :You are banned from this server\r\n","UTF-8"))
                 socket.sendall(bytes(f"ERROR :Closing Link: {ip} (K-Lined: {reason})\r\n","UTF-8"))
                 raise Exception("K-Lined: " + " ".join(i.split(" ")[1:]))
-    def onSocket(self, socket, value, ip, cachedNick=None, validated=False):
+    def onSocket(self, socket, value, ip, cachedNick=None, validated=False, *args, **kwargs):
         if validated:
             if self.useSQLengine:
                 pass
