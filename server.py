@@ -399,9 +399,9 @@ def session(connection, client, ip, isssl=False):
                             try:
                                 e = text.split(" ")[1]
                                 e = f":{e}" if e[0] != ":" else e
-                                pendingSend += f"{tags}:{server} PONG {server} {e}\r\n"
+                                pendingSend += f"{tags()}:{server} PONG {server} {e}\r\n"
                             except:
-                                pendingSend += f"{tags}:{server} PONG {server}\r\n"
+                                pendingSend += f"{tags()}:{server} PONG {server}\r\n"
                         elif command == "MOTD":
                             if motd_file != None:
                                 motd = open(motd_file).read()
