@@ -238,6 +238,17 @@ def session(connection, client, ip, isssl=False):
     unfinished = False
     textt = ""
     pendingSend = "" # Text that should be sent to the client
+    IRCv3Features = [] # List of Acknowledged IRCv3 features.
+    def tags(): # Get IRCv3 tags
+        tags = ""
+        if "server-time" in IRCv3Features:
+            tags += "@time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z"
+        return tags + (" " if tags != "" else "")
+    def tags_diffclient(nick:str): # Get tags of another client
+        othercap = property_list[nick]["v3cap"]
+        if "server-time" in othercap:
+            tags += "@time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z"
+        return tags + (" " if tags != "" else "")
     try:
         print("Connected to client IP: {}".format(client))
         if isssl:
@@ -290,7 +301,7 @@ def session(connection, client, ip, isssl=False):
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
                             if "onSocket" in dir(i):
-                                i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None, validated=finished)
+                                i.onSocket(socket=connection, ip=client[0], value=text, cachedNick=pending if pending != "*" else None, validated=finished, v3cap=IRCv3Features)
                         command = text.split(" ")[0].upper()
                         try:
                             args = text.split(" ")[1:]
@@ -300,10 +311,10 @@ def session(connection, client, ip, isssl=False):
                             pending = text.split(" ")[1]
                             if pending[0] == ":": pending = pending[1:]
                             if not isalphanumeric(pending):
-                                connection.sendall(bytes(f":{server} 432 * {pending} :Erroneus nickname\r\n","UTF-8"))
+                                connection.sendall(bytes(f"{tags()}:{server} 432 * {pending} :Erroneus nickname\r\n","UTF-8"))
                                 pending = "*"
                             elif pending.lower() in lower_nicks:
-                                connection.sendall(bytes(f":{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
+                                connection.sendall(bytes(f"{tags()}:{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                                 pending = "*"
                             else:
                                 already_set = True
@@ -314,13 +325,20 @@ def session(connection, client, ip, isssl=False):
                                 realname = " ".join(text.split(" ")[4:])[1:]
                                 ready = True
                         elif command == "CAP":
-                            #usesIRCv3 = True
                             if args[0].upper() == "LS":
-                                connection.sendall(bytes(f":{server} CAP * LS :ircat.xyz/foo\r\n", "UTF-8"))
+                                connection.sendall(bytes(f"{tags()}:{server} CAP * LS :server-time\r\n", "UTF-8"))
                             elif args[0].upper() == "REQ":
-                                if args[1].lower() == ":sasl":
-                                    pass
-                                    #connection.sendall(f":{server} CAP * ACK :sasl")
+                                usesIRCv3 = True # Halt the registration process until CAP END
+                                capabilities = " ".join(args[1:])[1:].split(" ")
+                                capsuccess = True
+                                for cap in capabilities:
+                                    if cap == "server-time":
+                                        IRCv3Features.append("server-time")
+                                    else:
+                                        capsuccess = False
+                                        break
+                                if capsuccess:
+                                    connection.sendall(f":{server} CAP * ACK :{capabilities}")
                             elif args[0].upper() == "END":
                                 CAPEND = True
                         elif command == "WEBIRC" and not finished:
@@ -328,9 +346,9 @@ def session(connection, client, ip, isssl=False):
                                 if args[0] == data2["webirc_pass"]:
                                     hostname = args[2]
                                     client = (args[3], client[1])
-                                    connection.sendall(bytes(f":{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
+                                    connection.sendall(bytes(f"{tags()}:{server} NOTICE * :*** WebIRC detected, welcome to IRC!\r\n", "UTF-8"))
                                     if hostname != client[0]:
-                                        connection.sendall(bytes(f":{server} NOTICE * :*** Got WebIRC hostname! {hostname}\r\n", "UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} NOTICE * :*** Got WebIRC hostname! {hostname}\r\n", "UTF-8"))
                             except:
                                 print(traceback.format_exc())
                                 break
@@ -338,7 +356,7 @@ def session(connection, client, ip, isssl=False):
                             cleanup_manual()
                             print(f"User {pending} successfully logged in.")
                             nickname_list[pending] = connection
-                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False, "identified": False, "ssl": isssl}
+                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "last_ping": time.time(), "ping_pending": False, "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features}
                             lower_nicks[pending.lower()] = pending
                             for i in socketListeners:
                                 if "onValidate" in dir(i):
@@ -346,28 +364,28 @@ def session(connection, client, ip, isssl=False):
                             threading.Thread(target=pinger, args=[pending, connection]).start()
                             if clident == None:
                                 rident = f"~{username}"
-                            connection.sendall(bytes(f":{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
                             # connection.sendall(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8")) Not supported as there isn't multi-server capability (yet)
                             ops = 0 # Placeholder, will replace with caclulating how much people have +o
-                            connection.sendall(bytes(f":{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
+                            connection.sendall(bytes(f"{tags()}:{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
                             chans = len(channels_list)
-                            connection.sendall(bytes(f":{server} 254 {pending} {chans} :channels formed\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 254 {pending} {chans} :channels formed\r\n", "UTF-8"))
                             cleints = len(nickname_list)
                             servers = 1
-                            connection.sendall(bytes(f":{server} 255 {pending} :I have {cleints} clients and {servers} servers\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 255 {pending} :I have {cleints} clients and {servers} servers\r\n", "UTF-8"))
                             # Start the MOTD
                             if motd_file != None:
                                 motd = open(motd_file).read()
-                            connection.sendall(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
                             for i in motd.rstrip().split("\n"):
-                                connection.sendall(bytes(f":{server} 372 {pending} :- {i}\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
+                                connection.sendall(bytes(f"{tags()}:{server} 372 {pending} :- {i}\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                             # End the MOTD
-                            connection.sendall(bytes(f":{pending} MODE {pending} +iw\r\n","UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{pending} MODE {pending} +iw\r\n","UTF-8"))
                             finished = True
                         elif command == "PING":
                             try:
@@ -379,10 +397,10 @@ def session(connection, client, ip, isssl=False):
                         elif command == "MOTD":
                             if motd_file != None:
                                 motd = open(motd_file).read()
-                            connection.sendall(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
                             for i in motd.rstrip().split("\n"):
-                                connection.sendall(bytes(f":{server} 372 {pending} :- {i}\r\n", "UTF-8"))
-                            connection.sendall(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
+                                connection.sendall(bytes(f"{tags()}:{server} 372 {pending} :- {i}\r\n", "UTF-8"))
+                            connection.sendall(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
                             pendingCommands += text
                             for comd in pendingCommands.replace("\r", "").split("\n"):
@@ -396,11 +414,11 @@ def session(connection, client, ip, isssl=False):
                                         if "identify" in cmdrun:
                                             if cmdrun["identify"] == "logout":
                                                 if "o" in property_list[pending]["modes"]:
-                                                    connection.sendall(bytes(f":{pending} MODE {pending} -o\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{pending} MODE {pending} -o\r\n","UTF-8"))
                                                 if not "i" in property_list[pending]["modes"]:
-                                                    connection.sendall(bytes(f":{pending} MODE {pending} +i\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{pending} MODE {pending} +i\r\n","UTF-8"))
                                                 if not "w" in property_list[pending]["modes"]:
-                                                    connection.sendall(bytes(f":{pending} MODE {pending} +w\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{pending} MODE {pending} +w\r\n","UTF-8"))
                                                 property_list[pending]["modes"] = "iw"
                                                 property_list[pending]["identified"] = False
                                             else:
@@ -408,7 +426,7 @@ def session(connection, client, ip, isssl=False):
                                                 property_list[pending]["identusername"] = cmdrun["identify"][0]
                                                 temp_mode = cmdrun["identify"][1]
                                                 property_list[pending]["modes"] = temp_mode
-                                                connection.sendall(bytes(f":{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
                                         processedExternally = True
                                         break
                                 if processedExternally:
@@ -436,7 +454,7 @@ def session(connection, client, ip, isssl=False):
                                                         lower_chans[channel.lower()] = channel
                                                         topic_list[channel] = "Topic is not implemented."
                                                 except:
-                                                    connection.sendall(bytes(f":{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                                 print(channels_list)
                                                 for i in channels_list[channel]:
                                                     try:
@@ -448,16 +466,16 @@ def session(connection, client, ip, isssl=False):
                                                     if pending in channels_list[channel]:
                                                         users = " ".join(channels_list[channel])
                                                         connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                                            connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                             print("Successfully pre-loaded /NAMES list")
                                         else:
-                                            connection.sendall(bytes(f":{server} 479 {pending} {channel} :Channel has erroneus characters\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 479 {pending} {channel} :Channel has erroneus characters\r\n","UTF-8"))
                                 elif command == "LIST":
-                                    connection.sendall(bytes(f":{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
+                                    connection.sendall(bytes(f"{tags()}:{server} 321 {pending} Channel :Users  Name\r\n","UTF-8"))
                                     for key, value in topic_list.items():
                                         usersin = len(channels_list[key])
-                                        connection.sendall(bytes(f":{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
-                                    connection.sendall(bytes(f":{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
+                                    connection.sendall(bytes(f"{tags()}:{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
                                 elif command == "PONG":
                                     e = text.split(" ")[1]
                                     if e == server or e == f":{server}":
@@ -466,19 +484,19 @@ def session(connection, client, ip, isssl=False):
                                         property_list[pending]["ping_pending"] = False
                                 elif command == "NICK":
                                     if len(args) == 0:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                     elif text.split(" ")[1] == pending:
                                         pass
                                     else:
                                         pending2 = text.split(" ")[1]
                                         if pending2[0] == ":": pending2 = pending2[1:]
                                         if not isalphanumeric(pending2):
-                                            connection.sendall(bytes(f":{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 432 {pending} {pending2} :Erroneus nickname\r\n","UTF-8"))
                                         elif pending2.lower() in lower_nicks:
-                                            connection.sendall(bytes(f":{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 433 {pending} {pending2} :Nickname is already in use.\r\n","UTF-8"))
                                         else:
                                             print("Sending nickname change...")
-                                            connection.sendall(bytes(f":{pending}!{rident}@{hostname} NICK {pending2}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{pending}!{rident}@{hostname} NICK {pending2}\r\n","UTF-8"))
                                             # Broadcast the nickname change
                                             done = []
                                             for i, users in channels_list.items():
@@ -486,7 +504,7 @@ def session(connection, client, ip, isssl=False):
                                                     for j in users:
                                                         if j != pending and j != pending2 and not j in done:
                                                             print("Broadcasting on " + j)
-                                                            nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                             done.append(j)
                                                     # Replace the nickname
                                                     try:
@@ -509,12 +527,12 @@ def session(connection, client, ip, isssl=False):
                                             print("Broadcasting nickname change...")
                                 elif command == "PART":
                                     if len(args) == 0:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                     else:
                                         channel = text.split(" ")[1]
                                         for i in channels_list[channel]:
                                             try:
-                                                nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                             except:
                                                 pass
                                         try:
@@ -524,16 +542,16 @@ def session(connection, client, ip, isssl=False):
                                 elif command == "AWAY":
                                     if len(args) == 0:
                                         property_list[pending]["away"] = False
-                                        connection.sendall(bytes(f":{server} 305 {pending} :You are no longer marked as being away\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 305 {pending} :You are no longer marked as being away\r\n","UTF-8"))
                                     else:
                                         reasons = " ".join(args)
                                         if reasons[0] == ":": reasons = reasons[1:]
                                         property_list[pending]["away"] = True
                                         property_list[pending]["reason"] = reasons
-                                        connection.sendall(bytes(f":{server} 306 {pending} :You have been marked as being away\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 306 {pending} :You have been marked as being away\r\n","UTF-8"))
                                 elif command == "WHO":
                                     if len(args) == 0:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                     else:
                                         channel = text.split(" ")[1]
                                         if channel in channels_list:
@@ -542,18 +560,18 @@ def session(connection, client, ip, isssl=False):
                                                 who_user = property_list[i]["username"]
                                                 who_realname = property_list[i]["realname"]
                                                 who_away = "G" if property_list[i]["away"] else "H"
-                                                connection.sendall(bytes(f":{server} 352 {pending} {channel} {who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 352 {pending} {channel} {who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
                                         elif channel in nickname_list:
                                             who_host = property_list[channel]["host"]
                                             who_user = property_list[channel]["username"]
                                             who_realname = property_list[channel]["realname"]
                                             who_away = "G" if property_list[channel]["away"] else "H"
-                                            connection.sendall(bytes(f":{server} 352 {pending} * {who_user} {who_host} {server} {channel} {who_away} :0 {who_realname}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 352 {pending} * {who_user} {who_host} {server} {channel} {who_away} :0 {who_realname}\r\n","UTF-8"))
 
-                                        connection.sendall(bytes(f":{server} 315 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 315 {pending} {channel} :End of /WHO list.\r\n","UTF-8"))
                                 elif command == "WHOIS":
                                     if len(args) == 0:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                     else:
                                         target = text.split(" ")[1]
                                         if target.lower() in lower_nicks:
@@ -572,23 +590,23 @@ def session(connection, client, ip, isssl=False):
                                                 who_flags = property_list[target]["modes"]
                                             except:
                                                 who_flags = None
-                                            connection.sendall(bytes(f":{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
-                                            connection.sendall(bytes(f":{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 311 {pending} {target} {who_user} {who_host} * :{who_realname}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 312 {pending} {target} {server} :{identifier}\r\n","UTF-8"))
                                             if "o" in who_flags: connection.sendall(bytes(f":{server} 313 {pending} {target} :is an IRC operator\r\n","UTF-8"))
                                             who_away = property_list[target]["away"]
                                             if who_away: 
                                                 who_reason = who_away = property_list[target]["reason"]
-                                                connection.sendall(bytes(f":{server} 301 {pending} {target} :{who_reason}\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 301 {pending} {target} :{who_reason}\r\n","UTF-8"))
                                             if who_identified:
-                                                connection.sendall(bytes(f":{server} 330 {pending} {target} {who_identifying} :is logged in as\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 330 {pending} {target} {who_identifying} :is logged in as\r\n","UTF-8"))
                                             if who_ssl:
-                                                connection.sendall(bytes(f":{server} 671 {pending} {target} :is using a secure connection\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 671 {pending} {target} :is using a secure connection\r\n","UTF-8"))
                                             #connection.sendall(bytes(f":{server} 317 {pending} {target} {time} :seconds idle\r\n","UTF-8")) # I haven't implemented idle time yet.
                                             if who_flags != None and who_flags != "iw":
-                                                connection.sendall(bytes(f":{server} 379 {pending} {target} :Is using modes +{who_flags}\r\n","UTF-8"))
-                                            connection.sendall(bytes(f":{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 379 {pending} {target} :Is using modes +{who_flags}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 318 {pending} {target} :End of /WHOIS list\r\n","UTF-8"))
                                         else:
-                                            connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                 elif command == "NAMES":
                                     if len(args) == 0:
                                         connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
@@ -597,8 +615,8 @@ def session(connection, client, ip, isssl=False):
                                         if channel in channels_list:
                                                 if pending in channels_list[channel]:
                                                     users = " ".join(channels_list[channel])
-                                                    connection.sendall(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                                        connection.sendall(bytes(f":{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                 elif command == "NOTICE":
                                     if len(args) >= 2:
                                         target = text.split(" ")[1]
@@ -609,15 +627,15 @@ def session(connection, client, ip, isssl=False):
                                                 for i in channels_list[channel]:
                                                     try:
                                                         if i != pending:
-                                                            nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                     except:
                                                         pass
                                         elif target in nickname_list:
-                                            nickname_list[target].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            nickname_list[target].sendall(bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         else:
-                                            connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                 elif command == "QUIT":
                                     # Parse the quit message.
                                     done = []
@@ -636,7 +654,7 @@ def session(connection, client, ip, isssl=False):
                                         if pending in users:
                                             for j in users:
                                                 if j != pending and not j in done:
-                                                    nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                    nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                     done.append(j)
                                             # Remove the quitting user from the channel.
                                             try:
@@ -645,7 +663,7 @@ def session(connection, client, ip, isssl=False):
                                                 print(traceback.format_exc())
                                     # Confirm QUIT and close the socket.
                                     try:
-                                        connection.sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         connection.sendall(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
                                     finally:
                                         connection.close()
@@ -654,29 +672,29 @@ def session(connection, client, ip, isssl=False):
                                 elif command == "MODE":
                                     target = args[0]
                                     if len(args) == 0:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                     elif len(args) == 1:
                                         if args[0] == pending:
                                             yourmodes = property_list[pending]["modes"]
-                                            connection.sendall(bytes(f":{server} 221 {pending} +{yourmodes}\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 221 {pending} +{yourmodes}\r\n","UTF-8"))
                                         elif args[0] in channels_list:
                                             if args[0] in property_list:
                                                 if "modes" in property_list[args[0]]:
                                                     # Get the modes + parameters, then print them out.
                                                     modes = property_list[args[0]]["modes"]
                                                     params = property_list[args[0]]["params"]
-                                                    connection.sendall(bytes(f":{server} 221 {pending} {target} +{modes} {params}\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{server} 221 {pending} {target} +{modes} {params}\r\n","UTF-8"))
                                                 else:
                                                     # Default channel mode
-                                                    connection.sendall(bytes(f":{server} 324 {pending} {target} +n\r\n","UTF-8"))
+                                                    connection.sendall(bytes(f"{tags()}:{server} 324 {pending} {target} +n\r\n","UTF-8"))
                                             else:
                                                 # Default channel mode
-                                                connection.sendall(bytes(f":{server} 324 {pending} {target} +n\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 324 {pending} {target} +n\r\n","UTF-8"))
                                         else:
                                             if args[0][0] == "#":
-                                                connection.sendall(bytes(f":{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
                                             else:
-                                                connection.sendall(bytes(f":{server} 505 {pending} :Cant change mode for other users\r\n","UTF-8"))
+                                                connection.sendall(bytes(f"{tags()}:{server} 505 {pending} :Cant change mode for other users\r\n","UTF-8"))
 
                                 elif command == "CATSERV" or (command == "PRIVMSG" and args[0].lower() == "catserv"):
                                     if command == "PRIVMSG":
@@ -688,22 +706,22 @@ def session(connection, client, ip, isssl=False):
                                     elif args[0].upper() == "PULL":
                                         updater = subprocess.run(["git", "pull"], stdout=subprocess.PIPE)
                                         if updater.stdout.decode().strip() == "Already up to date.":
-                                            connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat is already up-to-date.\r\n","UTF-8"))
                                         else:
-                                            connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :Done, it is recommended to use /RESTART if you're an IRC op\r\n","UTF-8"))
                                     elif args[0].upper() == "VERSION":
-                                        connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
-                                        connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :Codename IRCat version {__version__}\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :This is Codename IRCat's integrated services.\r\n","UTF-8"))
                                     else:
-                                        connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :CatServ Usage:\r\n","UTF-8"))
-                                        connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
-                                        connection.sendall(bytes(f":CatServ!Meow@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :CatServ Usage:\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :PULL     - Pulls the latest version of Codename IRCat\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:CatServ!Meow@IRCatCore NOTICE {pending} :VERSION  - Gets the version number of this service.\r\n","UTF-8"))
                                 elif command == "RESTART":
                                     if "o" in property_list[pending]["modes"]:
                                         global opened
                                         opened = False
                                     else:
-                                        connection.sendall(bytes(f":{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
                                 elif command == "PRIVMSG":
                                     if len(args) >= 2:
                                         target = text.split(" ")[1]
@@ -718,24 +736,24 @@ def session(connection, client, ip, isssl=False):
                                                         if i != pending:
                                                             print(i)
                                                             print(f":{pending}!{rident}@{hostname} {text}\r\n")
-                                                            nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
                                                         print(traceback.format_exc)
                                         elif target in nickname_list:
-                                            nickname_list[target].sendall(bytes(f":{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            nickname_list[target].sendall(bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         else:
-                                            connection.sendall(bytes(f":{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
+                                            connection.sendall(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
-                                        connection.sendall(bytes(f":{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                        connection.sendall(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
                                 # Ignore empty text
                                 elif text.split(" ")[0] == "":
                                     pass
                                 else:
                                     # Unknown command
                                     cmd = text.split(" ")[0]
-                                    connection.sendall(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
+                                    connection.sendall(bytes(f"{tags()}:{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
                             pendingCommands = ""
                         else:
                             pendingCommands += text
@@ -762,7 +780,7 @@ def session(connection, client, ip, isssl=False):
                     for j in users:
                         if j != pending and not j in done:
                             try:
-                                nickname_list[j].sendall(bytes(f":{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                                nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
                                 done.append(j)
                             except:
                                 print(traceback.format_exc())
