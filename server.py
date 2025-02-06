@@ -801,7 +801,7 @@ def session(connection, client, ip, isssl=False):
                     textt = ""
                     dosend(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
-            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
+            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
                 print("Skipable error occurred.")
                 pass
             except SSL.ZeroReturnError:
