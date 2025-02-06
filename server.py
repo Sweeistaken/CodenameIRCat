@@ -263,6 +263,7 @@ def session(connection, client, ip, isssl=False):
         try:
             connection.sendall(content)
         except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
+            print(traceback.format_exc())
             print("Soft error occurred")
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
