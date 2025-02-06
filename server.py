@@ -319,7 +319,7 @@ def session(connection, client, ip, isssl=False):
             print("Received data: {}".format(data))
             try:
                 textt += data.decode()
-                if pending != "*" and not property_list[pending]["ping_pending"]:
+                if finished and not property_list[pending]["ping_pending"]:
                     property_list[pending]["last_ping"] = time.time()
                 #if pending != "*":
                 #    if (time.time() - last_ping) > 30 and not ping_pending:
