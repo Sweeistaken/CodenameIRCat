@@ -263,7 +263,7 @@ def session(connection, client, ip, isssl=False):
             content = bytes(content, "UTF-8")
         try:
             connection.sendall(content)
-        except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
+        except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
             print(traceback.format_exc())
             print("Soft error occurred")
     def tags_diffclient(nick:str): # Get tags of another client
