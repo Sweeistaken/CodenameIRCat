@@ -19,7 +19,7 @@
 -  [ ] [Database support](https://discuss.swee.codes/t/41)
 -  [ ] User Flags
    -  [ ] i (invisible)
-   -  [ ] o (IRCOP)
+   -  [x] o (IRCOP)
    -  [ ] w (gets wallops)
 -  [ ] Channel Flags
    -  [ ] o \<user\> (CHANOP)
