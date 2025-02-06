@@ -304,7 +304,7 @@ def session(connection, client, ip, isssl=False):
                 if not data:
                     cause = "Remote host closed the connection"
                     break
-            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
+            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
                 print("Skipable error occurred.")
             except socket.timeout:
                 print("Socket timed out, ticking...")
