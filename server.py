@@ -179,14 +179,20 @@ sockets = {}
 sockets_ssl = {}
 # Open the specified non-SSL sockets.
 for i in restrict_ip.split(" "):
-    sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if ":" in i:
+        sockets[i] = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    else:
+        sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sockets[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sockets[i].settimeout(None)
     sockets[i].bind((i,6667))
     sockets[i].listen(1)
 if ssl_option:
     for i in restrict_ip.split(" "):
-        sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if ":" in i:
+            sockets_ssl[i] = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        else:
+            sockets_ssl[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sockets_ssl[i].setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sockets_ssl[i].settimeout(None)
         sockets_ssl[i].bind((i,6697))
