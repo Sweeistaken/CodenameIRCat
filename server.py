@@ -32,7 +32,7 @@ def isalphanumeric(text:str, channel=False):
     return True
 def getident(hostt:str, clientport:int, ssll:bool):
     try:
-        identsender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        identsender = socket.socket((socket.AF_INET if ":" in hostt else socket.AF_INET6), socket.SOCK_STREAM)
         identsender.settimeout(2)
         responsee = ""
         try:
