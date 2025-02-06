@@ -248,6 +248,7 @@ def session(connection, client, ip, isssl=False):
     textt = ""
     pendingSend = "" # Text that should be sent to the client
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
+    stillRunning = True
     def tags(): # Get IRCv3 tags
         tags = ""
         if "server-time" in IRCv3Features:
@@ -299,7 +300,7 @@ def session(connection, client, ip, isssl=False):
         except:
             print(traceback.format_exc())
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
-        while True:
+        while stillRunning:
             try:
                 data = connection.recv(2048)
                 if not data:
@@ -701,10 +702,11 @@ def session(connection, client, ip, isssl=False):
                                             except:
                                                 print(traceback.format_exc())
                                     # Confirm QUIT and close the socket.
+                                    stillRunning = False
                                     try:
                                         dosend(bytes(f"{tags()}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         dosend(bytes(f"ERROR :Closing Link: {hostname} ({msg})\r\n","UTF-8"))
-                                    finally:
+                                    except:
                                         connection.close()
                                         safe_quit = True
                                         break
