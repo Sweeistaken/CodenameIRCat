@@ -478,36 +478,39 @@ def session(connection, client, ip, isssl=False):
                                     for channelt in channels.split(","):
                                         channel = channelt.strip()
                                         if isalphanumeric(channel, True):
-                                            if channel.lower() in lower_chans:
-                                                channel = lower_chans[channel.lower()]
-                                            success = True
-                                            if channel in channels_list:
-                                                if pending in channels_list[channel]:
-                                                    success=False
-                                                    print(f"{pending} is already in {channel} , ignoring JOIN request.")
-                                            if success:
-                                                try:
-                                                    if channel in channels_list:
-                                                        channels_list[channel].append(pending)
-                                                    else:
-                                                        channels_list[channel] = [pending]
-                                                        lower_chans[channel.lower()] = channel
-                                                        topic_list[channel] = "Topic is not implemented."
-                                                except:
-                                                    dosend(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
-                                                print(channels_list)
-                                                for i in channels_list[channel]:
-                                                    try:
-                                                        nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
-                                                    except:
-                                                        pass
-                                            # Code re-used in the NAMES command
-                                            if channel in channels_list:
+                                            if channel[0] == "#":
+                                                if channel.lower() in lower_chans:
+                                                    channel = lower_chans[channel.lower()]
+                                                success = True
+                                                if channel in channels_list:
                                                     if pending in channels_list[channel]:
-                                                        users = " ".join(channels_list[channel])
-                                                        dosend(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                                            dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                                            print("Successfully pre-loaded /NAMES list")
+                                                        success=False
+                                                        print(f"{pending} is already in {channel} , ignoring JOIN request.")
+                                                if success:
+                                                    try:
+                                                        if channel in channels_list:
+                                                            channels_list[channel].append(pending)
+                                                        else:
+                                                            channels_list[channel] = [pending]
+                                                            lower_chans[channel.lower()] = channel
+                                                            topic_list[channel] = "Topic is not implemented."
+                                                    except:
+                                                        dosend(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
+                                                    print(channels_list)
+                                                    for i in channels_list[channel]:
+                                                        try:
+                                                            nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
+                                                        except:
+                                                            pass
+                                                # Code re-used in the NAMES command
+                                                if channel in channels_list:
+                                                        if pending in channels_list[channel]:
+                                                            users = " ".join(channels_list[channel])
+                                                            dosend(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                                dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                                print("Successfully pre-loaded /NAMES list")
+                                            else:
+                                                dosend(bytes(f"{tags()}:{server} 479 {pending} {channel} :Channel name needs to start with #\r\n","UTF-8"))
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 479 {pending} {channel} :Channel has erroneus characters\r\n","UTF-8"))
                                 elif command == "LIST":
