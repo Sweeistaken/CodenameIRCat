@@ -285,7 +285,7 @@ def session(connection, client, ip, isssl=False):
             hostname = client[0]
             dosend(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
         try:
-            identQuery = getident(hostname, client[1], isssl)
+            identQuery = getident(client[0], client[1], isssl)
             responseee = identQuery["response"]
             print(identQuery)
             if not identQuery["success"]:
