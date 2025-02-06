@@ -210,7 +210,7 @@ def pinger(nick, connection):
                 time.sleep(0.5)
                 try:
                     connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-                except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
+                except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
                     pass
                 except Exception as ex:
                     print(traceback.format_exc())
