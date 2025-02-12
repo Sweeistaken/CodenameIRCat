@@ -199,30 +199,30 @@ if ssl_option:
         sockets_ssl[i].listen(1)
 opened=True
 lower_chans = {} # Channel names in lowercase
-def pinger(nick, connection):
-    global property_list
-    while nick in property_list:
-        if (time.time() - property_list[nick]["last_ping"]) > 30 and not property_list[nick]["ping_pending"]:
-            if nick in property_list:
-                print("Sent ping message to " + nick)
-                property_list[nick]["ping_pending"] = True
-                time.sleep(0.5)
-                try:
-                    connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-                except Exception as ex:
-                    print(traceback.format_exc())
-                    property_list[nick]["cause"] = "Send error: " + str(ex)
-                    print("SHUTTING DOWN FOR " + nick)
-                    connection.shutdown(socket.SHUT_WR)
-                    connection.close()
-                    break
-        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > ping_timeout):
-            if nick in property_list:
-                property_list[nick]["cause"] = f"Ping timeout: {ping_timeout} seconds"
-                print("SHUTTING DOWN FOR " + nick)
-                connection.shutdown(socket.SHUT_WR)
-                connection.close()
-                break
+#def pinger(nick, connection):
+#    global property_list
+#    while nick in property_list:
+#        if (time.time() - property_list[nick]["last_ping"]) > 30 and not property_list[nick]["ping_pending"]:
+#            if nick in property_list:
+#                print("Sent ping message to " + nick)
+#                property_list[nick]["ping_pending"] = True
+#                time.sleep(0.5)
+#                try:
+#                    connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
+#                except Exception as ex:
+#                    print(traceback.format_exc())
+#                    property_list[nick]["cause"] = "Send error: " + str(ex)
+#                    print("SHUTTING DOWN FOR " + nick)
+#                    connection.shutdown(socket.SHUT_WR)
+#                    connection.close()
+#                    break
+#        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > ping_timeout):
+#            if nick in property_list:
+#                property_list[nick]["cause"] = f"Ping timeout: {ping_timeout} seconds"
+#                print("SHUTTING DOWN FOR " + nick)
+#                connection.shutdown(socket.SHUT_WR)
+#                connection.close()
+#                break
 def session(connection, client, ip, isssl=False):
     global property_list
     global channels_list
@@ -244,6 +244,8 @@ def session(connection, client, ip, isssl=False):
     unfinished = False
     textt = ""
     pendingSend = "" # Text that should be sent to the client
+    ping_pending = False
+    last_ping = time.time()
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
     stillRunning = True
     def tags(): # Get IRCv3 tags
@@ -313,18 +315,18 @@ def session(connection, client, ip, isssl=False):
             print("Received data: {}".format(data))
             try:
                 textt += data.decode()
-                if finished and not property_list[pending]["ping_pending"]:
-                    property_list[pending]["last_ping"] = time.time()
-                #if pending != "*":
-                #    if (time.time() - last_ping) > 30 and not ping_pending:
-                #        print(f"Sending ping msg to {pending}")
-                #        ping_pending = True
-                #        time.sleep(0.5)
-                #        dosend(bytes(f"PING {server}\r\n","UTF-8"))
-                #    elif ping_pending and (time.time() - last_ping) > ping_timeout:
-                #        cause = f"Ping timeout: {ping_timeout} seconds"
-                #        print(f"{pending} timed out.")
-                #        break
+                #if finished and not property_list[pending]["ping_pending"]:
+                #    property_list[pending]["last_ping"] = time.time()
+                if finshed:
+                    if (time.time() - last_ping) > 30 and not ping_pending:
+                        print(f"Sending ping msg to {pending}")
+                        ping_pending = True
+                        time.sleep(0.5)
+                        dosend(bytes(f"PING {server}\r\n","UTF-8"))
+                    elif ping_pending and (time.time() - last_ping) > ping_timeout:
+                        cause = f"Ping timeout: {ping_timeout} seconds"
+                        print(f"{pending} timed out.")
+                        break
                 if textt != "" and textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
@@ -388,11 +390,13 @@ def session(connection, client, ip, isssl=False):
                             print(f"User {pending} successfully logged in.")
                             nickname_list[pending] = connection
                             property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False}
+                            last_ping = time.time()
+                            ping_pending = False
                             lower_nicks[pending.lower()] = pending
                             for i in socketListeners:
                                 if "onValidate" in dir(i):
                                     i.onValidate(socket=connection, ip=client[0], v3cap=IRCv3Features)
-                            threading.Thread(target=pinger, args=[pending, connection]).start()
+                            #threading.Thread(target=pinger, args=[pending, connection]).start()
                             if clident == None:
                                 rident = f"~{username}"
                             dosend(bytes(f"{tags()}:{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
@@ -516,8 +520,10 @@ def session(connection, client, ip, isssl=False):
                                     e = text.split(" ")[1]
                                     if e == server or e == f":{server}":
                                         print(pending + " replied to PING.")
-                                        property_list[pending]["last_ping"] = time.time()
-                                        property_list[pending]["ping_pending"] = False
+                                        #property_list[pending]["last_ping"] = time.time()
+                                        #property_list[pending]["ping_pending"] = False
+                                        last_ping = time.time()
+                                        ping_pending = False
                                 elif command == "NICK":
                                     if len(args) == 0:
                                         dosend(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
@@ -554,11 +560,11 @@ def session(connection, client, ip, isssl=False):
                                             nickname_list[pending2] = nickname_list.pop(pending)
                                             del lower_nicks[pending.lower()]
                                             lower_nicks[pending2.lower()] = pending2
-                                            print("starting pinger...")
+                                            #print("starting pinger...")
                                             pending = pending2
-                                            property_list[pending2]["ping_pending"] = False
-                                            property_list[pending2]["last_ping"] = time.time()
-                                            threading.Thread(target=pinger, args=[pending, connection]).start()
+                                            #property_list[pending2]["ping_pending"] = False
+                                            #property_list[pending2]["last_ping"] = time.time()
+                                            #threading.Thread(target=pinger, args=[pending, connection]).start()
                                             print(f"User {pending} set nick")
                                             print("Broadcasting nickname change...")
                                 elif command == "PART":
