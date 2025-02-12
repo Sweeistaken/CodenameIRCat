@@ -317,7 +317,7 @@ def session(connection, client, ip, isssl=False):
                 textt += data.decode()
                 #if finished and not property_list[pending]["ping_pending"]:
                 #    property_list[pending]["last_ping"] = time.time()
-                if finshed:
+                if finished:
                     if (time.time() - last_ping) > 30 and not ping_pending:
                         print(f"Sending ping msg to {pending}")
                         ping_pending = True
