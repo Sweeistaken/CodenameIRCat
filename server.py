@@ -3,7 +3,6 @@ __version__ = "0.0.5"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
-from OpenSSL import SSL
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -210,8 +209,6 @@ def pinger(nick, connection):
                 time.sleep(0.5)
                 try:
                     connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-                except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
-                    pass
                 except Exception as ex:
                     print(traceback.format_exc())
                     property_list[nick]["cause"] = "Send error: " + str(ex)
@@ -263,9 +260,6 @@ def session(connection, client, ip, isssl=False):
             content = bytes(content, "UTF-8")
         try:
             connection.sendall(content)
-        except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
-            print(traceback.format_exc())
-            print("Soft error occurred")
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
         tags = ""
@@ -302,19 +296,14 @@ def session(connection, client, ip, isssl=False):
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
             try:
+                connection.settimeout(5)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
                     break
-            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError, SSL.SysCallError):
-                print("Skipable error occurred.")
             except socket.timeout:
                 print("Socket timed out, ticking...")
                 data = bytes("", "UTF-8")
-            except SSL.ZeroReturnError:
-                print(traceback.format_exc())
-                cause = "Remote host closed the connection"
-                break
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "Read error: " + str(ex)
@@ -806,13 +795,6 @@ def session(connection, client, ip, isssl=False):
                     textt = ""
                     dosend(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
-            except (SSL.WantReadError, SSL.WantWriteError, SSL.WantX509LookupError):
-                print("Skipable error occurred.")
-                pass
-            except SSL.ZeroReturnError:
-                print(traceback.format_exc())
-                cause = "Remote host closed the connection"
-                break
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "" + str(ex)
@@ -879,12 +861,9 @@ def ssl_session(sock):
             while opened:
                 connection, client = sock.accept()
                 ip_to = restrict_ip
-                ctx = SSL.Context(SSL.SSLv23_METHOD)
-                ctx.set_options(SSL.OP_NO_SSLv2)
-                ctx.use_privatekey_file(ssl_pkey)
-                ctx.use_certificate_chain_file(ssl_cert)
-                conn = SSL.Connection(ctx, connection)
-                conn.set_accept_state()
+                ctx = ssl.create_default_context
+                ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
+                conn = ctx.wrap_socket(connection, server_side=True)
                 conn.do_handshake()
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
