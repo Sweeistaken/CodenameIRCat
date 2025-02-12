@@ -863,7 +863,7 @@ def ssl_session(sock):
             while opened:
                 connection, client = sock.accept()
                 ip_to = restrict_ip
-                ctx = ssl.create_default_context()
+                ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
                 ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
                 conn = ctx.wrap_socket(connection, server_side=True)
                 conn.do_handshake()
