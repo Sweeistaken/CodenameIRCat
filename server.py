@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-__version__ = "0.0.5"
+__version__ = "0.0.7"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
@@ -300,7 +300,7 @@ def session(connection, client, ip, isssl=False):
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
             try:
-                connection.settimeout(5)
+                connection.settimeout(2)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
@@ -801,6 +801,11 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
+                # merge from properties
+                if finished and property_list[pending]["pendingSend"] != "":
+                    pendingSend += property_list[pending]["pendingSend"]
+                    property_list[pending]["pendingSend"] = ""
+                if pendingSend != "":
                     dosend(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
             except Exception as ex:
