@@ -325,7 +325,7 @@ def session(connection, client, ip, isssl=False):
                 #        cause = f"Ping timeout: {ping_timeout} seconds"
                 #        print(f"{pending} timed out.")
                 #        break
-                if textt[-1] == "\n":
+                if textt != "" and textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
                             if "onSocket" in dir(i):
