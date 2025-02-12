@@ -260,6 +260,8 @@ def session(connection, client, ip, isssl=False):
             content = bytes(content, "UTF-8")
         try:
             connection.sendall(content)
+        except Exception as ex:
+            raise ex
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
         tags = ""
