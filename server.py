@@ -270,7 +270,7 @@ def session(connection, client, ip, isssl=False):
         if "server-time" in othercap:
             tags.append("time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z")
         if "account-tag" in othercap and property_list[pending]["identified"]:
-            tags.append("account=" + property_list[pending]["identuser"])
+            tags.append("account=" + property_list[pending]["identusername"])
         return ("@" if args != [] else "") + ";".join(tags) + (" " if args != [] else "")
     try:
         print("Connected to client IP: {}".format(client))
