@@ -266,10 +266,12 @@ def session(connection, client, ip, isssl=False):
             raise ex
     def tags_diffclient(nick:str): # Get tags of another client
         othercap = property_list[nick]["v3cap"]
-        tags = ""
+        tags = []
         if "server-time" in othercap:
-            tags += "@time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z"
-        return tags + (" " if tags != "" else "")
+            tags.append("time=" + datetime.datetime.now(datetime.timezone.utc).isoformat()[:-9] + "Z")
+        if "account-tag" in othercap and property_list[pending]["identified"]:
+            tags.append("account=" + property_list[pending]["identuser"])
+        return ("@" if args != [] else "") + ";".join(tags) + (" " if args != [] else "")
     try:
         print("Connected to client IP: {}".format(client))
         #if isssl:
@@ -364,6 +366,8 @@ def session(connection, client, ip, isssl=False):
                                 for cap in capabilities:
                                     if cap == "server-time":
                                         IRCv3Features.append("server-time")
+                                    if cap == "account-tag":
+                                        IRCv3Features.append("account-tag")
                                     else:
                                         capsuccess = False
                                         break
