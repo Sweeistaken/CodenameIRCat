@@ -404,12 +404,12 @@ def session(connection, client, ip, isssl=False):
                             dosend(bytes(f"{tags()}:{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
                             # dosend(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8"))
-                            ops = 0 # Placeholder, will replace with caclulating how much people have +o
+                            ops = 0
                             for k, v in property_list:
                                 if "o" in v["modes"]:
                                     ops+=1
                             dosend(bytes(f"{tags()}:{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
-                            dosend(bytes(f"{tags()}:{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
+                            # dosend(bytes(f"{tags()}:{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
                             chans = len(channels_list)
                             dosend(bytes(f"{tags()}:{server} 254 {pending} {chans} :channels formed\r\n", "UTF-8"))
                             cleints = len(nickname_list)
