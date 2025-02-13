@@ -389,7 +389,7 @@ def session(connection, client, ip, isssl=False):
                             cleanup_manual()
                             print(f"User {pending} successfully logged in.")
                             nickname_list[pending] = connection
-                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False}
+                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": ""}
                             last_ping = time.time()
                             ping_pending = False
                             lower_nicks[pending.lower()] = pending
