@@ -358,7 +358,7 @@ def session(connection, client, ip, isssl=False):
                                 ready = True
                         elif command == "CAP":
                             if args[0].upper() == "LS":
-                                dosend(bytes(f"{tags()}:{server} CAP * LS :server-time\r\n", "UTF-8"))
+                                dosend(bytes(f"{tags()}:{server} CAP * LS :server-time account-tag\r\n", "UTF-8"))
                             elif args[0].upper() == "REQ":
                                 usesIRCv3 = True # Halt the registration process until CAP END
                                 capabilities = " ".join(args[1:])[1:].split(" ")
