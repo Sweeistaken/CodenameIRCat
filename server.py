@@ -400,7 +400,8 @@ def session(connection, client, ip, isssl=False):
                             if clident == None:
                                 rident = f"~{username}"
                             dosend(bytes(f"{tags()}:{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
-                            dosend(bytes(f"{tags()}:{server} 002 {pending} :Your host is {server}[{ip}/{"6697" if isssl else "6667"}], running version IRCat-v{__version__}\r\n", "UTF-8"))
+                            actport = "6697" if isssl else "6667"
+                            dosend(bytes(f"{tags()}:{server} 002 {pending} :Your host is {server}[{ip}/{actport}], running version IRCat-v{__version__}\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
                             # dosend(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8"))
