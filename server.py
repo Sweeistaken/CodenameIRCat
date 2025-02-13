@@ -400,11 +400,14 @@ def session(connection, client, ip, isssl=False):
                             if clident == None:
                                 rident = f"~{username}"
                             dosend(bytes(f"{tags()}:{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
-                            dosend(bytes(f"{tags()}:{server} 002 {pending} :Your host is {server}[{ip}/6667], running version IRCat-v{__version__}\r\n", "UTF-8"))
+                            dosend(bytes(f"{tags()}:{server} 002 {pending} :Your host is {server}[{ip}/{"6697" if isssl else "6667"}], running version IRCat-v{__version__}\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 004 {pending} {server} IRCat-{__version__} iow msitnR lfovkqb\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 005 {pending} CHANMODES=bq,k,fl,irmnpst CHANTYPES=# NETWORK={displayname} :are supported by this server\r\n", "UTF-8"))
-                            # dosend(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8")) Not supported as there isn't multi-server capability (yet)
+                            # dosend(bytes(f":{server} 251 {pending} :There are {allusers} users and {allinvis} invisible in {servers} servers\r\n", "UTF-8"))
                             ops = 0 # Placeholder, will replace with caclulating how much people have +o
+                            for k, v in property_list:
+                                if "o" in v["modes"]:
+                                    ops+=1
                             dosend(bytes(f"{tags()}:{server} 252 {pending} {ops} :IRC Operators online\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 253 {pending} 0 :unknown connection(s)\r\n", "UTF-8")) # Replace 0 with a variable of not setup clients.
                             chans = len(channels_list)
@@ -857,23 +860,21 @@ def cleanup_manual():
                     if k != h and k in nickname_list:
                         nickname_list[k].sendall(f":{h}!DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
 
-def tcp_session(sock):
+def tcp_session(sock, ip_to):
     while True:
         try:
             while opened:
                 print("Waiting for connection...")
                 connection, client = sock.accept()
-                ip_to = restrict_ip
                 threading.Thread(target=session, daemon=True, args=[connection, client, ip_to]).start()
         except:
             print("Something went wrong...")
             print(traceback.format_exc())
-def ssl_session(sock):
+def ssl_session(sock, ip_to):
     while True:
         try:
             while opened:
                 connection, client = sock.accept()
-                ip_to = restrict_ip
                 ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
                 ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
                 conn = ctx.wrap_socket(connection, server_side=True)
@@ -884,11 +885,11 @@ def ssl_session(sock):
             print(traceback.format_exc())
 for ip, i in sockets.items():
     print("Now listening on port 6667 with IP " + ip)
-    threading.Thread(target=tcp_session, args=[i], daemon=True).start()
+    threading.Thread(target=tcp_session, args=[i, ip], daemon=True).start()
 if ssl_option:
     for ip, i in sockets_ssl.items():
         print("Now listening on SSL port 6697 with IP " + ip)
-        threading.Thread(target=ssl_session, args=[i], daemon=True).start()
+        threading.Thread(target=ssl_session, args=[i, ip], daemon=True).start()
 while opened:
     pass
 print("Shutting down...")
