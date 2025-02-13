@@ -366,7 +366,7 @@ def session(connection, client, ip, isssl=False):
                                 for cap in capabilities:
                                     if cap == "server-time":
                                         IRCv3Features.append("server-time")
-                                    if cap == "account-tag":
+                                    elif cap == "account-tag":
                                         IRCv3Features.append("account-tag")
                                     else:
                                         capsuccess = False
