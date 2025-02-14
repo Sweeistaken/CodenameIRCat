@@ -390,7 +390,6 @@ def session(connection, client, ip, isssl=False):
                                 print(traceback.format_exc())
                                 break
                         elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
-                            cleanup_manual()
                             print(f"User {pending} successfully logged in.")
                             nickname_list[pending] = connection
                             property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": ""}
@@ -504,7 +503,7 @@ def session(connection, client, ip, isssl=False):
                                                     print(channels_list)
                                                     for i in channels_list[channel]:
                                                         try:
-                                                            nickname_list[i].sendall(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] += (bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
                                                         except:
                                                             pass
                                                 # Code re-used in the NAMES command
@@ -554,7 +553,7 @@ def session(connection, client, ip, isssl=False):
                                                     for j in users:
                                                         if j != pending and j != pending2 and not j in done:
                                                             print("Broadcasting on " + j)
-                                                            nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                             done.append(j)
                                                     # Replace the nickname
                                                     try:
@@ -582,7 +581,7 @@ def session(connection, client, ip, isssl=False):
                                         channel = text.split(" ")[1]
                                         for i in channels_list[channel]:
                                             try:
-                                                nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                             except:
                                                 pass
                                         try:
@@ -677,11 +676,11 @@ def session(connection, client, ip, isssl=False):
                                                 for i in channels_list[channel]:
                                                     try:
                                                         if i != pending:
-                                                            nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                     except:
                                                         pass
                                         elif target in nickname_list:
-                                            nickname_list[target].sendall(bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            property_list[target]["pendingSend"] += (bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
@@ -704,7 +703,7 @@ def session(connection, client, ip, isssl=False):
                                         if pending in users:
                                             for j in users:
                                                 if j != pending and not j in done:
-                                                    nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                    property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                     done.append(j)
                                             # Remove the quitting user from the channel.
                                             try:
@@ -787,13 +786,13 @@ def session(connection, client, ip, isssl=False):
                                                         if i != pending:
                                                             print(i)
                                                             print(f":{pending}!{rident}@{hostname} {text}\r\n")
-                                                            nickname_list[i].sendall(bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
                                                         print(traceback.format_exc())
                                         elif target in nickname_list:
-                                            nickname_list[target].sendall(bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            property_list[target]["pendingSend"] += (bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
@@ -836,7 +835,7 @@ def session(connection, client, ip, isssl=False):
                     for j in users:
                         if j != pending and not j in done:
                             try:
-                                nickname_list[j].sendall(bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                                property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
                                 done.append(j)
                             except:
                                 print(traceback.format_exc())
@@ -847,24 +846,6 @@ def session(connection, client, ip, isssl=False):
                         print(traceback.format_exc())
     except:
         print(traceback.format_exc())
-    cleanup_manual()
-def cleanup():
-    while True:
-        time.sleep(15)
-        cleanup_manual()
-def cleanup_manual():
-    global channels_list
-    global property_list
-    print("Cleaning up...")
-    for j, i in channels_list.items():
-        for h in i:
-            if not h in property_list:
-                print("Found a detached connection: " + h)
-                i.remove(h)
-                for k in channels_list[j]:
-                    if k != h and k in nickname_list:
-                        nickname_list[k].sendall(f":{h}!DISCONNECTED@DISCONNECTED PART {j} :IRCat Cleanup: Found missing connection!!\r\n")
-
 def tcp_session(sock, ip_to):
     while True:
         try:
