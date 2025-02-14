@@ -503,7 +503,8 @@ def session(connection, client, ip, isssl=False):
                                                     print(channels_list)
                                                     for i in channels_list[channel]:
                                                         try:
-                                                            property_list[i]["pendingSend"] += f":{pending}!{rident}@{hostname} JOIN {channel}\r\n"
+                                                            if i != pending:
+                                                                property_list[i]["pendingSend"] += f":{pending}!{rident}@{hostname} JOIN {channel}\r\n"
                                                         except:
                                                             pass
                                                 # Code re-used in the NAMES command
@@ -511,6 +512,7 @@ def session(connection, client, ip, isssl=False):
                                                         if pending in channels_list[channel]:
                                                             users = " ".join(channels_list[channel])
                                                             dosend(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                                dosend(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n", "UTF-8"))
                                                 dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                                 print("Successfully pre-loaded /NAMES list")
                                             else:
