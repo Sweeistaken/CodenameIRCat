@@ -809,7 +809,7 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
-                if pendingSend != "" or property_list[pending]["pendingSend"] != "":
+                if pendingSend != "" or (finished and property_list[pending]["pendingSend"] != ""):
                     dosend(bytes(pendingSend, "UTF-8"))
                     dosend(bytes(property_list[pending]["pendingSend"], "UTF-8"))
                     property_list[pending]["pendingSend"] = ""
