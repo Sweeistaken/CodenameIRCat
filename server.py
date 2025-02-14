@@ -225,6 +225,7 @@ lower_chans = {} # Channel names in lowercase
 #                break
 def session(connection, client, ip, isssl=False):
     global channels_list
+    global property_list
     global nickname_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
@@ -264,7 +265,6 @@ def session(connection, client, ip, isssl=False):
         except Exception as ex:
             raise ex
     def tags_diffclient(nick:str): # Get tags of another client
-        global property_list
         othercap = property_list[nick]["v3cap"]
         tags = []
         if "server-time" in othercap:
@@ -301,7 +301,6 @@ def session(connection, client, ip, isssl=False):
             print(traceback.format_exc())
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
-            global property_list
             try:
                 connection.settimeout(2)
                 data = connection.recv(2048)
