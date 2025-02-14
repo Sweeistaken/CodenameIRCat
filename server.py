@@ -681,7 +681,7 @@ def session(connection, client, ip, isssl=False):
                                                     except:
                                                         pass
                                         elif target in nickname_list:
-                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n""
+                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n"
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
