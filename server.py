@@ -808,12 +808,11 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
-                if finished:
-                    print(property_list[pending]["pendingSend"])
-                if pendingSend != "" or (finished and property_list[pending]["pendingSend"] != ""):
-                    dosend(bytes(pendingSend, "UTF-8"))
+                if finished and property_list[pending]["pendingSend"] != "":
                     dosend(bytes(property_list[pending]["pendingSend"], "UTF-8"))
                     property_list[pending]["pendingSend"] = ""
+                if pendingSend != "":
+                    dosend(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
             except Exception as ex:
                 print(traceback.format_exc())
