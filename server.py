@@ -508,11 +508,11 @@ def session(connection, client, ip, isssl=False):
                                                         except:
                                                             pass
                                                 # Code re-used in the NAMES command
+                                                dosend(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n", "UTF-8"))
                                                 if channel in channels_list:
                                                         if pending in channels_list[channel]:
                                                             users = " ".join(channels_list[channel])
                                                             dosend(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                                                dosend(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n", "UTF-8"))
                                                 dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                                 print("Successfully pre-loaded /NAMES list")
                                             else:
