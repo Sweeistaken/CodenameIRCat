@@ -883,7 +883,7 @@ def ssl_session(sock, ip_to):
                 ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
                 ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
                 conn = ctx.wrap_socket(connection, server_side=True)
-                #conn.do_handshake()
+                conn.do_handshake()
                 threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
