@@ -301,6 +301,7 @@ def session(connection, client, ip, isssl=False):
             print(traceback.format_exc())
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
+            global property_list
             try:
                 connection.settimeout(2)
                 data = connection.recv(2048)
@@ -808,13 +809,11 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
-                # merge from properties
-                if finished and property_list[pending]["pendingSend"] != "":
-                    pendingSend += property_list[pending]["pendingSend"]
-                    property_list[pending]["pendingSend"] = ""
-                    print("Loaded property_list pendingSend")
-                if pendingSend != "":
+                global property_list
+                if pendingSend != "" or property_list[pending]["pendingSend"] != "":
                     dosend(bytes(pendingSend, "UTF-8"))
+                    dosend(bytes(property_list[pending]["pendingSend"], "UTF-8"))
+                    property_list[pending]["pendingSend"] = ""
                     pendingSend = ""
             except Exception as ex:
                 print(traceback.format_exc())
