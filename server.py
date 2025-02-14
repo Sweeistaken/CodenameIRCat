@@ -224,7 +224,6 @@ lower_chans = {} # Channel names in lowercase
 #                connection.close()
 #                break
 def session(connection, client, ip, isssl=False):
-    global property_list
     global channels_list
     global nickname_list
     pending = "*" # The nickname of the client
@@ -265,6 +264,7 @@ def session(connection, client, ip, isssl=False):
         except Exception as ex:
             raise ex
     def tags_diffclient(nick:str): # Get tags of another client
+        global property_list
         othercap = property_list[nick]["v3cap"]
         tags = []
         if "server-time" in othercap:
@@ -809,7 +809,6 @@ def session(connection, client, ip, isssl=False):
                         else:
                             pendingCommands += text
                     textt = ""
-                global property_list
                 if pendingSend != "" or property_list[pending]["pendingSend"] != "":
                     dosend(bytes(pendingSend, "UTF-8"))
                     dosend(bytes(property_list[pending]["pendingSend"], "UTF-8"))
