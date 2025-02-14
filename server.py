@@ -812,6 +812,7 @@ def session(connection, client, ip, isssl=False):
                 if finished and property_list[pending]["pendingSend"] != "":
                     pendingSend += property_list[pending]["pendingSend"]
                     property_list[pending]["pendingSend"] = ""
+                    print("Loaded property_list pendingSend")
                 if pendingSend != "":
                     dosend(bytes(pendingSend, "UTF-8"))
                     pendingSend = ""
