@@ -811,7 +811,8 @@ def session(connection, client, ip, isssl=False):
                             pendingCommands += text
                     textt = ""
                 if finished and property_list[pending]["pendingSend"] != "":
-                    dosend(bytes(property_list[pending]["pendingSend"], "UTF-8"))
+                    print(str(property_list[pending]["pendingSend"]))
+                    dosend(bytes(str(property_list[pending]["pendingSend"]), "UTF-8"))
                     property_list[pending]["pendingSend"] = ""
                 if pendingSend != "":
                     dosend(bytes(pendingSend, "UTF-8"))
@@ -836,7 +837,7 @@ def session(connection, client, ip, isssl=False):
                     for j in users:
                         if j != pending and not j in done:
                             try:
-                                property_list[j]["pendingSend"] += f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n"
+                                property_list[j]["pendingSend"] += f":{pending}!{rident}@{hostname} QUIT :{cause}\r\n"
                                 done.append(j)
                             except:
                                 print(traceback.format_exc())
