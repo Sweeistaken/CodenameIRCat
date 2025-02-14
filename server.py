@@ -788,7 +788,7 @@ def session(connection, client, ip, isssl=False):
                                                         if i != pending:
                                                             print(i)
                                                             print(f":{pending}!{rident}@{hostname} {text}\r\n")
-                                                            property_list[i]["pendingSend"] = f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"
+                                                            property_list[i]["pendingSend"] = f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n"
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
