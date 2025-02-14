@@ -504,7 +504,7 @@ def session(connection, client, ip, isssl=False):
                                                     print(channels_list)
                                                     for i in channels_list[channel]:
                                                         try:
-                                                            property_list[i]["pendingSend"] += (bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] += f":{pending}!{rident}@{hostname} JOIN {channel}\r\n"
                                                         except:
                                                             pass
                                                 # Code re-used in the NAMES command
@@ -554,7 +554,7 @@ def session(connection, client, ip, isssl=False):
                                                     for j in users:
                                                         if j != pending and j != pending2 and not j in done:
                                                             print("Broadcasting on " + j)
-                                                            property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[j]["pendingSend"] += f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n"
                                                             done.append(j)
                                                     # Replace the nickname
                                                     try:
@@ -582,7 +582,7 @@ def session(connection, client, ip, isssl=False):
                                         channel = text.split(" ")[1]
                                         for i in channels_list[channel]:
                                             try:
-                                                property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                property_list[i]["pendingSend"] += f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n"
                                             except:
                                                 pass
                                         try:
@@ -677,11 +677,11 @@ def session(connection, client, ip, isssl=False):
                                                 for i in channels_list[channel]:
                                                     try:
                                                         if i != pending:
-                                                            property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] += f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n"
                                                     except:
                                                         pass
                                         elif target in nickname_list:
-                                            property_list[target]["pendingSend"] += (bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n""
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
@@ -704,7 +704,7 @@ def session(connection, client, ip, isssl=False):
                                         if pending in users:
                                             for j in users:
                                                 if j != pending and not j in done:
-                                                    property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                    property_list[j]["pendingSend"] += f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} {text}\r\n"
                                                     done.append(j)
                                             # Remove the quitting user from the channel.
                                             try:
@@ -787,13 +787,13 @@ def session(connection, client, ip, isssl=False):
                                                         if i != pending:
                                                             print(i)
                                                             print(f":{pending}!{rident}@{hostname} {text}\r\n")
-                                                            property_list[i]["pendingSend"] += (bytes(f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                                            property_list[i]["pendingSend"] = f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
                                                         print(traceback.format_exc())
                                         elif target in nickname_list:
-                                            property_list[target]["pendingSend"] += (bytes(f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n","UTF-8"))
+                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n"
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
@@ -836,7 +836,7 @@ def session(connection, client, ip, isssl=False):
                     for j in users:
                         if j != pending and not j in done:
                             try:
-                                property_list[j]["pendingSend"] += (bytes(f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n","UTF-8"))
+                                property_list[j]["pendingSend"] += f"{tags_diffclient(j)}:{pending}!{rident}@{hostname} QUIT :{cause}\r\n"
                                 done.append(j)
                             except:
                                 print(traceback.format_exc())
