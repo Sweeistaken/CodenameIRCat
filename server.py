@@ -520,6 +520,7 @@ def session(connection, client, ip, isssl=False):
                                                     except:
                                                         dosend(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                                     print(channels_list)
+                                                    print(channel_modestore_identify[channel])
                                                     if property_list[pending]["identified"] and property_list[pending]["identusername"] in channel_modestore_identify[channel]:
                                                         print(f"{pending} has an identify mode, setting mode " + channel_modestore_identify[channel][property_list[pending]["identusername"]])
                                                         channel_modestore[channel][pending] = channel_modestore_identify[channel][property_list[pending]["identusername"]]
