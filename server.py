@@ -236,6 +236,7 @@ def session(connection, client, ip, isssl=False):
     global nickname_list
     global channel_modestore
     global channel_modestore_identify
+    global topic_list
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
