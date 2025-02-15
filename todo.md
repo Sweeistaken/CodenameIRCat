@@ -15,14 +15,14 @@
    -  [x] Away
    -  [ ] Multi-server support
    -  [x] `LIST`
-   -  [ ] `TOPIC`
+   -  [x] `TOPIC`
 -  [ ] [Database support](https://discuss.swee.codes/t/41)
 -  [ ] User Flags
    -  [ ] i (invisible)
    -  [x] o (IRCOP)
    -  [ ] w (gets wallops)
 -  [ ] Channel Flags
-   -  [ ] o \<user\> (CHANOP)
+   -  [x] o \<user\> (CHANOP)
    -  [ ] v \<user\> (voice)
    -  [ ] m (moderated, only let voice or op talk)
    -  [ ] s (don't show in LIST)
