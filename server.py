@@ -483,6 +483,7 @@ def session(connection, client, ip, isssl=False):
                                             property_list[pending]["modes"] = temp_mode
                                             dosend(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
                                     if "initchan" in cmdrun:
+                                        print(cmdrun["initchan"])
                                         channels_list[cmdrun["initchan"]["name"]] = []
                                         topic_list[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["topic"]
                                         channel_modestore_identify[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["automodes"]
