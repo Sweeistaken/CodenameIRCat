@@ -46,6 +46,7 @@ class broker:
         e = self.cfexec("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
     def chanserv_details(self, channel):
         e = self.cfexec("SELECT * FROM chanserv WHERE name=?;", [channel])
+        print(e)
         if len(e) == 0:
             return False
         else:
