@@ -37,7 +37,27 @@ class IRCatModule:
         print("PawServ loaded!")
     def command(self, command, args, ip, nick, connection, user, v3tag, *nkwargs, **kwargs):
         try:
-            if command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
+            if command == "JOIN":
+                channel = args[0]
+                query = self.sql.chanserv_details(channel)
+                topic = ""
+                if query != False:
+                    for i in query["params"].split("\n"):
+                        if i.split(" ")[0] == "T":
+                            topic = " ".join(i.split(" ")[1:])
+                    switch = False
+                    automodes = {}
+                    collected = None
+                    for i in query["automodes"].split(" "):
+                        if not switch:
+                            collected = i
+                        else:
+                            automodes[i] = collected
+                        switch = not switch
+                    return {"success": "skip", "initchan": {"name": channel, "topic": topic, "automodes": automodes, "modes": query["modes"]}}
+                else:
+                    return {"success": False}
+            elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
                 if command == "PASS":
                     command = "NICKSERV"
                     args = ["IDENTIFY", args[0]]
