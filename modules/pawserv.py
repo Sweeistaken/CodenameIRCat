@@ -42,7 +42,7 @@ class IRCatModule:
                 channels = channels[1:] if channels[0] == ":" else channels
                 oreo = []
                 print(channels)
-                for channel in channels:
+                for channel in channels.split(","):
                     query = self.sql.chanserv_details(channel)
                     topic = ""
                     if query != False:
