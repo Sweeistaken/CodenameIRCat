@@ -486,6 +486,7 @@ def session(connection, client, ip, isssl=False):
                                         channels_list[cmdrun["initchan"]["name"]] = []
                                         topic_list[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["topic"]
                                         channel_modestore_identify[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["automodes"]
+                                        channel_modestore[cmdrun["initchan"]["name"]] = {}
                                 if processedExternally:
                                     pass
                                 elif command == "JOIN":
