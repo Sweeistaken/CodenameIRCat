@@ -486,6 +486,7 @@ def session(connection, client, ip, isssl=False):
                                         print(cmdrun["initchan"])
                                         channels_list[cmdrun["initchan"]["name"]] = []
                                         topic_list[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["topic"]
+                                        lower_chans[cmdrun["initchan"]["name"].lower()] = cmdrun["initchan"]["name"]
                                         channel_modestore_identify[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["automodes"]
                                         channel_modestore[cmdrun["initchan"]["name"]] = {}
                                 if processedExternally:
