@@ -483,13 +483,15 @@ def session(connection, client, ip, isssl=False):
                                             temp_mode = cmdrun["identify"][1]
                                             property_list[pending]["modes"] = temp_mode
                                             dosend(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
-                                    if "initchan" in cmdrun and cmdrun["initchan"]["name"] not in channels_list:
+                                    if "initchan" in cmdrun and :
                                         print(cmdrun["initchan"])
-                                        channels_list[cmdrun["initchan"]["name"]] = []
-                                        topic_list[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["topic"]
-                                        lower_chans[cmdrun["initchan"]["name"].lower()] = cmdrun["initchan"]["name"]
-                                        channel_modestore_identify[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["automodes"]
-                                        channel_modestore[cmdrun["initchan"]["name"]] = {}
+                                        for chran in cmdrun["initchan"]:
+                                            if chran["name"] not in channels_list:
+                                                channels_list[chran["name"]] = []
+                                                topic_list[chran["name"]] = chran["topic"]
+                                                lower_chans[chran["name"].lower()] = chran["name"]
+                                                channel_modestore_identify[chran["name"]] = chran["automodes"]
+                                                channel_modestore[chran["name"]] = {}
                                 if processedExternally:
                                     pass
                                 elif command == "JOIN":
