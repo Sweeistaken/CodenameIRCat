@@ -38,26 +38,27 @@ class IRCatModule:
     def command(self, command, args, ip, nick, connection, user, v3tag, *nkwargs, **kwargs):
         try:
             if command == "JOIN":
-                channel = args[0]
-                print(channel)
-                query = self.sql.chanserv_details(channel)
-                topic = ""
-                if query != False:
-                    for i in query["params"].split("\n"):
-                        if i.split(" ")[0] == "T":
-                            topic = " ".join(i.split(" ")[1:])
-                    switch = False
-                    automodes = {}
-                    collected = None
-                    for i in query["usermodes"].split(" "):
-                        if not switch:
-                            collected = i
-                        else:
-                            automodes[i] = collected
-                        switch = not switch
-                    return {"success": "skip", "initchan": {"name": channel, "topic": topic, "automodes": automodes, "modes": query["modes"]}}
-                else:
-                    return {"success": False}
+                channels = args[0]
+                channels = channels[1:] if channels[0] == ":" else channels
+                oreo = []
+                for channel in channels:
+                    query = self.sql.chanserv_details(channel)
+                    topic = ""
+                    if query != False:
+                        for i in query["params"].split("\n"):
+                            if i.split(" ")[0] == "T":
+                                topic = " ".join(i.split(" ")[1:])
+                        switch = False
+                        automodes = {}
+                        collected = None
+                        for i in query["usermodes"].split(" "):
+                            if not switch:
+                                collected = i
+                            else:
+                                automodes[i] = collected
+                            switch = not switch
+                        oreo.append({"name": channel, "topic": topic, "automodes": automodes, "modes": query["modes"]})
+                return {"success": "skip", "initchan": oreo}
             elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
                 if command == "PASS":
                     command = "NICKSERV"
