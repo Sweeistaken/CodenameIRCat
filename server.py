@@ -462,11 +462,6 @@ def session(connection, client, ip, isssl=False):
                                 processedExternally = False
                                 for i in commandProviders:
                                     cmdrun = i.command(command=command, args=args, nick=pending, ip=client[0], user=property_list[pending], connection=connection, v3tag=tags())
-                                    if cmdrun["success"] == "skip":
-                                        pass
-                                    elif cmdrun["success"]:
-                                        processedExternally = True
-                                        break
                                     if "identify" in cmdrun:
                                         if cmdrun["identify"] == "logout":
                                             if "o" in property_list[pending]["modes"]:
@@ -492,6 +487,11 @@ def session(connection, client, ip, isssl=False):
                                                 lower_chans[chran["name"].lower()] = chran["name"]
                                                 channel_modestore_identify[chran["name"]] = chran["automodes"]
                                                 channel_modestore[chran["name"]] = {}
+                                    if cmdrun["success"] == "skip":
+                                        pass
+                                    elif cmdrun["success"]:
+                                        processedExternally = True
+                                        break
                                 if processedExternally:
                                     pass
                                 elif command == "JOIN":
