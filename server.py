@@ -527,6 +527,8 @@ def session(connection, client, ip, isssl=False):
                                                         if property_list[pending]["identusername"] in channel_modestore_identify[channel]:
                                                             print(f"{pending} has an identify mode, setting mode " + channel_modestore_identify[channel][property_list[pending]["identusername"]])
                                                             channel_modestore[channel][pending] = channel_modestore_identify[channel][property_list[pending]["identusername"]]
+                                                            mo = channel_modestore[channel][pending]
+                                                            pendingSend += f":{server} MODE {channel} +{mo} {pending}\r\n"
                                                     for i in channels_list[channel]:
                                                         try:
                                                             if i != pending:
