@@ -539,7 +539,7 @@ def session(connection, client, ip, isssl=False):
                                                     users += f"{who_mode}{i} "
                                                 dosend(bytes(f"{tags()}:{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                                 dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                                                if topic_list[channel] == "":
+                                                if topic_list[channel] != "":
                                                     tpc = topic_list[channel]
                                                     print(tpc)
                                                     dosend(bytes(f"{tags()}:{server} 332 {pending} {channel} :{tpc}\r\n","UTF-8"))
@@ -570,7 +570,7 @@ def session(connection, client, ip, isssl=False):
                                                 else:
                                                     dosend(bytes(f"{tags()}:{server} 482 {pending} {channel} :You're not channel operator\r\n","UTF-8"))
                                             else:
-                                                if topic_list[channel] == "":
+                                                if topic_list[channel] != "":
                                                     tpc = topic_list[channel]
                                                     dosend(bytes(f"{tags()}:{server} 332 {pending} {channel} :{tpc}\r\n","UTF-8"))
                                                 else:
