@@ -44,6 +44,16 @@ class broker:
     def nickserv_register(self, nick, password, email):
         hashed = self.fnet.encrypt(bytes(password, "UTF-8")).decode()
         e = self.cfexec("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
+    def chanserv_details(self, channel)
+        e = self.cfexec("SELECT * FROM chanserv WHERE name=?;", [channel])
+        if len(e) == 0:
+            return False
+        else:
+            try:
+                return e[0]
+            except:
+                print(traceback.format_exc())
+                return False
     def nickserv_isexist(self, nick):
         e = self.cfexec("SELECT * FROM nickserv WHERE user=?;", [nick])
         f = self.cfexec("SELECT * FROM groups WHERE name=?;", [nick])
