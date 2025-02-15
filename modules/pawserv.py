@@ -49,15 +49,10 @@ class IRCatModule:
                         for i in query["params"].split("\n"):
                             if i.split(" ")[0] == "T":
                                 topic = " ".join(i.split(" ")[1:])
-                        switch = False
                         automodes = {}
                         collected = None
-                        for i in query["usermodes"].split(" "):
-                            if not switch:
-                                collected = i
-                            else:
-                                automodes[i] = collected
-                            switch = not switch
+                        for i in query["usermodes"].split("\n"):
+                            automodes(i.split(" ")[1]) = i.split(" ")[0]
                         oreo.append({"name": channel, "topic": topic, "automodes": automodes, "modes": query["modes"]})
                 return {"success": "skip", "initchan": oreo}
             elif command == "NICKSERV" or (command == "PRIVMSG" and args[0].lower() == "nickserv") or command == "PASS":
