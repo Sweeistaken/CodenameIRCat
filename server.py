@@ -551,7 +551,7 @@ def session(connection, client, ip, isssl=False):
                                         dosend(bytes(f"{tags()}:{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
                                     dosend(bytes(f"{tags()}:{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
                                 elif command == "TOPIC":
-                                    channel = args[1]
+                                    channel = args[0]
                                     if channel in channels_list:
                                         if pending in channels_list[channel]:
                                             if len(args) > 1:
