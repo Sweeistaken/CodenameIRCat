@@ -39,6 +39,7 @@ class IRCatModule:
         try:
             if command == "JOIN":
                 channel = args[0]
+                print(channel)
                 query = self.sql.chanserv_details(channel)
                 topic = ""
                 if query != False:
