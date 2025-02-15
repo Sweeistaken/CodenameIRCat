@@ -529,7 +529,17 @@ def session(connection, client, ip, isssl=False):
                                                         except:
                                                             pass
                                                 dosend(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n", "UTF-8"))
-                                                pendingCommands += f"\nMODES {channel}\nTOPIC {channel}\n"
+                                                users = ""
+                                                for i in channels_list[channel]:
+                                                    who_mode = "" if not i in channel_modestore[channel] else ("@" if channel_modestore[channel][i] == "o" else ("+" if channel_modestore[channel][i] == "v" else ""))
+                                                    users += f"{who_mode}{i} "
+                                                dosend(bytes(f"{tags()}:{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
+                                                dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
+                                                if topic_list[channel] == "":
+                                                    tpc = topic_list[channel]
+                                                    dosend(bytes(f"{tags()}:{server} 332 {pending} {channel} :{tpc}\r\n","UTF-8"))
+                                                else:
+                                                    dosend(bytes(f"{tags()}:{server} 331 {pending} {channel} :No topic is set\r\n","UTF-8"))
                                             else:
                                                 dosend(bytes(f"{tags()}:{server} 479 {pending} {channel} :Channel name needs to start with #\r\n","UTF-8"))
                                         else:
