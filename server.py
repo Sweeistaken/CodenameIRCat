@@ -29,6 +29,11 @@ def isalphanumeric(text:str, channel=False):
         if not i in alphanumericity:
             return False
     return True
+def parseOutContent(text:str):
+    if text[0] == ":":
+        return text[1:]
+    else:
+        return text.split(" ")[0]
 def getident(hostt:str, clientport:int, ssll:bool):
     try:
         print(hostt)
@@ -160,6 +165,8 @@ for i in mods['allsocket']:
 commandProviders = []
 nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
+channel_modestore = {} # Channel: {nick: mode}
+channel_modestore_identify = {} # Channel: {account: mode}
 property_list = {"CatServ": {"host": "IRCatCore", "username": "Meow", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
 for i in mods['command']:
     requires = {}
@@ -227,6 +234,8 @@ def session(connection, client, ip, isssl=False):
     global channels_list
     global property_list
     global nickname_list
+    global channel_modestore
+    global channel_modestore_identify
     pending = "*" # The nickname of the client
     already_set = False # If the client gave the server a NICK packet
     ready = False # If the client gave the server a USER packet
@@ -455,24 +464,28 @@ def session(connection, client, ip, isssl=False):
                                     if cmdrun["success"] == "skip":
                                         pass
                                     elif cmdrun["success"]:
-                                        if "identify" in cmdrun:
-                                            if cmdrun["identify"] == "logout":
-                                                if "o" in property_list[pending]["modes"]:
-                                                    dosend(bytes(f"{tags()}:{pending} MODE {pending} -o\r\n","UTF-8"))
-                                                if not "i" in property_list[pending]["modes"]:
-                                                    dosend(bytes(f"{tags()}:{pending} MODE {pending} +i\r\n","UTF-8"))
-                                                if not "w" in property_list[pending]["modes"]:
-                                                    dosend(bytes(f"{tags()}:{pending} MODE {pending} +w\r\n","UTF-8"))
-                                                property_list[pending]["modes"] = "iw"
-                                                property_list[pending]["identified"] = False
-                                            else:
-                                                property_list[pending]["identified"] = True
-                                                property_list[pending]["identusername"] = cmdrun["identify"][0]
-                                                temp_mode = cmdrun["identify"][1]
-                                                property_list[pending]["modes"] = temp_mode
-                                                dosend(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
                                         processedExternally = True
                                         break
+                                    if "identify" in cmdrun:
+                                        if cmdrun["identify"] == "logout":
+                                            if "o" in property_list[pending]["modes"]:
+                                                dosend(bytes(f"{tags()}:{pending} MODE {pending} -o\r\n","UTF-8"))
+                                            if not "i" in property_list[pending]["modes"]:
+                                                dosend(bytes(f"{tags()}:{pending} MODE {pending} +i\r\n","UTF-8"))
+                                            if not "w" in property_list[pending]["modes"]:
+                                                dosend(bytes(f"{tags()}:{pending} MODE {pending} +w\r\n","UTF-8"))
+                                            property_list[pending]["modes"] = "iw"
+                                            property_list[pending]["identified"] = False
+                                        else:
+                                            property_list[pending]["identified"] = True
+                                            property_list[pending]["identusername"] = cmdrun["identify"][0]
+                                            temp_mode = cmdrun["identify"][1]
+                                            property_list[pending]["modes"] = temp_mode
+                                            dosend(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
+                                    if "initchan" in cmdrun:
+                                        channels_list[cmdrun["initchan"]["name"]] = []
+                                        topic_list[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["topic"]
+                                        channel_modestore_identify[cmdrun["initchan"]["name"]] = cmdrun["initchan"]["automodes"]
                                 if processedExternally:
                                     pass
                                 elif command == "JOIN":
@@ -497,24 +510,25 @@ def session(connection, client, ip, isssl=False):
                                                         else:
                                                             channels_list[channel] = [pending]
                                                             lower_chans[channel.lower()] = channel
-                                                            topic_list[channel] = "Topic is not implemented."
+                                                            topic_list[channel] = ""
+                                                            channel_modestore[channel] = {pending: "o"}
+                                                            dosend(bytes(f":{server} MODE {channel} +o {pending}\r\n", "UTF-8"))
                                                     except:
                                                         dosend(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                                     print(channels_list)
+                                                    if property_list[pending]["identified"] and property_list[pending]["identusername"] in channel_modestore_identify[channel]:
+                                                        channel_modestore[channel][pending] = channel_modestore_identify[channel][property_list[pending]["identusername"]]
                                                     for i in channels_list[channel]:
                                                         try:
                                                             if i != pending:
                                                                 property_list[i]["pendingSend"] += f":{pending}!{rident}@{hostname} JOIN {channel}\r\n"
+                                                                if pending in channel_modestore[channel] and channel_modestore[channel][pending] != "":
+                                                                    mo = channel_modestore[channel][pending]
+                                                                    property_list[i]["pendingSend"] += f":{server} MODE {channel} +{mo} {pending}\r\n"
                                                         except:
                                                             pass
-                                                # Code re-used in the NAMES command
                                                 dosend(bytes(f":{pending}!{rident}@{hostname} JOIN {channel}\r\n", "UTF-8"))
-                                                if channel in channels_list:
-                                                        if pending in channels_list[channel]:
-                                                            users = " ".join(channels_list[channel])
-                                                            dosend(bytes(f":{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
-                                                dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
-                                                print("Successfully pre-loaded /NAMES list")
+                                                pendingCommands += f"\nMODES {channel}\nTOPIC {channel}\n"
                                             else:
                                                 dosend(bytes(f"{tags()}:{server} 479 {pending} {channel} :Channel name needs to start with #\r\n","UTF-8"))
                                         else:
@@ -525,6 +539,30 @@ def session(connection, client, ip, isssl=False):
                                         usersin = len(channels_list[key])
                                         dosend(bytes(f"{tags()}:{server} 322 {pending} {key} {usersin} :{value}\r\n","UTF-8"))
                                     dosend(bytes(f"{tags()}:{server} 323 {pending} :End of /LIST\r\n","UTF-8"))
+                                elif command == "TOPIC":
+                                    channel = args[1]
+                                    if channel in channels_list:
+                                        if pending in channels_list[channel]:
+                                            if len(args) > 1:
+                                                if "o" in channel_modestore[channel][pending]:
+                                                    content = parseOutContent(" ".join(text.split(" ")[2:]))
+                                                    for i in channels_list[channel]:
+                                                        try:
+                                                            property_list[i]["pendingSend"] += f":{pending}!{rident}@{hostname} TOPIC {channel} :{content}\r\n"
+                                                        except:
+                                                            pass
+                                                else:
+                                                    dosend(bytes(f"{tags()}:{server} 482 {pending} {channel} :You're not channel operator\r\n","UTF-8"))
+                                            else:
+                                                if topic_list[channel] == "":
+                                                    tpc = topic_list[channel]
+                                                    dosend(bytes(f"{tags()}:{server} 332 {pending} {channel} :{tpc}\r\n","UTF-8"))
+                                                else:
+                                                    dosend(bytes(f"{tags()}:{server} 331 {pending} {channel} :No topic is set\r\n","UTF-8"))
+                                        else:
+                                            dosend(bytes(f"{tags()}:{server} 441 {pending} {channel} :You're not on that channel\r\n","UTF-8"))
+                                    else:
+                                        dosend(bytes(f"{tags()}:{server} 441 {pending} {channel} :You're not on that channel\r\n","UTF-8"))
                                 elif command == "PONG":
                                     e = text.split(" ")[1]
                                     if e == server or e == f":{server}":
@@ -611,7 +649,8 @@ def session(connection, client, ip, isssl=False):
                                                 who_user = property_list[i]["username"]
                                                 who_realname = property_list[i]["realname"]
                                                 who_away = "G" if property_list[i]["away"] else "H"
-                                                dosend(bytes(f"{tags()}:{server} 352 {pending} {channel} {who_user} {who_host} {server} {i} {who_away} :0 {who_realname}\r\n","UTF-8"))
+                                                who_mode = "" if not i in channel_modestore[channel] else ("@" if channel_modestore[channel][i] == "o" else ("+" if channel_modestore[channel][i] == "v" else ""))
+                                                dosend(bytes(f"{tags()}:{server} 352 {pending} {channel} {who_user} {who_host} {server} {i} {who_away}{who_mode} :0 {who_realname}\r\n","UTF-8"))
                                         elif channel in nickname_list:
                                             who_host = property_list[channel]["host"]
                                             who_user = property_list[channel]["username"]
@@ -665,11 +704,15 @@ def session(connection, client, ip, isssl=False):
                                         channel = text.split(" ")[1]
                                         if channel in channels_list:
                                                 if pending in channels_list[channel]:
-                                                    users = " ".join(channels_list[channel])
+                                                    users = ""
+                                                    for i in channels_list[channel]:
+                                                        who_mode = "" if not i in channel_modestore[channel] else ("@" if channel_modestore[channel][i] == "o" else ("+" if channel_modestore[channel][i] == "v" else ""))
+                                                        users += f"{who_mode}{i} "
                                                     dosend(bytes(f"{tags()}:{server} 353 {pending} = {channel} :{users}\r\n","UTF-8"))
                                         dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                 elif command == "NOTICE":
                                     if len(args) >= 2:
+                                        content = praseOutContent(" ".join(text.split(" ")[2:]))
                                         target = text.split(" ")[1]
                                         if target.lower() in lower_nicks:
                                             target = lower_nicks[target.lower()]
@@ -678,11 +721,11 @@ def session(connection, client, ip, isssl=False):
                                                 for i in channels_list[channel]:
                                                     try:
                                                         if i != pending:
-                                                            property_list[i]["pendingSend"] += f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n"
+                                                            property_list[i]["pendingSend"] += f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} NOTICE {target} :{content}\r\n"
                                                     except:
                                                         pass
                                         elif target in nickname_list:
-                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n"
+                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} NOTICE {target} :{content}\r\n"
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
@@ -776,6 +819,7 @@ def session(connection, client, ip, isssl=False):
                                         dosend(bytes(f"{tags()}:{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
                                 elif command == "PRIVMSG":
                                     if len(args) >= 2:
+                                        content = parseOutContent(" ".join(text.split(" ")[2:]))
                                         target = text.split(" ")[1]
                                         if target.lower() in lower_nicks:
                                             target = lower_nicks[target.lower()]
@@ -787,14 +831,14 @@ def session(connection, client, ip, isssl=False):
                                                     try:
                                                         if i != pending:
                                                             print(i)
-                                                            print(f":{pending}!{rident}@{hostname} {text}\r\n")
-                                                            property_list[i]["pendingSend"] = f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} {text}\r\n"
+                                                            print(f":{pending}!{rident}@{hostname} PRIVMSG {target} :{content}\r\n")
+                                                            property_list[i]["pendingSend"] = f"{tags_diffclient(i)}:{pending}!{rident}@{hostname} PRIVMSG {target} :{content}\r\n"
                                                         else:
                                                             print(i + " Is the current user!")
                                                     except:
                                                         print(traceback.format_exc())
                                         elif target in nickname_list:
-                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} {text}\r\n"
+                                            property_list[target]["pendingSend"] += f"{tags_diffclient(target)}:{pending}!{rident}@{hostname} PRIVMSG {target} :{content}\r\n"
                                         else:
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
