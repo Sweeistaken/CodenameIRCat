@@ -483,7 +483,7 @@ def session(connection, client, ip, isssl=False):
                                             temp_mode = cmdrun["identify"][1]
                                             property_list[pending]["modes"] = temp_mode
                                             dosend(bytes(f"{tags()}:{pending} MODE {pending} +{temp_mode}\r\n","UTF-8"))
-                                    if "initchan" in cmdrun and :
+                                    if "initchan" in cmdrun:
                                         print(cmdrun["initchan"])
                                         for chran in cmdrun["initchan"]:
                                             if chran["name"] not in channels_list:
