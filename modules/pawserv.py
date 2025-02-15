@@ -48,7 +48,7 @@ class IRCatModule:
                     switch = False
                     automodes = {}
                     collected = None
-                    for i in query["automodes"].split(" "):
+                    for i in query["usermodes"].split(" "):
                         if not switch:
                             collected = i
                         else:
