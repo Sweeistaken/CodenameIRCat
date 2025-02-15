@@ -519,6 +519,7 @@ def session(connection, client, ip, isssl=False):
                                                         dosend(bytes(f"{tags()}:{server} NOTICE * :*** Could not join {channel}\r\n","UTF-8"))
                                                     print(channels_list)
                                                     if property_list[pending]["identified"] and property_list[pending]["identusername"] in channel_modestore_identify[channel]:
+                                                        print(f"{pending} has an identify mode, setting mode " + channel_modestore_identify[channel][property_list[pending]["identusername"]])
                                                         channel_modestore[channel][pending] = channel_modestore_identify[channel][property_list[pending]["identusername"]]
                                                     for i in channels_list[channel]:
                                                         try:
@@ -538,6 +539,7 @@ def session(connection, client, ip, isssl=False):
                                                 dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                                 if topic_list[channel] == "":
                                                     tpc = topic_list[channel]
+                                                    print(tpc)
                                                     dosend(bytes(f"{tags()}:{server} 332 {pending} {channel} :{tpc}\r\n","UTF-8"))
                                                 else:
                                                     dosend(bytes(f"{tags()}:{server} 331 {pending} {channel} :No topic is set\r\n","UTF-8"))
