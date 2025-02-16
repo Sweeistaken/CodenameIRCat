@@ -22,9 +22,11 @@ Alternatively, you can access the webchat on https://web.ircat.xyz
    * `yaml` module (`pyyaml` on PyPi/pip)
    * `cloudflare` module (MUST be version 4.0.0 or higher, Optional: only needed for `cfd1` plugin.)
 
+## Configuration
+
 You can get configuration by editing the `config.yml` example in this repo.
 
-Command syntax:
+## Command syntax
 
 ```bash
 python3 /path/to/ircat/server.py /path/to/config.yml
