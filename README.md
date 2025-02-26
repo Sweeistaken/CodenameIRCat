@@ -13,6 +13,16 @@ You may check out the server details on https://ircat.xyz/try
 
 Alternatively, you can access the webchat on https://web.ircat.xyz
 
+# Our mission
+
+We want to make IRC good again, we're talking about botnet protection,
+
+ease to host, easily build your own IRC network, etc etc.
+
+With our updating plugins, you can make your network use IRCat and protect
+
+your network from the nasty botnets and spambots
+
 # How to install
 
 ## Requirements
