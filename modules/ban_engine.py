@@ -37,6 +37,6 @@ class IRCatModule:
                         raise Exception("Banned: " + " ".join(i.split(" ")[1:]))
     def ban(self, target_mask, reason="The ban() hammer has spoken!"):
         if self.useSQLengine:
-            cur = self.SQLengine.conn.cursor()
+            self.SQLengine.ban(target_mask, reason)
         else:
             open(self.ban_provider, "a").write(f"\n{target_mask} {reason}")
