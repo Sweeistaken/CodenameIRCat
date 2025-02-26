@@ -636,6 +636,17 @@ def session(connection, client, ip, isssl=False):
                                             #threading.Thread(target=pinger, args=[pending, connection]).start()
                                             print(f"User {pending} set nick")
                                             print("Broadcasting nickname change...")
+                                elif command == "ISON":
+                                    if args[0][0] == ":":
+                                        args[0] = args[0][1:]
+                                    onlines = []
+                                    for someuser in args:
+                                        if someuser.lower() in lower_nicks:
+                                            someuser = lower_nicks[someuser.lower()]
+                                        if someuser in nickname_list:
+                                            onlines.append(someuser)
+                                    onlines = " ".join(onlines)
+                                    dosend(bytes(f"{tags()}:{server} 303 {pending} :{onlines}\r\n","UTF-8"))
                                 elif command == "PART":
                                     if len(args) == 0:
                                         dosend(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
