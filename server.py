@@ -745,7 +745,7 @@ def session(connection, client, ip, isssl=False):
                                         dosend(bytes(f"{tags()}:{server} 366 {pending} {channel} :End of /NAMES list.\r\n","UTF-8"))
                                 elif command == "NOTICE":
                                     if len(args) >= 2:
-                                        content = praseOutContent(" ".join(text.split(" ")[2:]))
+                                        content = parseOutContent(" ".join(text.split(" ")[2:]))
                                         target = text.split(" ")[1]
                                         if target.lower() in lower_nicks:
                                             target = lower_nicks[target.lower()]
