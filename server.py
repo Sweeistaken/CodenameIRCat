@@ -455,7 +455,7 @@ def session(connection, client, ip, isssl=False):
                             dosend(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
                             if "kill" in property_list[pending] and property_list[pending]["kill"]:
-                                raise Exception("Killed by " + property_list[pending]["kill_user"] + ":" + property_list[pending]["kill_comment"])
+                                raise Exception("Killed by " + property_list[pending]["kill_user"] + ": " + property_list[pending]["kill_comment"])
                             pendingCommands += text
                             for comd in pendingCommands.replace("\r", "").split("\n"):
                                 command = comd.split(" ")[0].upper()
