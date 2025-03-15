@@ -454,6 +454,8 @@ def session(connection, client, ip, isssl=False):
                                 dosend(bytes(f"{tags()}:{server} 372 {pending} :- {i}\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
+                            if "kill" in property_list[pending] and property_list[pending]["kill"]:
+                                raise Exception("Killed by " + property_list[pending]["kill_user"] + ":" + property_list[pending]["kill_comment"])
                             pendingCommands += text
                             for comd in pendingCommands.replace("\r", "").split("\n"):
                                 command = comd.split(" ")[0].upper()
@@ -848,6 +850,17 @@ def session(connection, client, ip, isssl=False):
                                     if "o" in property_list[pending]["modes"]:
                                         global opened
                                         opened = False
+                                    else:
+                                        dosend(bytes(f"{tags()}:{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
+                                elif command == "KILL":
+                                    if "o" in property_list[pending]["modes"]:
+                                        target = args[0]
+                                        try:
+                                            property_list[target]["kill_user"] = pending
+                                            property_list[target]["kill_comment"] = args[1:] if len(args) > 1 else "No reason given"
+                                            property_list[target]["kill"] = True
+                                        except:
+                                            dosend(bytes(f"{tags()}:{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
                                     else:
                                         dosend(bytes(f"{tags()}:{server} 481 {pending} :Permission Denied- You're not an IRC operator\r\n","UTF-8"))
                                 elif command == "PRIVMSG":
