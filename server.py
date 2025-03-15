@@ -339,6 +339,8 @@ def session(connection, client, ip, isssl=False):
                         cause = f"Ping timeout: {ping_timeout} seconds"
                         print(f"{pending} timed out.")
                         break
+                    if "kill" in property_list[pending] and property_list[pending]["kill"]:
+                        raise Exception("Killed by " + property_list[pending]["kill_user"] + ": " + property_list[pending]["kill_comment"])
                 if textt != "" and textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
@@ -454,8 +456,6 @@ def session(connection, client, ip, isssl=False):
                                 dosend(bytes(f"{tags()}:{server} 372 {pending} :- {i}\r\n", "UTF-8"))
                             dosend(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
-                            if "kill" in property_list[pending] and property_list[pending]["kill"]:
-                                raise Exception("Killed by " + property_list[pending]["kill_user"] + ": " + property_list[pending]["kill_comment"])
                             pendingCommands += text
                             for comd in pendingCommands.replace("\r", "").split("\n"):
                                 command = comd.split(" ")[0].upper()
