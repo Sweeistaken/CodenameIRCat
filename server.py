@@ -856,8 +856,9 @@ def session(connection, client, ip, isssl=False):
                                     if "o" in property_list[pending]["modes"]:
                                         target = args[0]
                                         try:
+                                            reason = parseOutContent(" ".join(args[1:])) if len(args) > 1 else "No reason given"
                                             property_list[target]["kill_user"] = pending
-                                            property_list[target]["kill_comment"] = args[1:] if len(args) > 1 else "No reason given"
+                                            property_list[target]["kill_comment"] = reason
                                             property_list[target]["kill"] = True
                                         except:
                                             dosend(bytes(f"{tags()}:{server} 403 {pending} {target} :No such channel\r\n","UTF-8"))
