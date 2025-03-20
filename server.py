@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-__version__ = "0.0.7"
+__version__ = "0.0.9"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
@@ -109,6 +109,22 @@ with open(sys.argv[1], 'r') as file:
     except:
         print("IRCat needs at least one module enabled.")
         sys.exit(1)
+    try: multi_server = data["multiserver"]
+    except: pass
+    if multi_server:
+        try: multi_server_role = data["multiserver-role"]
+        except:
+            print("Multi-server IRCat needs multiserver-role to be either master or client")
+            sys.exit(1)
+        if not multi_server_role in ["master", "client"]:
+            print("Multi-server IRCat needs multiserver-role to be either master or client")
+            sys.exit(1)
+        if multi_server_role == "client":
+            try: multi_server_host = data["multiserver-host"]
+            except:
+                print("Multi-server IRCat client needs a master to connect to.")
+                sys.exit(1)
+    try: 
     file.close()
     print("Successfully loaded config!")
 for mod in modules:
@@ -230,6 +246,7 @@ lower_chans = {} # Channel names in lowercase
 #                connection.shutdown(socket.SHUT_WR)
 #                connection.close()
 #                break
+
 def session(connection, client, ip, isssl=False):
     global channels_list
     global property_list
