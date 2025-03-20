@@ -124,7 +124,6 @@ with open(sys.argv[1], 'r') as file:
             except:
                 print("Multi-server IRCat client needs a master to connect to.")
                 sys.exit(1)
-    try: 
     file.close()
     print("Successfully loaded config!")
 for mod in modules:
