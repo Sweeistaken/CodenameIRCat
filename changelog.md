@@ -20,7 +20,7 @@
 * Fixed bugs:
     * Mostly SSL issues
     * Erroneus nicknames/channels
-    * Problems with NICK
+    * Problems with NICK not being synced
 
 
 # 0.0.5
