@@ -1,3 +1,7 @@
+# 0.0.9 (Pre-Release)
+* Multi-server support (Progress: STARTING)
+
+
 # 0.0.7
 * The first stable release of IRCat (SweeNet stability is OK)
 * Implement IRC features:
