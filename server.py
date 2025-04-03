@@ -1,8 +1,9 @@
 #!/usr/bin/python3
-__version__ = "0.0.9"
+__version__ = "0.0.9-pre"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
+from cryptography.fernet import Fernet
 from requests import get
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
@@ -112,10 +113,10 @@ with open(sys.argv[1], 'r') as file:
     try: multi_server = data["multiserver"]
     except: multi_server = False
     if multi_server:
-        if multi_server.__class__.__name__ != "list":
+        if multi_server.__class__.__name__ != "list" and multi_server != "loner":
             print("The multiserver option must be a list.")
             sys.exit(1)
-        try: multi_server_key = data["fernet-key"]
+        try: fnet = Fernet(data["fernet-key"])
         except:
             print("Multi-Server IRCat needs a Fernet key.")
             sys.exit(1)
@@ -177,7 +178,8 @@ nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
 channel_modestore = {} # Channel: {nick: mode}
 channel_modestore_identify = {} # Channel: {account: mode}
-property_list = {"CatServ": {"host": "IRCatCore", "username": "Meow", "realname": "Updates bot", "modes": "iw", "away": False}} # Stores properties for active users and channels
+property_list = {"CatServ": {"host": server, "username": "system", "realname": "Updates bot (Internal)", "modes": "owi", "away": False, "external": False}} # Stores properties for active users and channels
+users_externalservers = {} # Nicknames that come from different servers, useful in netsplit situations
 for i in mods['command']:
     requires = {}
     for j in i.__ircat_requires__:
@@ -216,6 +218,7 @@ if ssl_option:
         sockets_ssl[i].listen(1)
 opened=True
 lower_chans = {} # Channel names in lowercase
+sessions = {}
 #def pinger(nick, connection):
 #    global property_list
 #    while nick in property_list:
@@ -240,8 +243,49 @@ lower_chans = {} # Channel names in lowercase
 #                connection.shutdown(socket.SHUT_WR)
 #                connection.close()
 #                break
-def multiserverhost():
-
+def multiserverpinger(sock):
+    while True:
+        time.sleep(30)
+        sock.sendall(fnet.encrypt(bytes("PING", "UTF-8")))
+def multiserverhost(sock, client):
+    try:
+        threading.Thread(target=multiserverpinger, args=[sock]).start()
+        global sessions
+        sessions[client[0]] = sock
+        global channels_list
+        global property_list
+        global nickname_list
+        global topic_list
+        if sock.recv(2048).decode() == "meow":
+            sock.sendall("woem")
+        else:
+            raise Exception("Something wrong happened")
+        while True:
+            txt = fnet.decrypt(sock.recv(2048)).decode()
+            if txt.split(" ")[0] == "VERIFYUSER":
+                nck = txt.split(" ")[1]
+                usr = json.loads(" ".join(txt.split(" ")[2:]))
+                property_list[nck] = usr
+                nickname_list[nck] = "external"
+                lower_nicks[nck.lower()] = usr
+                users_externalservers[nck] = client[0]
+            elif txt.split(" ")[0] == "SND":
+                property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:])
+            elif txt.split(" ")[0] == "CNGPROP":
+                nck = txt.split(" ")[1]
+                usr = json.loads(" ".join(txt.split(" ")[2:]))
+                property_list[nck] = usr
+            elif txt.split(" ")[0] == "CNGNICK":
+                nck = txt.split(" ")[1]
+                nnck = txt.split(" ")[2]
+                nickname_list[nnck] = nickname_list.pop(nck)
+                property_list[nnck] = property_list.pop(nck)
+                del lower_nicks[nck.lower()]
+                lower_nicks[nnck.lower()] = nnck
+            elif txt == "PING":
+                sock.sendall(fnet.encrypt(bytes("PONG", "UTF-8")))
+    finally:
+        netsplit(client[0])
 def session(connection, client, ip, isssl=False):
     global channels_list
     global property_list
@@ -416,7 +460,7 @@ def session(connection, client, ip, isssl=False):
                         elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                             print(f"User {pending} successfully logged in.")
                             nickname_list[pending] = connection
-                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": ""}
+                            property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": "", "external": False}
                             last_ping = time.time()
                             ping_pending = False
                             lower_nicks[pending.lower()] = pending
