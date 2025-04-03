@@ -273,7 +273,9 @@ def multiserverhost(sock, client):
                 lower_nicks[nck.lower()] = usr # Add the lowercase nickname
                 users_externalservers[nck] = client[0] # Add to the list of external users
             elif txt.split(" ")[0] == "SND": # When a token was sent by another server
-                property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:]) # Send the text to the specified user
+                nck = txt.split(" ")[1] # Nickname
+                cmd = txt.split(" ")[2] # Command
+                arg = txt.split(" ")[3:] # Arguments
             elif txt.split(" ")[0] == "CNGPROP": # When properties changed on another server
                 nck = txt.split(" ")[1] # Nickname
                 usr = json.loads(" ".join(txt.split(" ")[2:])) # JSON
