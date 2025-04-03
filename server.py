@@ -115,6 +115,10 @@ with open(sys.argv[1], 'r') as file:
         if multi_server.__class__.__name__ != "list":
             print("The multiserver option must be a list.")
             sys.exit(1)
+        try: multi_server_key = data["fernet-key"]
+        except:
+            print("Multi-Server IRCat needs a Fernet key.")
+            sys.exit(1)
     file.close()
     print("Successfully loaded config!")
 for mod in modules:
@@ -236,6 +240,7 @@ lower_chans = {} # Channel names in lowercase
 #                connection.shutdown(socket.SHUT_WR)
 #                connection.close()
 #                break
+def multiserverhost():
 
 def session(connection, client, ip, isssl=False):
     global channels_list
