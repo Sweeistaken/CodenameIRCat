@@ -284,7 +284,7 @@ def multiserverhost(sock, client):
                     sock.sendall(fnet.encrypt(bytes("THIS", "UTF-8"))) # Keep this connection
             """ # We won't need colliding, they will connect to eachother.
             elif txt.split(" ")[0] == "SPLIT": # When the remote host realizes it doesn't have an outgoing connection to this server.
-
+                pass
             elif txt.split(" ")[0] == "SND": # When a token was sent by another server
                 property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:]) # Send the text to the specified user
             elif txt.split(" ")[0] == "CNGPROP": # When properties changed on another server
