@@ -178,7 +178,7 @@ nickname_list = {} # Stores nicknames and the respective sockets
 lower_nicks =   {"catserv": "CatServ"} # Nicknames in lowercase
 channel_modestore = {} # Channel: {nick: mode}
 channel_modestore_identify = {} # Channel: {account: mode}
-property_list = {"CatServ": {"host": server, "username": "system", "realname": "Updates bot (Internal)", "modes": "owi", "away": False, "external": False}} # Stores properties for active users and channels
+property_list = {"CatServ": {"host": server, "username": "system", "realname": "Updates bot (Internal)", "modes": "o", "away": False, "external": False}} # Stores properties for active users and channels
 users_externalservers = {} # Nicknames that come from different servers, useful in netsplit situations
 cache_properties = {} # Cached property lists from other servers, used to send out changes
 for i in mods['command']:
