@@ -271,20 +271,7 @@ def multiserverhost(sock, client):
                 property_list[nck] = usr # Add the properties
                 nickname_list[nck] = {"external": client[0]} # Add the nickname indicating it's external
                 lower_nicks[nck.lower()] = usr # Add the lowercase nickname
-                users_externalservers[nck] = client[0] # 
-            """
-            elif txt.split(" ")[0] == "COLLIDE": # Fix connection collision, choose which server would have the outgoing connection.
-                if multi_server == "loner":
-                    sock.sendall(fnet.encrypt(bytes("THIS", "UTF-8"))) # Keep this connection
-                elif random.randint(0,1):
-                    sock.sendall(fnet.encrypt(bytes("THAT", "UTF-8"))) # Move to other connection
-                    time.sleep(3)
-                    raise Exception("THAT sent, closing.") # Close the connection
-                else:
-                    sock.sendall(fnet.encrypt(bytes("THIS", "UTF-8"))) # Keep this connection
-            """ # We won't need colliding, they will connect to eachother.
-            elif txt.split(" ")[0] == "SPLIT": # When the remote host realizes it doesn't have an outgoing connection to this server.
-                pass
+                users_externalservers[nck] = client[0] # Add to the list of external users
             elif txt.split(" ")[0] == "SND": # When a token was sent by another server
                 property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:]) # Send the text to the specified user
             elif txt.split(" ")[0] == "CNGPROP": # When properties changed on another server
