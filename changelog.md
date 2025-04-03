@@ -1,5 +1,6 @@
 # 0.0.9 (Pre-Release)
 * Multi-server support (Progress: STARTING)
+* Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 
 
 # 0.0.7
