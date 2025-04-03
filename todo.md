@@ -1,28 +1,27 @@
 # To-Do list
 - [ ] Implement the base of an IRCd, using Libera.Chat and RFC1459 as a reference
-   -  [x] [Add the (full) connection process](https://mastodon.swee.codes/@swee/113659491393674897)
-   -  [x] Add join/part, and it's requirements (WHO, etc)
-   -  [x] Implement proper PRIVMSG
-   -  [x] Broadcast QUIT
-   -  [x] DNS lookup
-   -  [x] Identity management
+   -  [x] [Add the (full) connection process](https://mastodon.swee.codes/@swee/113659491393674897) (0.0.4)
+   -  [x] Add join/part, and it's requirements (WHO, etc) (0.0.1)
+   -  [x] Implement proper PRIVMSG (0.0.1)
+   -  [x] Broadcast QUIT (0.0.1)
+   -  [x] DNS lookup (0.0.1)
    -  [ ] WallOps
    -  [ ] Channel invite system
    -  [ ] Wildcard logic (for +b and +q)
-   -  [x] Send PING and wait for PONG
-   -  [x] Reply PONG if received PING
-   -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887)
-   -  [x] Away
+   -  [x] Send PING and wait for PONG (0.0.1)
+   -  [x] Reply PONG if received PING (0.0.1)
+   -  [x] [Change of nicknames](https://mastodon.swee.codes/@swee/113642104470536887) (0.0.1)
+   -  [x] Away (0.0.1)
    -  [ ] Multi-server support
-   -  [x] `LIST`
-   -  [x] `TOPIC`
+   -  [x] `LIST` (0.0.5)
+   -  [x] `TOPIC` (0.0.7)
 -  [ ] [Database support](https://discuss.swee.codes/t/41)
 -  [ ] User Flags
    -  [ ] i (invisible)
-   -  [x] o (IRCOP)
+   -  [x] o (IRCOP) (0.0.7)
    -  [ ] w (gets wallops)
 -  [ ] Channel Flags
-   -  [x] o \<user\> (CHANOP)
+   -  [x] o \<user\> (CHANOP) (0.0.7)
    -  [ ] v \<user\> (voice)
    -  [ ] m (moderated, only let voice or op talk)
    -  [ ] s (don't show in LIST)
@@ -39,30 +38,32 @@
 - [ ] Destructive features for IRCOPS
    -  [ ] `KILL <user> <comment>`
    -  [ ] `MODE <external user>`
-   -  [x] `RESTART`
+   -  [x] `RESTART` (0.07)
 - [ ] Extra commands
-   -  [x] `NAMES`
-   -  [x] `WHOIS`
+   -  [x] `NAMES` (0.0.1)
+   -  [x] `WHOIS` (0.0.1)
    -  [ ] `WHOWAS`
 - [ ] [Implement services.](modules/pawserv.py)
-   -  [x] Nickserv
+   -  [x] Nickserv (0.0.7)
    -  [ ] ChanServ
-   -  [x] CatServ (Outside of PawServ)
-   -  [x] Link `PRIVMSG *serv` to `*serv`
+   -  [x] CatServ (Outside of PawServ) (0.0.4)
+   -  [x] Link `PRIVMSG *serv` to `*serv` (0.0.4)
 - [x] Extra ~~(not planned)~~ features
-   -  [x] ident support
+   -  [x] ident support (0.0.5)
 - [x] Authentication
-   -  [x] Store credentials in ~~an SQLite3 file.~~ database engine
-   -  [x] Map NickServ IDENTIFY
-   -  [x] Map PASS
+   -  [x] Store credentials in ~~an SQLite3 file.~~ database engine (0.0.1)
+   -  [x] Map NickServ IDENTIFY (0.0.7)
+   -  [x] Map PASS (0.0.7)
 - [x] SSL/TLS
-   -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774)
-   -  [x] Automatically reload the certificate ~~if defined in config.~~
+   -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774) (0.0.1)
+   -  [x] Automatically reload the certificate ~~if defined in config.~~ (0.0.1)
 - [ ] Add IRCv3 features.
-   -  [x] List capabilities (`CAP LS 302`)
+   -  [x] List capabilities (`CAP LS 302`) (0.0.1)
    -  [ ] `away-notify`
    -  [ ] `tls` (STARTTLS)
    -  [ ] `sasl`
-   -  [x] `server-time`
+   -  [x] `server-time` (0.0.7)
+   -  [ ] `account-notify`
+   -  [x] `account-tag` (0.0.7)
    -  Will research later.
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
