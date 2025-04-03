@@ -252,41 +252,59 @@ def multiserverhost(sock, client):
     try:
         threading.Thread(target=multiserverpinger, args=[sock]).start()
         global sessions
+        global cache_properties
         sessions[client[0]] = sock
+        cache_properties[client[0]] = {}
         global channels_list
         global property_list
         global nickname_list
         global topic_list
         if sock.recv(2048).decode() == "meow":
-            sock.sendall("woem")
+            sock.sendall(bytes("woem", "UTF-8"))
         else:
-            raise Exception("Something wrong happened")
+            raise Exception("This isn't an IRCat server!!")
         while True:
             txt = fnet.decrypt(sock.recv(2048)).decode()
-            if txt.split(" ")[0] == "VERIFYUSER":
-                nck = txt.split(" ")[1]
-                usr = json.loads(" ".join(txt.split(" ")[2:]))
-                property_list[nck] = usr
-                nickname_list[nck] = "external"
-                lower_nicks[nck.lower()] = usr
-                users_externalservers[nck] = client[0]
-            elif txt.split(" ")[0] == "SND":
-                property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:])
-            elif txt.split(" ")[0] == "CNGPROP":
-                nck = txt.split(" ")[1]
-                usr = json.loads(" ".join(txt.split(" ")[2:]))
-                property_list[nck] = usr
-            elif txt.split(" ")[0] == "CNGNICK":
-                nck = txt.split(" ")[1]
-                nnck = txt.split(" ")[2]
-                nickname_list[nnck] = nickname_list.pop(nck)
-                property_list[nnck] = property_list.pop(nck)
-                del lower_nicks[nck.lower()]
-                lower_nicks[nnck.lower()] = nnck
+            if txt.split(" ")[0] == "VERIFYUSER": # When a user from a different server logs in
+                nck = txt.split(" ")[1] # Nickname
+                usr = json.loads(" ".join(txt.split(" ")[2:])) # New JSON properties
+                property_list[nck] = usr # Add the properties
+                nickname_list[nck] = {"external": client[0]} # Add the nickname indicating it's external
+                lower_nicks[nck.lower()] = usr # Add the lowercase nickname
+                users_externalservers[nck] = client[0] # 
+            """
+            elif txt.split(" ")[0] == "COLLIDE": # Fix connection collision, choose which server would have the outgoing connection.
+                if multi_server == "loner":
+                    sock.sendall(fnet.encrypt(bytes("THIS", "UTF-8"))) # Keep this connection
+                elif random.randint(0,1):
+                    sock.sendall(fnet.encrypt(bytes("THAT", "UTF-8"))) # Move to other connection
+                    time.sleep(3)
+                    raise Exception("THAT sent, closing.") # Close the connection
+                else:
+                    sock.sendall(fnet.encrypt(bytes("THIS", "UTF-8"))) # Keep this connection
+            """ # We won't need colliding, they will connect to eachother.
+            elif txt.split(" ")[0] == "SPLIT": # When the remote host realizes it doesn't have an outgoing connection to this server.
+
+            elif txt.split(" ")[0] == "SND": # When a token was sent by another server
+                property_list[txt.split(" ")[1]]["pendingSend"] += " ".join(txt.split(" ")[2:]) # Send the text to the specified user
+            elif txt.split(" ")[0] == "CNGPROP": # When properties changed on another server
+                nck = txt.split(" ")[1] # Nickname
+                usr = json.loads(" ".join(txt.split(" ")[2:])) # JSON
+                property_list[nck] = usr # Change the JSON...
+                cache_properties[client[0]][nck] = usr # ...And cache it
+            elif txt.split(" ")[0] == "CNGNICK": # When nick changed on another server
+                nck = txt.split(" ")[1] # Old nickname
+                nnck = txt.split(" ")[2] # New nickname
+                nickname_list[nnck] = nickname_list.pop(nck) # Move old nickname from list
+                property_list[nnck] = property_list.pop(nck) # Move properties...
+                cache_properties[client[0]][nnck] = cache_properties[client[0]].pop(nck) # ...And cache it
+                del lower_nicks[nck.lower()] # Remove the old lowercase nickname...
+                lower_nicks[nnck.lower()] = nnck # ...And replace it
             elif txt == "PING":
                 sock.sendall(fnet.encrypt(bytes("PONG", "UTF-8")))
     finally:
         netsplit(client[0])
+        sock.close()
 def session(connection, client, ip, isssl=False):
     global channels_list
     global property_list
