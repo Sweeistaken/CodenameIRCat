@@ -110,20 +110,11 @@ with open(sys.argv[1], 'r') as file:
         print("IRCat needs at least one module enabled.")
         sys.exit(1)
     try: multi_server = data["multiserver"]
-    except: pass
+    except: multi_server = False
     if multi_server:
-        try: multi_server_role = data["multiserver-role"]
-        except:
-            print("Multi-server IRCat needs multiserver-role to be either master or client")
+        if multi_server.__class__.__name__ != "list":
+            print("The multiserver option must be a list.")
             sys.exit(1)
-        if not multi_server_role in ["master", "client"]:
-            print("Multi-server IRCat needs multiserver-role to be either master or client")
-            sys.exit(1)
-        if multi_server_role == "client":
-            try: multi_server_host = data["multiserver-host"]
-            except:
-                print("Multi-server IRCat client needs a master to connect to.")
-                sys.exit(1)
     file.close()
     print("Successfully loaded config!")
 for mod in modules:
