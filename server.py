@@ -388,7 +388,7 @@ def session(connection, client, ip, isssl=False):
                 print(traceback.format_exc())
                 cause = "Read error: " + str(ex)
                 break
-            print("Received data: {}".format(data))
+            print(f"Received data from {pending}: {data}")
             try:
                 textt += data.decode()
                 #if finished and not property_list[pending]["ping_pending"]:
