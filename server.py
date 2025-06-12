@@ -295,6 +295,10 @@ def multiserverhost(sock, client):
         netsplit(client[0])
         sock.close()
 def session(connection, client, ip, isssl=False):
+    if isssl:
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
+        connection = ctx.wrap_socket(connection, server_side=True)
     global channels_list
     global property_list
     global nickname_list
@@ -1017,11 +1021,7 @@ def ssl_session(sock, ip_to):
         try:
             print("Waiting for SSL connection...")
             connection, client = sock.accept()
-            ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-            ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
-            conn = ctx.wrap_socket(connection, server_side=True)
-            conn.do_handshake()
-            threading.Thread(target=session, daemon=True, args=[conn, client, ip_to, True]).start()
+            threading.Thread(target=session, daemon=True, args=[connection, client, ip_to, True]).start()
         except:
             print("Something went wrong...")
             print(traceback.format_exc())
