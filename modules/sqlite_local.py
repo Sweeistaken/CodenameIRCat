@@ -39,7 +39,7 @@ class broker:
                     self.conn.commit()
                 else:
                     try:
-                        hash = ph.verify(e[0][2])
+                        hash = ph.verify(e[0][2], password)
                     except:
                         hash = False
                 return e[0] if hash else False
