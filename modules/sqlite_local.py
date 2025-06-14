@@ -1,6 +1,8 @@
 # IRCat module for local SQLite database (default)
 import sqlite3, os, traceback
 from cryptography.fernet import Fernet
+from argon2 import PasswordHasher
+ph = PasswordHasher()
 __ircat_type__ = "sql.provider" # The type of module
 __ircat_requires__ = ["data-path", "fernet-key"] # The required config.yml entries.
 class broker:
@@ -27,12 +29,25 @@ class broker:
             return False
         else:
             try:
-                return e[0] if self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password else False
+                if "$argon2id" not in e[0][2]:
+                    print("[XXX] User was registered before 0.0.9, automatically porting hash to Argon2...")
+                    hash = self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode() == password
+                    temphash = self.fnet.decrypt(bytes(e[0][2], "UTF-8")).decode()
+                    temphash = ph.hash(temphash)
+                    db = self.conn.cursor()
+                    db.execute("UPDATE nickserv SET hash=? WHERE user=?;", [temphash, nick])
+                    self.conn.commit()
+                else:
+                    try:
+                        hash = ph.verify(e[0][2])
+                    except:
+                        hash = False
+                return e[0] if hash else False
             except:
                 print(traceback.format_exc())
                 return False
     def nickserv_register(self, nick, password, email):
-        hashed = self.fnet.encrypt(bytes(password, "UTF-8")).decode()
+        hashed = ph.hash(password)
         db = self.conn.cursor()
         db.execute("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
         self.conn.commit()
