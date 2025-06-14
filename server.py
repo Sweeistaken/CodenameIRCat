@@ -386,13 +386,13 @@ def session(connection, client, ip, isssl=False):
                     cause = "Remote host closed the connection"
                     break
             except socket.timeout:
-                print("Socket timed out, ticking...")
                 data = bytes("", "UTF-8")
             except Exception as ex:
                 print(traceback.format_exc())
                 cause = "Read error: " + str(ex)
                 break
-            print(f"Received data from {pending}: {data}")
+            if data != bytes("", "UTF-8"):
+                print(f"Received data from {pending}: {data}")
             try:
                 textt += data.decode()
                 #if finished and not property_list[pending]["ping_pending"]:
