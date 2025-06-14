@@ -37,6 +37,7 @@ motd: |
 # ssl_pkey: /etc/letsencrypt/live/domain/privkey.pem
 
 ## Deprecated, but continue using fernet-key to make sure users registered before IRCat 0.0.9 are ported to Argon2.
+## You can, of course, ignore this if you haven't been using IRCat before 0.0.9
 
 # fernet-key: MaybeUseOpensslRand
 
