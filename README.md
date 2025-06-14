@@ -2,7 +2,7 @@
 
 Lightweight IRCd in Python
 
-* [Mastodon tag (for updates)](https://mastodon.swee.codes/tags/CodenameIRCat)
+* <a rel="me" href="https://mastodon.swee.codes/@ircat">Mastodon</a>
 * [Issue tracker](https://discuss.swee.codes/c/12)
 
 [To-do list](todo.md)
