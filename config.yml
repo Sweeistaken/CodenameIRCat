@@ -42,10 +42,9 @@ motd: |
 # fernet-key: MaybeUseOpensslRand
 
 ## A file used to store IP bans (K-Lines) and their reasons
+## You can also use `sql` to make it use the SQL engine, but that option is not implemented, but will be later in 0.0.9
 
 ban-provider: /path/to/bans.txt
-
-## ban-provider: sql
 
 ## Mail server settings for PawServ
 
