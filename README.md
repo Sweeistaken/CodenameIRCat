@@ -29,6 +29,7 @@ your network from the nasty botnets and spambots
 
 * Python 3 (Doesn't matter which platform, but IRCat is only tested on Linux)
    * `requests` module
+   * `argon2-cffi` module
    * `yaml` module (`pyyaml` on PyPi/pip)
    * `cloudflare` module (MUST be version 4.0.0 or higher, Optional: only needed for `cfd1` plugin.)
 
