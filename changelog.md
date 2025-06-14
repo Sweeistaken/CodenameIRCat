@@ -2,6 +2,7 @@
 * Multi-server support (Progress: STARTING)
 * Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 * Dockerfile (Progress: PLANNED)
+* Argon2 instead of Fernet (Progress: Working on....)
 
 # 0.0.7
 * The first stable release of IRCat (SweeNet stability is OK)
