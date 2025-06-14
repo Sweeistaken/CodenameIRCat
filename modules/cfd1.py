@@ -47,7 +47,7 @@ class broker:
                     self.cfexec("UPDATE nickserv SET hash=? WHERE user=?;", [temphash, nick])
                 else:
                     try:
-                        hash = ph.verify(e[0]["hash"])
+                        hash = ph.verify(e[0]["hash"], password)
                     except:
                         hash = False
                 return self.parse2sqlite(e[0]) if hash else False
