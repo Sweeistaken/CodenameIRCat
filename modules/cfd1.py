@@ -1,5 +1,7 @@
 import os, traceback
 from cryptography.fernet import Fernet
+from argon2 import PasswordHasher
+ph = PasswordHasher()
 from cloudflare import Cloudflare # Please make sure you install this module from pip, not package manager.
 __ircat_type__ = "sql.provider" # The type of module
 __ircat_requires__ = ["cf_accountid", "cf_apitoken", "cf_d1database", "fernet-key"] # The required config.yml entries.
@@ -37,12 +39,23 @@ class broker:
             return False
         else:
             try:
-                return self.parse2sqlite(e[0]) if self.fnet.decrypt(bytes(e[0]["hash"], "UTF-8")).decode() == password else False
+                if "$argon2id" not in e[0]["hash"]:
+                    print("[XXX] User was registered before 0.0.9, automatically porting hash to Argon2...")
+                    hash = self.fnet.decrypt(bytes(e[0]["hash"], "UTF-8")).decode() == password
+                    temphash = self.fnet.decrypt(bytes(e[0]["hash"], "UTF-8")).decode()
+                    temphash = ph.hash(temphash)
+                    self.cfexec("UPDATE nickserv SET hash=? WHERE user=?;", [temphash, nick])
+                else:
+                    try:
+                        hash = ph.verify(e[0]["hash"])
+                    except:
+                        hash = False
+                return self.parse2sqlite(e[0]) if hash else False
             except:
                 print(traceback.format_exc())
                 return False
     def nickserv_register(self, nick, password, email):
-        hashed = self.fnet.encrypt(bytes(password, "UTF-8")).decode()
+        hashed = ph.hash(password)
         e = self.cfexec("INSERT INTO nickserv values(?, 'iw', ?, ?);", [nick, hashed, email])
     def chanserv_details(self, channel):
         e = self.cfexec("SELECT * FROM chanserv WHERE name=?;", [channel])
