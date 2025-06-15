@@ -385,7 +385,10 @@ def session(connection, client, ip, isssl=False):
             if data != bytes("", "UTF-8"):
                 print(f"Received data from {pending}: {data}")
             try:
-                textt += data.decode()
+                try:
+                    textt += data.decode()
+                except UnicodeDecodeError:
+                    textt += data.decode("latin-1")
                 #if finished and not property_list[pending]["ping_pending"]:
                 #    property_list[pending]["last_ping"] = time.time()
                 if finished:
