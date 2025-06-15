@@ -5,7 +5,8 @@
 * Security
   * [x] Argon2 instead of Fernet for passwords
 * Bug fixes
-  * [x] SSL port times out 
+  * SSL port times out
+  * Decode with `latin-1` if `UTF-8` fails
 
 # 0.0.7
 * The first stable release of IRCat (SweeNet stability is OK)
