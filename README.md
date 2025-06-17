@@ -42,3 +42,21 @@ You can get configuration by editing the `config.yml` example in this repo.
 ```bash
 python3 /path/to/ircat/server.py /path/to/config.yml
 ```
+
+# Docker
+
+Use this compose file
+
+```yaml
+services:
+    fastfile:
+        image: git.swee.codes/swee/ircat:stable
+        restart: unless-stopped
+        ports:
+            - 6667:6667
+            # - 6697:6697
+        volumes:
+            - ./data:/app/data
+```
+
+Create a `config.yml` inside the `data` directory of your compose file, using the example in this repository, or else IRCat will fail to start.
