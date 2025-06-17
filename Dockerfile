@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 
 RUN mkdir data
 
-CMD ["python3", "server.py", "data/config.yml"]
+CMD ["python3", "-u", "server.py", "data/config.yml"]
