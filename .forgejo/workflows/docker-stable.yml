@@ -1,4 +1,4 @@
-name: Create Docker image
+name: Create Docker image (Stable)
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
     - name: Setup Alpine 
       uses: https://git.swee.codes/swee/setup-alpine@main
       with:
-        additional: docker
+        additional: docker curl
     - uses: actions/checkout@v3
       with:
         ref: stable
