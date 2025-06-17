@@ -21,6 +21,8 @@ jobs:
         ref: stable
     - name: Start daemon
       run: dockerd &
+    - name: Download dockerfile
+      run: curl https://git.swee.codes/swee/IRCat/raw/branch/main/Dockerfile > Dockerfile
     - name: Login to Docker
       run: echo ${{ secrets.TOKEN }} | docker login git.swee.codes --username swee --password-stdin
     - name: Build docker image
