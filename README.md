@@ -49,7 +49,7 @@ Use this compose file
 
 ```yaml
 services:
-    fastfile:
+    ircat:
         image: git.swee.codes/swee/ircat:latest
         restart: unless-stopped
         ports:
