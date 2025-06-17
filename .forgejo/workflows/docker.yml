@@ -12,10 +12,12 @@ jobs:
     - name: Setup Alpine 
       uses: https://git.swee.codes/swee/setup-alpine@main
       with:
-        additional: docker
+        additional: docker curl
     - uses: actions/checkout@v3
     - name: Start daemon
       run: dockerd &
+    - name: Download dockerfile
+      run: curl https://git.swee.codes/swee/IRCat/raw/branch/main/Dockerfile > Dockerfile
     - name: Login to Docker
       run: echo ${{ secrets.TOKEN }} | docker login git.swee.codes --username swee --password-stdin
     - name: Build docker image
