@@ -1,7 +1,7 @@
 # 0.0.9 (Pre-Release)
 * [ ] Multi-server support (Progress: PLANNED)
 * [ ] Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
-* [ ] Dockerfile (Progress: PLANNED)
+* [x] Dockerfile
 * [ ] Prometheus metrics (Progress: PLANNED)
 * Security
   * Argon2 instead of Fernet for passwords
