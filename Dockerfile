@@ -4,4 +4,6 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-CMD ["python3", "server.py", "config.yml"]
+RUN mkdir data
+
+CMD ["python3", "server.py", "data/config.yml"]
