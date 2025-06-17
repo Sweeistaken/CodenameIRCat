@@ -1,0 +1,24 @@
+name: Create Docker image
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  deploy:
+    runs-on: alpine
+    steps:
+    - name: Setup Alpine 
+      uses: https://git.swee.codes/swee/setup-alpine@main
+      with:
+        additional: docker
+    - uses: actions/checkout@v3
+    - name: Start daemon
+      run: dockerd &
+    - name: Login to Docker
+      run: echo ${{ secrets.TOKEN }} | docker login git.swee.codes --username swee --password-stdin
+    - name: Build docker image
+      run: docker build -t git.swee.codes/swee/ircat:unstable .
+    - name: Push docker image
+      run: docker push git.swee.codes/swee/ircat --all-tags
