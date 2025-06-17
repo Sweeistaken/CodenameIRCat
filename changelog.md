@@ -2,8 +2,9 @@
 * [ ] Multi-server support (Progress: PLANNED)
 * [ ] Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 * [ ] Dockerfile (Progress: PLANNED)
+* [ ] Prometheus metrics (Progress: PLANNED)
 * Security
-  * [x] Argon2 instead of Fernet for passwords
+  * Argon2 instead of Fernet for passwords
 * Bug fixes
   * SSL port times out
   * Decode with `latin-1` if `UTF-8` fails
