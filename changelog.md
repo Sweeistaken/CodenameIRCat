@@ -8,6 +8,7 @@
 * Bug fixes
   * SSL port times out
   * Decode with `latin-1` if `UTF-8` fails
+  * Bind ident fetcher to make sure correct IP is being used when fetching ident for a client that is local
 
 # 0.0.7
 * The first stable release of IRCat (SweeNet stability is OK)
