@@ -35,9 +35,10 @@ def parseOutContent(text:str):
         return text[1:]
     else:
         return text.split(" ")[0]
-def getident(hostt:str, clientport:int, ssll:bool):
+def getident(hostt:str, clientport:int, ssll:bool, ip:str):
     try:
         identsender = socket.socket((socket.AF_INET6 if ":" in hostt else socket.AF_INET), socket.SOCK_STREAM)
+        identsender.bind((ip, 0))
         identsender.settimeout(2)
         responsee = ""
         try:
@@ -359,7 +360,7 @@ def session(connection, client, ip, isssl=False):
             hostname = client[0]
             dosend(bytes(f":{server} NOTICE * :*** Oof! Can't find your hostname, using IP...\r\n","UTF-8"))
         try:
-            identQuery = getident(client[0], client[1], isssl)
+            identQuery = getident(client[0], client[1], isssl, ip)
             responseee = identQuery["response"]
             if not identQuery["success"]:
                 dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: {responseee}\r\n","UTF-8"))
