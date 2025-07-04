@@ -8,7 +8,8 @@ class IRCatModule:
         # Known SupernetS botnet texts
         # Contribute here: https://discuss.swee.codes/t/61
         "                                 .''.", # 2025 new year
-        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" # "The United States of America" LATEST
+        "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀" # The United States of America
+        "           𝐢𝐫𝐜.𝐬𝐮𝐩𝐞𝐫𝐧𝐞𝐭𝐬.𝐨𝐫𝐠 #𝐬𝐮𝐩𝐞𝐫𝐛𝐨𝐰𝐥       " # The United States of America, dominating land sea and irc (again)
     ]
     memory = {} # {nick: {channel: trustlevel}} one can also be {nick: True} if it is whitelisted for the session.
     useSQLengine = False
