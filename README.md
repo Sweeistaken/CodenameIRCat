@@ -21,7 +21,13 @@ ease to host, easily build your own IRC network, etc etc.
 
 With our updating plugins, you can make your network use IRCat and protect
 
-your network from the nasty botnets and spambots
+your network from the nasty botnets, spambots, and exploits.
+
+# Disclaimer
+
+This project is very experimental and is currently not recommended for production usage.
+
+Although this IRCd software is pretty stable, there's still a lot of IRC features that need to be implemented.
 
 # How to install
 
