@@ -372,7 +372,7 @@ def session(connection, client, ip, isssl=False):
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
             try:
-                connection.settimeout(2)
+                connection.settimeout(5)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
