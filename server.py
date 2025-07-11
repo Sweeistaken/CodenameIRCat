@@ -555,7 +555,7 @@ def session(connection, client, ip, isssl=False):
                                         processedExternally = True
                                         break
                                 if processedExternally:
-                                    pass
+                                    continue
                                 elif command == "JOIN":
                                     channels = text.split(" ")[1]
                                     if channels[0] == ":":
@@ -965,6 +965,9 @@ def session(connection, client, ip, isssl=False):
             del nickname_list[pending]
             del property_list[pending]
             del lower_nicks[pending.lower()]
+        for chan, users in channel_modestore.items():
+            if pending in users:
+                del channel_modestore[chan][pending]
         if not safe_quit:
             done = []
             for i, users in channels_list.items():
