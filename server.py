@@ -588,6 +588,7 @@ def session(connection, client, ip, isssl=False):
                                                             channel_modestore[channel][pending] = channel_modestore_identify[channel][property_list[pending]["identusername"]]
                                                             mo = channel_modestore[channel][pending]
                                                             pendingSend += f":{server} MODE {channel} +{mo} {pending}\r\n"
+                                                    print(channel_modestore)
                                                     for i in channels_list[channel]:
                                                         try:
                                                             if i != pending:
