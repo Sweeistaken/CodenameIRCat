@@ -8,7 +8,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY . .
 
-COPY --from builder /usr/lib/python3.12 /usr/lib/python3.12
+COPY --from=builder /usr/lib/python3.12 /usr/lib/python3.12
 
 RUN mkdir data
 
