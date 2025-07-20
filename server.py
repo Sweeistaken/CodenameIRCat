@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-__version__ = "0.0.9-pre"
-print(f"Codename IRCat v{__version__}")
-print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
 from cryptography.fernet import Fernet
 from requests import get
+__version__ = "0.0.9-pre"
+print(f"Codename IRCat v{__version__}")
+print("Welcome! /ᐠ ˵> ⩊ <˵マ")
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
     sys.exit(1)
@@ -25,7 +25,10 @@ motd_file = None
 ping_timeout = 255
 restrict_ip = ''
 def isalphanumeric(text:str, channel=False):
-    alphanumericity = list("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+-_[]^\\|<>?`" + ("$%*,./~'\"{};#=" if channel else ""))
+    alphanumericity = list(
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+-_[]^\\|<>?`" +
+        ("$%*,./~'\"{};#=" if channel else "")
+    )
     for i in text:
         if not i in alphanumericity:
             return False
@@ -38,7 +41,7 @@ def parseOutContent(text:str):
 def getident(hostt:str, clientport:int, ssll:bool, ip:str):
     try:
         identsender = socket.socket((socket.AF_INET6 if ":" in hostt else socket.AF_INET), socket.SOCK_STREAM)
-        identsender.bind((ip, 0))
+        identsender.bind((ip, 0)) # If the server has multiple IPs
         identsender.settimeout(2)
         responsee = ""
         try:
@@ -214,30 +217,6 @@ if ssl_option:
 opened=True
 lower_chans = {} # Channel names in lowercase
 sessions = {}
-#def pinger(nick, connection):
-#    global property_list
-#    while nick in property_list:
-#        if (time.time() - property_list[nick]["last_ping"]) > 30 and not property_list[nick]["ping_pending"]:
-#            if nick in property_list:
-#                print("Sent ping message to " + nick)
-#                property_list[nick]["ping_pending"] = True
-#                time.sleep(0.5)
-#                try:
-#                    connection.sendall(bytes(f"PING {server}\r\n","UTF-8"))
-#                except Exception as ex:
-#                    print(traceback.format_exc())
-#                    property_list[nick]["cause"] = "Send error: " + str(ex)
-#                    print("SHUTTING DOWN FOR " + nick)
-#                    connection.shutdown(socket.SHUT_WR)
-#                    connection.close()
-#                    break
-#        elif property_list[nick]["ping_pending"] and ((time.time() - property_list[nick]["last_ping"]) > ping_timeout):
-#            if nick in property_list:
-#                property_list[nick]["cause"] = f"Ping timeout: {ping_timeout} seconds"
-#                print("SHUTTING DOWN FOR " + nick)
-#                connection.shutdown(socket.SHUT_WR)
-#                connection.close()
-#                break
 def multiserverpinger(sock):
     while True:
         time.sleep(30)
@@ -289,7 +268,7 @@ def multiserverhost(sock, client):
         netsplit(client[0])
         sock.close()
 def session(connection, client, ip, isssl=False):
-    if isssl:
+    if isssl: # Then prepare SSL handshaking
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
         connection = ctx.wrap_socket(connection, server_side=True)
@@ -304,22 +283,22 @@ def session(connection, client, ip, isssl=False):
     ready = False # If the client gave the server a USER packet
     finished = False # If the server gave the client its information, indicating it's ready.
     username = "oreo" # Username/ident specified by client
-    rident = "~oreo" # Real ident
+    rident = "~oreo" # Real ident - shown to other users
     hostname = "" # Hostname, can be IP or domain
     realname = "realname" # Realname specified by client
     safe_quit = False # If the client safely exited, or if the server should manually drop the connection
     cause = "Unknown" # The cause of the unexpected exit
-    usesIRCv3 = False
-    CAPEND = False
-    clident = None
+    usesIRCv3 = False # If the client used CAP LS 302
+    CAPEND = False # If the client used CAP END
+    clident = None # Client's ident
     pendingCommands = "" # list of commands that were executed before verification
-    unfinished = False
-    textt = ""
+    textt = "" # Pending text (if the client sent incomplete packets before [CR]LF)
     pendingSend = "" # Text that should be sent to the client
-    ping_pending = False
-    last_ping = time.time()
+    ping_pending = False # Did the server already ping the client?
+    last_ping = time.time() # Last time the server pinged the client
     IRCv3Features = [] # List of Acknowledged IRCv3 features.
     stillRunning = True
+    alreadyNotified = False
     def tags(): # Get IRCv3 tags
         tags = ""
         if "server-time" in IRCv3Features:
@@ -346,10 +325,6 @@ def session(connection, client, ip, isssl=False):
         return ("@" if args != [] else "") + ";".join(tags) + (" " if args != [] else "")
     try:
         print("Connected to client IP: {}".format(client))
-        #if isssl:
-        #    connection.do_handshake()
-        #    tlsver = connection.version()
-        #    print(f"Got SSL version: {tlsver}")
         connection.settimeout(None)
         dosend(bytes(f":{server} NOTICE * :*** Looking for your hostname...\r\n","UTF-8"))
         dosend(bytes(f":{server} NOTICE * :*** Checking your ident...\r\n","UTF-8"))
@@ -372,7 +347,7 @@ def session(connection, client, ip, isssl=False):
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
             try:
-                connection.settimeout(5)
+                connection.settimeout(1)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
@@ -390,8 +365,6 @@ def session(connection, client, ip, isssl=False):
                     textt += data.decode()
                 except UnicodeDecodeError:
                     textt += data.decode("latin-1")
-                #if finished and not property_list[pending]["ping_pending"]:
-                #    property_list[pending]["last_ping"] = time.time()
                 if finished:
                     if (time.time() - last_ping) > 30 and not ping_pending:
                         print(f"Sending ping msg to {pending}")
@@ -403,6 +376,8 @@ def session(connection, client, ip, isssl=False):
                         break
                     if "kill" in property_list[pending] and property_list[pending]["kill"]:
                         raise Exception("Killed by " + property_list[pending]["kill_user"] + ": " + property_list[pending]["kill_comment"])
+                    if data == bytes("", "UTF-8"):
+                        continue
                 if textt != "" and textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
@@ -464,6 +439,7 @@ def session(connection, client, ip, isssl=False):
                                 break
                         elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                             print(f"User {pending} successfully logged in.")
+                            del alreadyNotified
                             nickname_list[pending] = connection
                             property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": "", "external": False}
                             last_ping = time.time()
@@ -472,7 +448,6 @@ def session(connection, client, ip, isssl=False):
                             for i in socketListeners:
                                 if "onValidate" in dir(i):
                                     i.onValidate(socket=connection, ip=client[0], v3cap=IRCv3Features)
-                            #threading.Thread(target=pinger, args=[pending, connection]).start()
                             if clident == None:
                                 rident = f"~{username}"
                             dosend(bytes(f"{tags()}:{server} 001 {pending} :Welcome to the {displayname} Internet Relay Chat Network {pending}\r\n", "UTF-8"))
@@ -509,13 +484,6 @@ def session(connection, client, ip, isssl=False):
                                 pendingSend += f"{tags()}:{server} PONG {server} {e}\r\n"
                             except:
                                 pendingSend += f"{tags()}:{server} PONG {server}\r\n"
-                        elif command == "MOTD":
-                            if motd_file != None:
-                                motd = open(motd_file).read()
-                            dosend(bytes(f"{tags()}:{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
-                            for i in motd.rstrip().split("\n"):
-                                dosend(bytes(f"{tags()}:{server} 372 {pending} :- {i}\r\n", "UTF-8"))
-                            dosend(bytes(f"{tags()}:{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                         elif finished:
                             pendingCommands += text
                             for comd in pendingCommands.replace("\r", "").split("\n"):
@@ -935,15 +903,25 @@ def session(connection, client, ip, isssl=False):
                                             dosend(bytes(f"{tags()}:{server} 401 {pending} {target} :No such nick/channel\r\n","UTF-8"))
                                     else:
                                         dosend(bytes(f"{tags()}:{server} 461 {pending} {command} :Not enough parameters\r\n","UTF-8"))
+                                elif command == "MOTD":
+                                    if motd_file != None:
+                                        motd = open(motd_file).read()
+                                    dosend(bytes(f":{server} 375 {pending} :- {server} Message of the Day -\r\n", "UTF-8"))
+                                    for i in motd.rstrip().split("\n"):
+                                        dosend(bytes(f":{server} 372 {pending} :- {i}\r\n", "UTF-8"))
+                                    dosend(bytes(f":{server} 376 {pending} :End of /MOTD command\r\n", "UTF-8"))
                                 # Ignore empty text
                                 elif text.split(" ")[0] == "":
                                     pass
                                 else:
                                     # Unknown command
                                     cmd = text.split(" ")[0]
-                                    dosend(bytes(f"{tags()}:{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
+                                    dosend(bytes(f":{server} 421 {pending} {cmd} :Unknown command\r\n","UTF-8"))
                             pendingCommands = ""
                         else:
+                            if not alreadyNotified:
+                                dosend(f":{server} 451 {pending} :You have not registered\r\n")
+                                alreadyNotified = True
                             pendingCommands += text
                     textt = ""
                 if finished and property_list[pending]["pendingSend"] != "":
