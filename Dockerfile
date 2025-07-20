@@ -1,10 +1,14 @@
-FROM python:3-slim
+FROM python:3.12-slim AS builder
+
+RUN apt update && apt install libcap-dev gcc -y
+
+RUN pip install -r requirements.txt
+
+FROM python:3.12-slim
 WORKDIR /app
 COPY . .
 
-RUN apt update && apt install libcap-dev -y
-
-RUN pip install -r requirements.txt
+COPY --from builder /usr/lib/python3.12 /usr/lib/python3.12
 
 RUN mkdir data
 
