@@ -997,6 +997,7 @@ if ssl_option:
     for ip, i in sockets_ssl.items():
         print("Now listening on SSL port 6697 with IP " + ip)
         threading.Thread(target=ssl_session, args=[i, ip], daemon=True).start()
+setproctitle.setthreadtitle("Codename IRCat: Main process")
 while opened:
     pass
 print("Shutting down...")
