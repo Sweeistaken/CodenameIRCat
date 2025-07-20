@@ -3,6 +3,8 @@
 * [ ] Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 * [x] Dockerfile
 * [ ] Prometheus metrics (Progress: PLANNED)
+* Implement IRC features
+  * ERR_NOTREGISTERED
 * Security
   * Argon2 instead of Fernet for passwords
 * Bug fixes
