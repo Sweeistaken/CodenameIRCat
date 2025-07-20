@@ -998,5 +998,5 @@ if ssl_option:
         print("Now listening on SSL port 6697 with IP " + ip)
         threading.Thread(target=ssl_session, args=[i, ip], daemon=True).start()
 while opened:
-    pass
+    time.sleep(5)
 print("Shutting down...")
