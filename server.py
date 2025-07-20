@@ -6,7 +6,7 @@ from requests import get
 __version__ = "0.0.9-pre"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-setproctitle.setthreadtitle("Codename IRCat: Loading...")
+setproctitle.setproctitle("Codename IRCat: Loading...")
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
     sys.exit(1)
@@ -997,7 +997,7 @@ if ssl_option:
     for ip, i in sockets_ssl.items():
         print("Now listening on SSL port 6697 with IP " + ip)
         threading.Thread(target=ssl_session, args=[i, ip], daemon=True).start()
-setproctitle.setthreadtitle("Codename IRCat: Main process")
+setproctitle.setproctitle("Codename IRCat: Main process")
 while opened:
     pass
 print("Shutting down...")
