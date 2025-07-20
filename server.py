@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, os, importlib, datetime
-import setproctitle
+import prctl
 from cryptography.fernet import Fernet
 from requests import get
 __version__ = "0.0.9-pre"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
-setproctitle.setproctitle("Codename IRCat: Loading...")
+prctl.set_name("Codename IRCat: Loading...")
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
     sys.exit(1)
@@ -270,7 +270,7 @@ def multiserverhost(sock, client):
         netsplit(client[0])
         sock.close()
 def session(connection, client, ip, isssl=False):
-    setproctitle.setthreadtitle(f"Codename IRCat: {client[0]} Unknown connection")
+    prctl.set_name(f"Codename IRCat: {client[0]} Unknown connection")
     if isssl: # Then prepare SSL handshaking
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(ssl_cert, keyfile=ssl_pkey)
@@ -401,7 +401,7 @@ def session(connection, client, ip, isssl=False):
                                 dosend(bytes(f"{tags()}:{server} 433 * {pending} :Nickname is already in use.\r\n","UTF-8"))
                                 pending = "*"
                             else:
-                                setproctitle.setthreadtitle(f"Codename IRCat: {client[0]} as {pending} logging in")
+                                prctl.set_name(f"Codename IRCat: {client[0]} as {pending} logging in")
                                 already_set = True
                         elif command == "USER":
                             if not ready:
@@ -443,7 +443,7 @@ def session(connection, client, ip, isssl=False):
                                 break
                         elif (ready and already_set) and (CAPEND if usesIRCv3 else True) and not finished:
                             print(f"User {pending} successfully logged in.")
-                            setproctitle.setthreadtitle(f"Codename IRCat: {client[0]} as {pending}")
+                            prctl.set_name(f"Codename IRCat: {client[0]} as {pending}")
                             del alreadyNotified
                             nickname_list[pending] = connection
                             property_list[pending] = {"host": hostname, "username": clident if clident != None else f"~{username }", "realname": realname, "modes": "iw", "away": False, "identified": False, "ssl": isssl, "v3cap": IRCv3Features, "last_ping": time.time(), "ping_pending": False, "pendingSend": "", "external": False}
@@ -662,7 +662,7 @@ def session(connection, client, ip, isssl=False):
                                             #property_list[pending2]["ping_pending"] = False
                                             #property_list[pending2]["last_ping"] = time.time()
                                             #threading.Thread(target=pinger, args=[pending, connection]).start()
-                                            setproctitle.setthreadtitle(f"Codename IRCat: {client[0]} as {pending}")
+                                            prctl.set_name(f"Codename IRCat: {client[0]} as {pending}")
                                 elif command == "ISON":
                                     if args[0][0] == ":":
                                         args[0] = args[0][1:]
@@ -971,7 +971,7 @@ def session(connection, client, ip, isssl=False):
     except:
         print(traceback.format_exc())
 def tcp_session(sock, ip_to):
-    setproctitle.setthreadtitle(f"Codename IRCat: TCP listener for {ip_to}")
+    prctl.set_name(f"Codename IRCat: TCP listener for {ip_to}")
     while opened:
         try:
             print("Waiting for connection...")
@@ -981,7 +981,7 @@ def tcp_session(sock, ip_to):
             print("Something went wrong...")
             print(traceback.format_exc())
 def ssl_session(sock, ip_to):
-    setproctitle.setthreadtitle(f"Codename IRCat: SSL listener for {ip_to}")
+    prctl.set_name(f"Codename IRCat: SSL listener for {ip_to}")
     while opened:
         try:
             print("Waiting for SSL connection...")
@@ -997,7 +997,7 @@ if ssl_option:
     for ip, i in sockets_ssl.items():
         print("Now listening on SSL port 6697 with IP " + ip)
         threading.Thread(target=ssl_session, args=[i, ip], daemon=True).start()
-setproctitle.setproctitle("Codename IRCat: Main process")
+prctl.set_name("Codename IRCat: Main process")
 while opened:
     pass
 print("Shutting down...")
