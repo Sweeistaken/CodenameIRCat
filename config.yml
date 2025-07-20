@@ -36,8 +36,9 @@ motd: |
 # ssl_cert: /etc/letsencrypt/live/domain/fullchain.pem
 # ssl_pkey: /etc/letsencrypt/live/domain/privkey.pem
 
-## Deprecated, but continue using fernet-key to make sure users registered before IRCat 0.0.9 are ported to Argon2.
-## You can, of course, ignore this if you haven't been using IRCat before 0.0.9
+## Used as passwords before 0.0.9
+## But still used in multi-server
+## Make a secure fernet key using openssl rand -hex 32
 
 # fernet-key: MaybeUseOpensslRand
 
