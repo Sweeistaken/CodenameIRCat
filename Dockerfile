@@ -1,7 +1,5 @@
 FROM python:3.12-slim AS builder
 
-RUN python3 -c "import sys; sys.path"
-
 RUN apt update && apt install libcap-dev gcc -y
 
 COPY requirements.txt requirements.txt
@@ -12,7 +10,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY . .
 
-COPY --from=builder /usr/lib/python3.12 /usr/lib/python3.12
+COPY --from=builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
 
 RUN mkdir data
 
