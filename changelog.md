@@ -3,6 +3,7 @@
 * [ ] Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 * [x] Dockerfile
 * [ ] Prometheus metrics (Progress: PLANNED)
+* Show connection information in COMM ([Explanation](https://lounge.swee.codes/uploads/fb071794558484f7/pasted%20file.png))
 * Implement IRC features
   * ERR_NOTREGISTERED
 * Security
@@ -11,6 +12,7 @@
   * SSL port times out
   * Decode with `latin-1` if `UTF-8` fails
   * Bind ident fetcher to make sure correct IP is being used when fetching ident for a client that is local
+  * Reduce CPU usage in main process
 
 # 0.0.7
 * The first stable release of IRCat (SweeNet stability is OK)
