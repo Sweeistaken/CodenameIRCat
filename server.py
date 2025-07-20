@@ -350,7 +350,7 @@ def session(connection, client, ip, isssl=False):
             dosend(bytes(f":{server} NOTICE * :*** Uhm, Couldn't find your ident: Unknown error.\r\n","UTF-8"))
         while stillRunning:
             try:
-                connection.settimeout(1)
+                connection.settimeout(0.1)
                 data = connection.recv(2048)
                 if not data:
                     cause = "Remote host closed the connection"
@@ -372,7 +372,7 @@ def session(connection, client, ip, isssl=False):
                     if (time.time() - last_ping) > 30 and not ping_pending:
                         print(f"Sending ping msg to {pending}")
                         ping_pending = True
-                        time.sleep(0.5)
+                        time.sleep(0.1)
                         dosend(bytes(f"PING {server}\r\n","UTF-8"))
                     elif ping_pending and (time.time() - last_ping) > ping_timeout:
                         cause = f"Ping timeout: {ping_timeout} seconds"
