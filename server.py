@@ -379,8 +379,6 @@ def session(connection, client, ip, isssl=False):
                         break
                     if "kill" in property_list[pending] and property_list[pending]["kill"]:
                         raise Exception("Killed by " + property_list[pending]["kill_user"] + ": " + property_list[pending]["kill_comment"])
-                    if data == bytes("", "UTF-8"):
-                        continue
                 if textt != "" and textt[-1] == "\n":
                     for text in textt.replace("\r", "").split("\n"):
                         for i in socketListeners:
