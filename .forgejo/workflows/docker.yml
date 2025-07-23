@@ -3,7 +3,7 @@ name: Create Docker image
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '30 1 * * *'
 
 jobs:
   deploy:
