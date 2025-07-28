@@ -5,7 +5,7 @@ __ircat_type__ = "none"
 __ircat_requires__ = ["ws_config", "webirc_pass"]
 class IRCatModule:
     def __init__(self, ws_config, webirc_pass):
-        self.pass = webirc_pass
+        self.password = webirc_pass
         self.cfg = json.loads(open(ws_config).read())
     async def WSprocess(sock):
         writer = asyncio.create_task(self.WSwriter(sock))
