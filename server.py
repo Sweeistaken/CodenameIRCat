@@ -3,6 +3,7 @@ import socket, time, ssl, threading, traceback, sys, subprocess, yaml, sqlite3, 
 import prctl
 from cryptography.fernet import Fernet
 from requests import get
+# Initialization #
 __version__ = "0.0.9-pre"
 print(f"Codename IRCat v{__version__}")
 print("Welcome! /ᐠ ˵> ⩊ <˵マ")
@@ -10,22 +11,24 @@ prctl.set_name("Codename IRCat")
 if not len(sys.argv) == 2:
     print("IRCat requires the following arguments: config.yml")
     sys.exit(1)
+# Default settings #
 server = "127.0.0.1"
 displayname = "foo"
 identifier = "somewhere in the universe"
 admin_nick = "admin"
 data_path  = ""
-motd = """
+motd = r"""
   ____          _                                   ___ ____   ____      _  
  / ___|___   __| | ___ _ __   __ _ _ __ ___   ___  |_ _|  _ \ / ___|__ _| |_ 
 | |   / _ \ / _` |/ _ \ '_ \ / _` | '_ ` _ \ / _ \  | || |_) | |   / _` | __|
 | |__| (_) | (_| |  __/ | | | (_| | | | | | |  __/  | ||  _ <| |__| (_| | |_ 
- \____\___/ \__,_|\___|_| |_|\__,_|_| |_| |_|\___| |___|_| \_\\\\____\__,_|\__|
+ \____\___/ \__,_|\___|_| |_|\__,_|_| |_| |_|\___| |___|_| \_\\____\__,_|\__|
 https://ircat.xyz
 This server doesn't have a MOTD in its configuration, or is invalid."""
 motd_file = None
 ping_timeout = 255
 restrict_ip = ''
+# Message parsing #
 def isalphanumeric(text:str, channel=False):
     alphanumericity = list(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+-_[]^\\|<>?`" +
@@ -40,6 +43,7 @@ def parseOutContent(text:str):
         return text[1:]
     else:
         return text.split(" ")[0]
+# Ident resolving #
 def getident(hostt:str, clientport:int, ssll:bool, ip:str):
     try:
         identsender = socket.socket((socket.AF_INET6 if ":" in hostt else socket.AF_INET), socket.SOCK_STREAM)
@@ -73,6 +77,7 @@ def getident(hostt:str, clientport:int, ssll:bool, ip:str):
     except:
         print(traceback.format_exc())
         return {"success": False, "response": "Unknown error."}
+# Config loading #
 global mods
 mods = {"sql_provider": None, "command": [], "allsocket": [], "identified": False, "ssl": False}
 with open(sys.argv[1], 'r') as file:
@@ -123,6 +128,7 @@ with open(sys.argv[1], 'r') as file:
             sys.exit(1)
     file.close()
     print("Successfully loaded config!")
+# Module loading #
 for mod in modules:
     i = mod
     if not os.path.isabs(i):
@@ -148,6 +154,7 @@ for mod in modules:
         print(f"Module {i} failed to load.")
         print(traceback.format_exc())
         sys.exit(1)
+# Variable initialization #
 global topic_list
 topic_list = {}
 channels_list = {} # Store channels and their user lists
