@@ -34,7 +34,7 @@ Although this IRCd software is pretty stable, there's still a lot of IRC feature
 ## Requirements
 
 * A Linux machine
-* Python 3
+* Python 3 (Tested in 3.12)
    * Don't forget to use `pip install -r requirements.txt`
 
 ## Configuration
