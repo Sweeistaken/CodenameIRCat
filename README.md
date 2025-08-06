@@ -33,11 +33,9 @@ Although this IRCd software is pretty stable, there's still a lot of IRC feature
 
 ## Requirements
 
-* Python 3 (Doesn't matter which platform, but IRCat is only tested on Linux)
-   * `requests` module
-   * `argon2-cffi` module
-   * `yaml` module (`pyyaml` on PyPi/pip)
-   * `cloudflare` module (MUST be version 4.0.0 or higher, Optional: only needed for `cfd1` plugin.)
+* A Linux machine
+* Python 3
+   * Don't forget to use `pip install -r requirements.txt`
 
 ## Configuration
 
