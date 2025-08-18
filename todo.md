@@ -15,6 +15,7 @@
    -  [ ] Multi-server support
    -  [x] `LIST` (0.0.5)
    -  [x] `TOPIC` (0.0.7)
+   -  [ ] Proper ISUPPORT
 -  [ ] [Database support](https://discuss.swee.codes/t/41)
 -  [ ] User Flags
    -  [ ] i (invisible)
@@ -31,14 +32,15 @@
    -  [ ] l \<num\> (user limit)
    -  [ ] b \<usermask\> (ban a user)
    -  [ ] k \<key\> (password lock)
-   -  [ ] EXTRAS q \<usermask\> (Quiet)
+   -  [ ] q \<usermask\> (Quiet)
 - [ ] Destructive features for CHANOPS
    -  [ ] `KICK`
    -  [ ] `MODE <channel>`
 - [ ] Destructive features for IRCOPS
-   -  [ ] `KILL <user> <comment>`
+   -  [x] `KILL <user> <comment>` (0.0.7)
    -  [ ] `MODE <external user>`
    -  [x] `RESTART` (0.07)
+   -  [x] `KLINE <user> <comment>`
 - [ ] Extra commands
    -  [x] `NAMES` (0.0.1)
    -  [x] `WHOIS` (0.0.1)
@@ -48,6 +50,7 @@
    -  [ ] ChanServ
    -  [x] CatServ (Outside of PawServ) (0.0.4)
    -  [x] Link `PRIVMSG *serv` to `*serv` (0.0.4)
+   -  [ ] Hostname cloaking
 - [x] Extra ~~(not planned)~~ features
    -  [x] ident support (0.0.5)
 - [x] Authentication
@@ -57,13 +60,41 @@
 - [x] SSL/TLS
    -  [x] [Use a thread to accept connections on SSL port 6697](https://mastodon.swee.codes/@swee/113762525145710774) (0.0.1)
    -  [x] Automatically reload the certificate ~~if defined in config.~~ (0.0.1)
+   -  [x] Automatically choose certificate based on hostname (SNI)
+- [ ] `rebellious` config
+- [ ] WS support
 - [ ] Add IRCv3 features.
    -  [x] List capabilities (`CAP LS 302`) (0.0.1)
    -  [ ] `away-notify`
-   -  [ ] `tls` (STARTTLS)
-   -  [ ] `sasl`
+   -  [ ] `sts`
+   -  [ ] `sasl` (PawServ)
    -  [x] `server-time` (0.0.7)
    -  [ ] `account-notify`
    -  [x] `account-tag` (0.0.7)
-   -  Will research later.
+   -  [x] `WEBIRC` (0.0.7)
+   -  [ ] `extended-join`
+   -  [ ] Bot Mode
+   -  [ ] Standard Replies
+   -  [ ] `utf8only`
+   -  [ ] `batch`
+   -  [ ] `invite-notify`
+   -  [ ] `batch`
+   -  [ ] `draft/channel-rename`
+   -  [ ] `chghost`
+   -  [ ] `setname`
+   -  [ ] `draft/channel-context`
+   -  [ ] `draft/reply`
+   -  [ ] `draft/react`
+   -  [ ] `typing`
+   -  [ ] `echo-message`
+   -  [ ] `multi-prefix`
+   -  [ ] `userhost-in-names`
+   -  [ ] WHOX
+   -  [ ] `draft/no-implicit-names`
+   -  [ ] `message-tabs`
+   -  [ ] `msgid` tag
+   -  [ ] `draft/metadata-2`
+   -  [ ] `MONITOR` command
+   -  [ ] `extended-monitor`
+   -  [ ] `draft/multiline`
 I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
