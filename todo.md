@@ -97,4 +97,3 @@
    -  [ ] `MONITOR` command
    -  [ ] `extended-monitor`
    -  [ ] `draft/multiline`
-I am going to fully read [RFC 1459](https://datatracker.ietf.org/doc/html/rfc1459) soon and add each part to the TODO.
