@@ -55,7 +55,16 @@ smtp_starttls: off
 smtp_username: pawserv@example.com
 smtp_password: examplePassword
 
-## If you setup a webchat, use this passphrase to let IRCat know that instance is trusted to set IP.
+## Reverse proxy
+
+## If IRCat is being run under a reverse proxy, you can set the proxy type.
+## Current values: none, nginx
+
+reverse_proxy: none
+# trusted_reverse_proxies:
+#   - 127.0.0.1
+
+## If you setup a webchat, use this passphrase to let IRCat know what instance is trusted to set IP.
 webirc_pass: helloworld
 
 ## Use of modules in the /modules folder, or in an absolute path specified.
