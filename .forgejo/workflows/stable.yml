@@ -1,15 +1,13 @@
-name: Create Docker image (Stable)
+name: Create Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Latest version'
-        required: true
-        type: string
+  release:
+    types: [published]
 
 jobs:
-  deploy:
+  # TODO: Debian, Alpine, RPM, Arch, etc. packages and PyPI
+  docker:
     runs-on: alpine
     steps:
     - name: Setup Alpine 
@@ -17,15 +15,11 @@ jobs:
       with:
         additional: docker curl
     - uses: actions/checkout@v3
-      with:
-        ref: stable
     - name: Start daemon
       run: dockerd &
-    - name: Download dockerfile
-      run: curl https://git.swee.codes/swee/IRCat/raw/branch/main/Dockerfile > Dockerfile
     - name: Login to Docker
       run: echo ${{ secrets.TOKEN }} | docker login git.swee.codes --username swee --password-stdin
     - name: Build docker image
-      run: docker build -t git.swee.codes/swee/ircat:latest -t git.swee.codes/swee/ircat:${{ inputs.version }} .
+      run: docker build -t git.swee.codes/swee/ircat:latest -t git.swee.codes/swee/ircat:$(git branch --show-current) .
     - name: Push docker image
       run: docker push git.swee.codes/swee/ircat --all-tags
