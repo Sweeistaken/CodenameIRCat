@@ -27,18 +27,33 @@ motd: |
 # ping-timeout: 255
 
 ## Restrict what IP(s) the server runs on, separated by spaces, useful if you have alternate IPs/Networks
+## Set to "0.0.0.0 ::" to listen on every possible IP
 
 # restrict-ip: 127.0.0.1
 
 ## SSL enable, certificate, and private key.
 
+## Plain SSL
+
 # ssl: on
+# ssl-sni: off
 # ssl_cert: /etc/letsencrypt/live/domain/fullchain.pem
 # ssl_pkey: /etc/letsencrypt/live/domain/privkey.pem
 
+## SSL with SNI
+
+# ssl: on
+# ssl-sni: on
+# ssl_cert:
+#   - irc.example.com: /etc/letsencrypt/live/irc.example.com/fullchain.pem
+#   - srv1.example.com: /etc/letsencrypt/live/srv1.example.com/fullchain.pem
+# ssl_pkey:
+#   - irc.example.com: /etc/letsencrypt/live/irc.example.com/privkey.pem
+#   - srv1.example.com: /etc/letsencrypt/live/srv1.example.com/privkey.pem
+
 ## Used as passwords before 0.0.9
 ## But still used in multi-server
-## Make a secure fernet key using openssl rand -hex 32
+## Make a secure fernet key using openssl rand -hex 64
 
 # fernet-key: MaybeUseOpensslRand
 
