@@ -2,7 +2,7 @@
 * [ ] Multi-server support (Progress: PLANNED)
 * [ ] Full Chanserv support in `pawserv` plugin (Progress: PLANNED)
 * [x] Dockerfile
-* [ ] Add `rebellious` config, where channel and nicknames don't have to follow RFC1459 guidelines
+* [ ] Add `rebellious` config, where channel and nicknames don't have to follow RFC1459 guidelines (Except for ones that will break clients if not followed)
 * [ ] Prometheus metrics (Progress: PLANNED)
 * Show connection information in COMM ([Explanation](https://lounge.swee.codes/uploads/fb071794558484f7/pasted%20file.png))
 * Implement IRC features
